@@ -15,11 +15,16 @@ BLOCKED_KEYWORDS = {"student", "anti-kraak", "antikraak", "temporary", "tijdelij
 
 def is_rental_match(listing: Listing, config: AppConfig) -> bool:
     searchable = f"{listing.title} {listing.location}".lower()
+    # Keep the shortlist actionable: require concrete rent/size data.
+    if listing.rent_eur is None or listing.size_m2 is None:
+        return False
+    if listing.rent_eur < 300:
+        return False
     if any(word in searchable for word in BLOCKED_KEYWORDS):
         return False
-    if listing.rent_eur is not None and listing.rent_eur > config.max_rent:
+    if listing.rent_eur > config.max_rent:
         return False
-    if listing.size_m2 is not None and listing.size_m2 < config.min_size:
+    if listing.size_m2 < config.min_size:
         return False
     if "eindhoven" not in searchable:
         return False
