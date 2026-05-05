@@ -80,6 +80,8 @@ Required repository secrets:
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_CHAT_ID`
 
+The workflow now also builds `docs/data/latest_listings.json` and deploys `docs/` to GitHub Pages.
+
 ## Localhost status page
 
 Run:
@@ -92,3 +94,13 @@ Then open `http://127.0.0.1:8080` to view:
 - telegram config status
 - github workflow presence
 - recent event log (provider failures, alerts sent, telegram failures)
+
+## GitHub hosted website (clean UI)
+
+Static site files live in `docs/`.
+
+- Main page: `docs/index.html`
+- UI styles: `docs/styles.css`
+- Data feed: `docs/data/latest_listings.json`
+
+After enabling GitHub Pages (Source: GitHub Actions), each scheduled run updates the website with the latest Eindhoven listing workrun.

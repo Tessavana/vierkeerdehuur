@@ -1,0 +1,33 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, Segoe UI, Arial, sans-serif;
+  color: #f6f7fb;
+  background: radial-gradient(circle at top, #2d3559 0%, #161a2f 60%, #101322 100%);
+}
+.container { max-width: 1080px; margin: 0 auto; padding: 24px; }
+.hero { margin-bottom: 20px; }
+h1 { margin: 0; font-size: 42px; letter-spacing: 0.5px; }
+.subtitle { margin: 8px 0 12px; color: #b7bfd8; }
+.meta { font-size: 14px; color: #8de2c4; }
+.cards { display: grid; gap: 16px; grid-template-columns: 1fr 1.3fr; }
+.panel {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 14px;
+  backdrop-filter: blur(4px);
+}
+h2 { margin: 4px 0 12px; font-size: 20px; }
+.provider-item, .listing-item {
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  background: rgba(0, 0, 0, 0.2);
+}
+.ok { color: #62f5be; }
+.err { color: #ff9c9c; }
+.listing-item a { color: #9cd8ff; text-decoration: none; }
+.listing-item a:hover { text-decoration: underline; }
+.muted { color: #b8c1db; font-size: 13px; }
+@media (max-width: 860px) { .cards { grid-template-columns: 1fr; } }

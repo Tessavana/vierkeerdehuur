@@ -1,0 +1,284 @@
+{
+  "generated_at_utc": "2026-05-05T19:14:32.269153+00:00",
+  "city": "Eindhoven",
+  "max_rent": 1150,
+  "provider_results": [
+    {
+      "provider": "KamernetProvider",
+      "status": "ok",
+      "parsed": 10,
+      "suitable": 2,
+      "error": null
+    },
+    {
+      "provider": "ParariusProvider",
+      "status": "error",
+      "parsed": 0,
+      "suitable": 0,
+      "error": "403 Client Error: Forbidden for url: https://www.pararius.com/apartments/eindhoven"
+    },
+    {
+      "provider": "FundaProvider",
+      "status": "ok",
+      "parsed": 0,
+      "suitable": 0,
+      "error": null
+    },
+    {
+      "provider": "VestedaProvider",
+      "status": "ok",
+      "parsed": 4,
+      "suitable": 4,
+      "error": null
+    },
+    {
+      "provider": "VbtProvider",
+      "status": "ok",
+      "parsed": 18,
+      "suitable": 18,
+      "error": null
+    }
+  ],
+  "listings": [
+    {
+      "source": "kamernet",
+      "title": "Kronehoefstraat , Eindhoven 42 m\u00b2 unfurnished Apartment From 1 Apr 2026 \u20ac1,000 /month",
+      "location": "Eindhoven",
+      "rent_eur": 1000,
+      "size_m2": 42,
+      "outdoor_space": false,
+      "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/kronehoefstraat/apartment-2365695",
+      "score": 15
+    },
+    {
+      "source": "kamernet",
+      "title": "Blauwe Loper , Eindhoven 36 m\u00b2 furnished Apartment 1 Oct 2026 - 1 Feb 2027 \u20ac925 /month incl. utilities",
+      "location": "Eindhoven",
+      "rent_eur": 925,
+      "size_m2": 36,
+      "outdoor_space": false,
+      "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/blauwe-loper/apartment-2374435",
+      "score": 15
+    },
+    {
+      "source": "vesteda",
+      "title": "Voorrang verlaten sociale huurwoning",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://www.vesteda.com/nl/consument/huren-op-maat/voorrang-verlaten-sociale-huurwoning",
+      "score": 0
+    },
+    {
+      "source": "vesteda",
+      "title": "Opwettensemolen I",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://www.vesteda.com/nl/huurwoningen-eindhoven/opwettensemolen-i",
+      "score": 0
+    },
+    {
+      "source": "vesteda",
+      "title": "Picushof Appartementen",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://www.vesteda.com/nl/huurwoningen-eindhoven/picushof-appartementen",
+      "score": 0
+    },
+    {
+      "source": "vesteda",
+      "title": "Kloosterdreef",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://www.vesteda.com/nl/huurwoningen-eindhoven/kloosterdreef",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "Ik huur bij vb&t",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://portaal.ikhuurbijvbt.nl",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "Direct te huur",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://vbtverhuurmakelaars.nl/woningen",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "inkomenseisen",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://www.vbtverhuurmakelaars.nl/toewijzingscriteria/",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "De Baron",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://vbtverhuurmakelaars.nl/project/de-baron-eindhoven",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "De Jonkheer",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://vbtverhuurmakelaars.nl/project/de-jonkheer-eindhoven",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "Picuskade",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://vbtverhuurmakelaars.nl/project/picuskade-eindhoven",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "De Regent",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://vbtverhuurmakelaars.nl/project/de-regent-eindhoven",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "Hartje Eindhoven",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://vbtverhuurmakelaars.nl/project/hartje-eindhoven-eindhoven",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "Fontainebleau-, Finistere- en Neverslaan",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://vbtverhuurmakelaars.nl/project/fontainebleau-finistere-en-neverslaan-eindhoven",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "Blixembosch",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://vbtverhuurmakelaars.nl/project/blixembosch-eindhoven",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "Meerrijk",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://vbtverhuurmakelaars.nl/project/meerrijk-antony-fokker-blok-b5-eindhoven",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "Anthony Fokker",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://vbtverhuurmakelaars.nl/project/meerrijk-anthony-fokker-b3-eindhoven",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "Amsterdam",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://vbtverhuurmakelaars.nl/huurwoningen-amsterdam",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "Eindhoven",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://vbtverhuurmakelaars.nl/huurwoningen-eindhoven",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "'s-Hertogenbosch",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://vbtverhuurmakelaars.nl/huurwoningen-denbosch",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "Den Haag",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://vbtverhuurmakelaars.nl/huurwoningen-denhaag",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "Maastricht",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://vbtverhuurmakelaars.nl/huurwoningen-maastricht",
+      "score": 0
+    },
+    {
+      "source": "vbt",
+      "title": "Rotterdam",
+      "location": "Eindhoven",
+      "rent_eur": null,
+      "size_m2": null,
+      "outdoor_space": false,
+      "url": "https://vbtverhuurmakelaars.nl/huurwoningen-rotterdam",
+      "score": 0
+    }
+  ]
+}
