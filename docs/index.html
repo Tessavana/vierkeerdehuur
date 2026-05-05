@@ -20,19 +20,23 @@
         </p>
       </section>
 
-      <section class="map-grid">
-        <article class="panel map-panel">
-          <h2>Matches op de kaart</h2>
+      <section class="panel map-section">
+        <h2>Matches op de kaart</h2>
+        <div class="map-with-detail">
           <div id="map"></div>
-        </article>
-        <article class="panel side-panel">
-          <h2>Overzicht</h2>
-          <table id="status-table" class="overview-table"></table>
-          <h3>Geselecteerde match</h3>
-          <div id="selected-match" class="muted">Klik op een pin op de kaart om details te zien.</div>
-          <h3>Matches</h3>
-          <div id="match-list"></div>
-        </article>
+          <aside class="map-detail">
+            <h3>Geselecteerde match</h3>
+            <div id="selected-match" class="muted">Klik op een pin op de kaart om details te zien.</div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="panel overview-section">
+        <h2>Overzicht</h2>
+        <div class="overview-columns">
+          <table id="status-table-left" class="overview-table"></table>
+          <table id="status-table-right" class="overview-table"></table>
+        </div>
       </section>
 
       <section class="panel">

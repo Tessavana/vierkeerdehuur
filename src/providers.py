@@ -7,6 +7,10 @@ import requests
 from bs4 import BeautifulSoup
 
 from src.models import Listing
+from src.sites.huurwoningen_listings import fetch_huurwoningen_eindhoven_listings
+from src.sites.rentfinder_inertia import fetch_rentfinder_eindhoven_listings
+from src.sites.vbt_feed import fetch_vbt_eindhoven_listings
+from src.sites.vesteda_pages import fetch_vesteda_eindhoven_listings
 from src.web_fetch import fetch_html_with_fallback
 
 
@@ -49,6 +53,7 @@ class ParariusProvider(ListingProvider):
                     size_m2=size_m2,
                     outdoor_space=_has_outdoor_keywords(title + " " + location),
                     contract_months=None,
+                    available_from=None,
                 )
             )
         return listings
@@ -86,6 +91,7 @@ class KamernetProvider(ListingProvider):
                     size_m2=size,
                     outdoor_space=_has_outdoor_keywords(title),
                     contract_months=None,
+                    available_from=None,
                 )
             )
         return listings
@@ -125,6 +131,7 @@ class FundaProvider(ListingProvider):
                         size_m2=_extract_int(name),
                         outdoor_space=_has_outdoor_keywords(name),
                         contract_months=None,
+                        available_from=None,
                     )
                 )
         return listings
@@ -135,49 +142,7 @@ class VbtProvider(ListingProvider):
         self.url = url
 
     def fetch(self) -> list[Listing]:
-        # Use VB&T's pagecontent API for more stable extraction than scraping rendered HTML.
-        api_url = "https://vbtverhuurmakelaars.nl/api/pagecontent?path=/huurwoningen-eindhoven"
-        response = requests.get(api_url, timeout=20, headers={"User-Agent": "Mozilla/5.0"})
-        response.raise_for_status()
-        payload = response.json()
-
-        content_html = ""
-        content = payload.get("content", {})
-        if isinstance(content, dict):
-            for value in content.values():
-                if isinstance(value, dict):
-                    for text in value.values():
-                        if isinstance(text, str):
-                            content_html += text + "\n"
-
-        soup = BeautifulSoup(content_html, "html.parser")
-        listings: list[Listing] = []
-        for link in soup.select("a[href*='/project/'], a[href*='/huurwoningen-eindhoven']"):
-            href = link.get("href", "")
-            title = link.get_text(" ", strip=True)
-            if not href or len(title) < 8:
-                continue
-            lower_href = href.lower()
-            if any(skip in lower_href for skip in ("/huurwoningen-amsterdam", "/huurwoningen-den", "/huurwoningen-rotterdam", "/huurwoningen-maastricht", "toewijzingscriteria")):
-                continue
-            if "eindhoven" not in (title + " " + href).lower():
-                continue
-            rent = _extract_currency_amount(title)
-            size = _extract_size_m2(title)
-            listings.append(
-                Listing(
-                    source="vbt",
-                    source_id=href.strip("/"),
-                    title=title,
-                    url=href if href.startswith("http") else f"https://vbtverhuurmakelaars.nl{href}",
-                    location="Eindhoven",
-                    rent_eur=rent,
-                    size_m2=size,
-                    outdoor_space=_has_outdoor_keywords(title),
-                    contract_months=None,
-                )
-            )
-        return _dedupe_listings(listings)
+        return fetch_vbt_eindhoven_listings()
 
 
 class VestedaProvider(ListingProvider):
@@ -185,32 +150,7 @@ class VestedaProvider(ListingProvider):
         self.url = url
 
     def fetch(self) -> list[Listing]:
-        fetched = fetch_html_with_fallback(self.url)
-        soup = BeautifulSoup(fetched.html, "html.parser")
-        listings: list[Listing] = []
-        for link in soup.select("a[href*='/nl/huurwoningen-eindhoven/']"):
-            href = link.get("href", "")
-            title = link.get_text(" ", strip=True)
-            if not href or len(title) < 8:
-                continue
-            if any(skip in href.lower() for skip in ("consumer", "huren-op-maat", "sociale-huurwoning")):
-                continue
-            rent = _extract_currency_amount(title)
-            size = _extract_size_m2(title)
-            listings.append(
-                Listing(
-                    source="vesteda",
-                    source_id=href.strip("/"),
-                    title=title,
-                    url=href if href.startswith("http") else f"https://www.vesteda.com{href}",
-                    location="Eindhoven",
-                    rent_eur=rent,
-                    size_m2=size,
-                    outdoor_space=_has_outdoor_keywords(title),
-                    contract_months=None,
-                )
-            )
-        return _dedupe_listings(listings)
+        return fetch_vesteda_eindhoven_listings(self.url)
 
 
 class HuislijnProvider(ListingProvider):
@@ -241,6 +181,7 @@ class HuislijnProvider(ListingProvider):
                     size_m2=size,
                     outdoor_space=_has_outdoor_keywords(title),
                     contract_months=None,
+                    available_from=None,
                 )
             )
         return _dedupe_listings(listings)
@@ -251,32 +192,7 @@ class RentfinderProvider(ListingProvider):
         self.url = url
 
     def fetch(self) -> list[Listing]:
-        fetched = fetch_html_with_fallback(self.url)
-        soup = BeautifulSoup(fetched.html, "html.parser")
-        listings: list[Listing] = []
-        for link in soup.select("a[href*='/properties/'], a[href*='/property/']"):
-            href = link.get("href", "")
-            title = link.get_text(" ", strip=True)
-            if not href or len(title) < 8:
-                continue
-            if any(skip in href.lower() for skip in ("/info/", "/login", "/packages", "/subscribe", "/terms")):
-                continue
-            rent = _extract_currency_amount(title)
-            size = _extract_size_m2(title)
-            listings.append(
-                Listing(
-                    source="rentfinder",
-                    source_id=href.strip("/"),
-                    title=title,
-                    url=href if href.startswith("http") else f"https://rentfinder.nl{href}",
-                    location="Eindhoven" if "eindhoven" in (title + " " + href).lower() else "Unknown",
-                    rent_eur=rent,
-                    size_m2=size,
-                    outdoor_space=_has_outdoor_keywords(title),
-                    contract_months=None,
-                )
-            )
-        return _dedupe_listings(listings)
+        return fetch_rentfinder_eindhoven_listings()
 
 
 class HuurwoningenProvider(ListingProvider):
@@ -284,30 +200,7 @@ class HuurwoningenProvider(ListingProvider):
         self.url = url
 
     def fetch(self) -> list[Listing]:
-        fetched = fetch_html_with_fallback(self.url)
-        soup = BeautifulSoup(fetched.html, "html.parser")
-        listings: list[Listing] = []
-        for link in soup.select("a[href*='/huurwoning/']"):
-            href = link.get("href", "")
-            title = link.get_text(" ", strip=True)
-            if not href or len(title) < 8:
-                continue
-            rent = _extract_currency_amount(title)
-            size = _extract_size_m2(title)
-            listings.append(
-                Listing(
-                    source="huurwoningen",
-                    source_id=href.strip("/"),
-                    title=title,
-                    url=href if href.startswith("http") else f"https://www.huurwoningen.nl{href}",
-                    location="Eindhoven",
-                    rent_eur=rent,
-                    size_m2=size,
-                    outdoor_space=_has_outdoor_keywords(title),
-                    contract_months=None,
-                )
-            )
-        return _dedupe_listings(listings)
+        return fetch_huurwoningen_eindhoven_listings(self.url)
 
 
 class JsonFileProvider(ListingProvider):
@@ -329,6 +222,7 @@ class JsonFileProvider(ListingProvider):
                     size_m2=item.get("size_m2"),
                     outdoor_space=bool(item.get("outdoor_space", False)),
                     contract_months=item.get("contract_months"),
+                    available_from=item.get("available_from"),
                 )
             )
         return listings

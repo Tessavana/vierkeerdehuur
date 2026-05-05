@@ -12,4 +12,5 @@ class Listing:
     rent_eur: Optional[int]
     size_m2: Optional[int]
     outdoor_space: bool
-    contract_months: Optional[int]
+    contract_months: Optional[int] = None
+    available_from: Optional[str] = None

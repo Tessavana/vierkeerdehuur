@@ -30,13 +30,19 @@ def fetch_html_with_fallback(url: str, timeout: int = 25) -> FetchResult:
     return FetchResult(html=html, final_url=final_url, used_browser=True)
 
 
+def fetch_html_with_playwright(url: str, wait_ms: int = 5000) -> FetchResult:
+    """Always render with Chromium (for heavy client-side listing pages)."""
+    html, final_url = _fetch_with_playwright(url, wait_ms=wait_ms)
+    return FetchResult(html=html, final_url=final_url, used_browser=True)
+
+
 def _looks_like_antibot(html: str) -> bool:
     text = html[:1600].lower()
     hints = ("just a moment", "cloudflare", "captcha", "access denied", "je bent bijna", "bot")
     return any(h in text for h in hints)
 
 
-def _fetch_with_playwright(url: str) -> tuple[str, str]:
+def _fetch_with_playwright(url: str, wait_ms: int = 3000) -> tuple[str, str]:
     try:
         from playwright.sync_api import sync_playwright
     except Exception as exc:
@@ -56,7 +62,7 @@ def _fetch_with_playwright(url: str) -> tuple[str, str]:
             )
         page = context.new_page()
         page.goto(url, wait_until="domcontentloaded", timeout=45000)
-        page.wait_for_timeout(3000)
+        page.wait_for_timeout(int(wait_ms))
         html = page.content()
         final_url = page.url
         context.close()

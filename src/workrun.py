@@ -49,6 +49,7 @@ def run_workrun() -> dict:
                             "url": listing.url,
                             "reason": reason,
                             "neighborhood": _extract_neighborhood(listing.title, listing.location),
+                            "available_from": listing.available_from,
                         }
                     )
             normalized = [
@@ -64,6 +65,7 @@ def run_workrun() -> dict:
                     "url": l.url,
                     "match_tag": _match_tag(score_rental(l, config)),
                     "neighborhood": _extract_neighborhood(l.title, l.location),
+                    "available_from": l.available_from,
                 }
                 for l in suitable
             ]
@@ -159,7 +161,7 @@ def _load_application_status() -> dict:
             "applications_sent": 5,
             "viewings": 0,
             "rejections": 3,
-            "no_response": 2,
+            "no_response": 4,
             "rejected_addresses": ["PSV-laan 233", "Schootsestraat 94 A"],
             "sociale_huur": {
                 "platform": "Wooniezie",
@@ -186,22 +188,30 @@ def _match_tag(score: int) -> str:
 
 def _extract_neighborhood(title: str, location: str) -> str:
     searchable = f"{title} {location}".lower()
-    neighborhoods = [
-        "strijp",
-        "stratum",
-        "centrum",
-        "bergen",
-        "vonderkwartier",
-        "engelsbergen",
-        "schrijversbuurt",
-        "woensel",
-        "tongelre",
-        "gestel",
+    # Longer phrases first so "strijp-s" wins over "strijp".
+    hits = [
+        ("strijp-s", "Strijp"),
+        ("strijp", "Strijp"),
+        ("meerrijk", "Meerrijk"),
+        ("blixembosch", "Blixembosch"),
+        ("centrum", "Centrum"),
+        ("stratum", "Stratum"),
+        ("woensel", "Woensel"),
+        ("tongelre", "Tongelre"),
+        ("gestel", "Gestel"),
+        ("bergen", "Bergen"),
+        ("vonderkwartier", "Vonderkwartier"),
+        ("engelsbergen", "Engelsbergen"),
+        ("schrijversbuurt", "Schrijversbuurt"),
+        ("genneper", "Genneper"),
+        ("vaartbroek", "Vaartbroek"),
+        ("het regentekwartier", "Centrum"),
+        ("regentekwartier", "Centrum"),
     ]
-    for neighborhood in neighborhoods:
-        if neighborhood in searchable:
-            return neighborhood.capitalize()
-    return "Eindhoven"
+    for needle, label in hits:
+        if needle in searchable:
+            return label
+    return ""
 
 
 if __name__ == "__main__":

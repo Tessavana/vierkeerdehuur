@@ -1,6 +1,6 @@
 function updateClock() {
   const el = document.getElementById("clock");
-  el.textContent = new Date().toLocaleTimeString();
+  if (el) el.textContent = new Date().toLocaleTimeString();
 }
 
 function groupByProvider(listings) {
@@ -12,12 +12,23 @@ function groupByProvider(listings) {
   return out;
 }
 
+function dash(v) {
+  if (v === null || v === undefined || v === "") return "-";
+  return v;
+}
+
+function matchTagClass(tag) {
+  if (tag === "Twijfelgeval") return "tag tag-twijfel";
+  if (tag === "Instant reageren") return "tag tag-instant";
+  return "tag tag-kans";
+}
+
 async function loadRun() {
   const res = await fetch("./data/latest_listings.json", { cache: "no-store" });
   const data = await res.json();
 
   const status = data.application_status || {};
-  renderOverviewTable(status);
+  renderOverviewTables(status);
   const subtitle = document.getElementById("results-subtitle");
   if (subtitle) subtitle.textContent = `Alle woningen gevonden op ${new Date(data.generated_at_utc).toLocaleString()}`;
   const headline = document.getElementById("headline-status");
@@ -25,20 +36,22 @@ async function loadRun() {
 
   renderProviders(data);
   await renderMap(data.listings);
-  renderMatchList(data.listings);
 }
 
-function renderOverviewTable(status) {
-  const table = document.getElementById("status-table");
-  if (!table) return;
+function renderOverviewTables(status) {
+  const left = document.getElementById("status-table-left");
+  const right = document.getElementById("status-table-right");
+  if (!left || !right) return;
   const rejected = (status.rejected_addresses || []).join(", ");
   const sh = status.sociale_huur || {};
-  table.innerHTML = `
+  left.innerHTML = `
     <tr><td>Applications sent</td><td><b>${status.applications_sent ?? 5}</b></td></tr>
     <tr><td>Viewings</td><td><b>${status.viewings ?? 0}</b></td></tr>
     <tr><td>Rejections</td><td><b>${status.rejections ?? 3}</b></td></tr>
-    <tr><td>No response</td><td><b>${status.no_response ?? 2}</b></td></tr>
+    <tr><td>No response</td><td><b>${status.no_response ?? 4}</b></td></tr>
     <tr><td>Afwijzingen tot nu toe</td><td>${rejected || "-"}</td></tr>
+  `;
+  right.innerHTML = `
     <tr><td>Sociale huur via</td><td>${sh.platform ?? "Wooniezie"}</td></tr>
     <tr><td>Inschrijfduur</td><td>${sh.inschrijfduur ?? "4 jaar en 3 maanden"}</td></tr>
     <tr><td>Reacties verstuurd</td><td>${sh.reacties_verstuurd ?? "230+"}</td></tr>
@@ -57,15 +70,28 @@ function renderProviders(data) {
   data.provider_results.forEach((p) => {
     const block = document.createElement("div");
     block.className = "provider-block";
-    const cls = p.status === "ok" ? "status-ok" : "status-error";
     const suitable = suitableByProvider[p.provider] || [];
     const excluded = excludedByProvider[p.provider] || [];
     const sectionId = `excluded-${p.provider}`;
     const displayName = p.provider_name || p.provider.replace("Provider", "");
+    const errLine = p.error ? `<div class="muted"><span class="status-error">error:</span> ${p.error}</div>` : "";
+    const statusLine =
+      p.status === "error"
+        ? `<div class="muted"><span class="status-error">mislukt</span></div>`
+        : "";
     block.innerHTML = `
-      <div><b>${displayName}</b> <span class="${cls}">${p.status}</span></div>
+      <div><b>${displayName}</b></div>
+      ${statusLine}
       <div class="muted">parsed=${p.parsed} | suitable=${p.suitable} | excluded=${p.excluded ?? 0}</div>
-      ${p.error ? `<div class="muted">error: ${p.error}</div>` : ""}
+      ${errLine}
+      <div class="listing-header">
+        <div>Woning</div>
+        <div>Wijk</div>
+        <div>Huur</div>
+        <div>m²</div>
+        <div>Huur vanaf</div>
+        <div>Tag / link</div>
+      </div>
       <div id="suitable-${p.provider}"></div>
       <button class="toggle-btn" data-target="${sectionId}">Show excluded (${excluded.length})</button>
       <div id="${sectionId}" class="hidden"></div>
@@ -88,6 +114,7 @@ function renderProviders(data) {
   providersEl.querySelectorAll(".toggle-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       const target = document.getElementById(btn.dataset.target);
+      if (!target) return;
       target.classList.toggle("hidden");
       btn.textContent = target.classList.contains("hidden") ? "Show excluded" : "Hide excluded";
     });
@@ -95,24 +122,31 @@ function renderProviders(data) {
 }
 
 function listingRow(l, excluded) {
+  const wijk = dash(l.neighborhood);
+  const avail = dash(l.available_from);
   const reason = excluded
     ? `<span class="muted">${l.reason ?? "excluded"}</span>`
-    : `<span>${l.match_tag ?? "Kansrijk"} | ${l.neighborhood ?? "Eindhoven"}</span>`;
+    : `<span class="${matchTagClass(l.match_tag || "Kansrijk")}">${l.match_tag ?? "Kansrijk"}</span>`;
   return `
     <div class="listing-row">
-      <div><b>${l.title}</b><div class="muted">${l.location} | ${l.neighborhood ?? "Eindhoven"}</div></div>
+      <div><b>${l.title}</b><div class="muted">${l.location}</div></div>
+      <div>${wijk}</div>
       <div>EUR ${l.rent_eur ?? "?"}</div>
       <div>${l.size_m2 ?? "?"} m2</div>
+      <div>${avail}</div>
       <div>${reason}<br/><a href="${l.url}" target="_blank" rel="noopener noreferrer">open</a></div>
     </div>
   `;
 }
 
 async function renderMap(listings) {
-  if (!document.getElementById("map")) return;
+  const mapEl = document.getElementById("map");
+  if (!mapEl) return;
   const map = L.map("map").setView([51.4416, 5.4697], 12);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors",
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+    attribution: "&copy; OpenStreetMap &copy; CARTO",
+    subdomains: "abcd",
+    maxZoom: 20,
   }).addTo(map);
   const shown = listings.slice(0, 20);
   const usedCoords = new Map();
@@ -132,12 +166,16 @@ async function renderMap(listings) {
       const lonAdj = lon + offset * 0.00035;
 
       const marker = L.circleMarker([latAdj, lonAdj], {
-        radius: 7,
+        radius: 8,
         color: "#000",
+        weight: 2,
         fillColor: "#000",
         fillOpacity: 1,
       }).addTo(map);
-      marker.bindPopup(`<b>${listing.title}</b><br/>EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m2`);
+      const wijk = dash(listing.neighborhood);
+      marker.bindPopup(
+        `<b>${listing.title}</b><br/>${wijk !== "-" ? `${wijk} · ` : ""}EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²<br/>${listing.available_from ? `Vanaf ${listing.available_from}<br/>` : ""}`
+      );
       marker.on("click", () => {
         showSelectedMatch(listing);
       });
@@ -147,34 +185,16 @@ async function renderMap(listings) {
   }
 }
 
-function renderMatchList(listings) {
-  const container = document.getElementById("match-list");
-  if (!container) return;
-  container.innerHTML = "";
-  if (!listings.length) {
-    container.innerHTML = `<div class="muted">Nog geen shortlist matches.</div>`;
-    return;
-  }
-  listings.forEach((listing) => {
-    const row = document.createElement("div");
-    row.className = "listing-row";
-    row.innerHTML = `
-      <div><b>${listing.title}</b><div class="muted">${listing.neighborhood ?? "Eindhoven"} | EUR ${listing.rent_eur ?? "?"}</div></div>
-      <div><button class="toggle-btn">Bekijk</button></div>
-    `;
-    row.querySelector("button").addEventListener("click", () => showSelectedMatch(listing));
-    container.appendChild(row);
-  });
-}
-
 function showSelectedMatch(listing) {
   const el = document.getElementById("selected-match");
   if (!el) return;
+  const wijk = dash(listing.neighborhood);
   el.innerHTML = `
     <b>${listing.title}</b><br/>
-    ${listing.location} | ${listing.neighborhood ?? "Eindhoven"}<br/>
+    ${listing.location}${wijk !== "-" ? ` · ${wijk}` : ""}<br/>
     EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m2<br/>
-    <span class="muted">${listing.match_tag ?? "Kansrijk"}</span><br/>
+    Huur vanaf: ${dash(listing.available_from)}<br/>
+    <span class="${matchTagClass(listing.match_tag || "Kansrijk")}">${listing.match_tag ?? "Kansrijk"}</span><br/>
     <a href="${listing.url}" target="_blank" rel="noopener noreferrer">open listing</a>
   `;
 }

@@ -12,6 +12,8 @@ def notify_console(listing: Listing, score: int) -> None:
     print(f"Location: {listing.location}")
     print(f"Rent: {listing.rent_eur if listing.rent_eur is not None else 'unknown'}")
     print(f"Size: {listing.size_m2 if listing.size_m2 is not None else 'unknown'}")
+    if listing.available_from:
+        print(f"Available from: {listing.available_from}")
     print(f"Outdoor: {'yes' if listing.outdoor_space else 'unknown/no'}")
     print(f"Score: {score}")
     print(f"Link: {listing.url}")
@@ -50,6 +52,7 @@ def _build_telegram_message(listing: Listing, score: int) -> str:
         f"Rent: {rent}\n"
         f"Size: {size}\n"
         f"Outdoor: {outdoor}\n"
+        f"Available: {listing.available_from or 'unknown'}\n"
         f"Score: {score}\n"
         f"Link: {listing.url}"
     )

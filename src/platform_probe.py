@@ -55,6 +55,7 @@ def parse_pararius(html: str, page_url: str) -> list[Listing]:
                 size_m2=_extract_int(area_el.get_text(" ", strip=True)) if area_el else None,
                 outdoor_space=_has_outdoor_keywords(title + " " + location),
                 contract_months=None,
+                available_from=None,
             )
         )
     return listings
@@ -90,6 +91,7 @@ def parse_funda(html: str, page_url: str) -> list[Listing]:
                     size_m2=_extract_int(name),
                     outdoor_space=_has_outdoor_keywords(name),
                     contract_months=None,
+                    available_from=None,
                 )
             )
     return listings
@@ -114,6 +116,7 @@ def parse_huurwoningen(html: str, page_url: str) -> list[Listing]:
                 size_m2=None,
                 outdoor_space=_has_outdoor_keywords(title),
                 contract_months=None,
+                available_from=None,
             )
         )
     return listings
@@ -146,6 +149,7 @@ def parse_kamernet(html: str, page_url: str) -> list[Listing]:
                 size_m2=size,
                 outdoor_space=_has_outdoor_keywords(title),
                 contract_months=None,
+                available_from=None,
             )
         )
     return listings
@@ -170,6 +174,7 @@ def parse_directwonen(html: str, page_url: str) -> list[Listing]:
                 size_m2=None,
                 outdoor_space=_has_outdoor_keywords(title),
                 contract_months=None,
+                available_from=None,
             )
         )
     return listings
