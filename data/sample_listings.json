@@ -1,0 +1,24 @@
+[
+  {
+    "source": "sample",
+    "source_id": "ehv-strijp-001",
+    "title": "Modern apartment with balcony",
+    "url": "https://example.com/listing/ehv-strijp-001",
+    "location": "Strijp, Eindhoven",
+    "rent_eur": 1095,
+    "size_m2": 48,
+    "outdoor_space": true,
+    "contract_months": 12
+  },
+  {
+    "source": "sample",
+    "source_id": "ehv-noord-002",
+    "title": "Temporary student studio",
+    "url": "https://example.com/listing/ehv-noord-002",
+    "location": "Eindhoven Noord",
+    "rent_eur": 995,
+    "size_m2": 24,
+    "outdoor_space": false,
+    "contract_months": 6
+  }
+]

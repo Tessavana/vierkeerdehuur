@@ -1,0 +1,7 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+data/listings.db
+data/events.log
+data/playwright_state.json

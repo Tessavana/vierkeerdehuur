@@ -1,0 +1,521 @@
+Alright — here is a **very extensive, structured, copy-paste-ready Markdown file** you can drop into Cursor or save locally as `EINDHOVEN_HOUSING_BOT.md`.
+
+This includes:
+
+* Full architecture
+* Practical implementation details
+* Deployment strategies
+* Dashboard design
+* Rental + buying logic
+* Your motivation letter
+* Eindhoven insights
+* Real-world patterns & sources
+* Engineering tips (very important)
+
+---
+
+# 🏠 EINDHOVEN HOUSING BOT — MASTER SPEC (EXTENDED)
+
+## 🎯 Project Goal
+
+Build a **fast, practical housing assistant** that helps secure a home in Eindhoven by:
+
+* Monitoring rental listings (Pararius, Huislijn, etc.)
+* Monitoring buying listings (Funda)
+* Deduplicating listings across platforms
+* Finding direct/free application routes
+* Sending **instant Telegram alerts**
+* Generating ready-to-send messages
+* Tracking all applications in a dashboard
+* Visualizing progress publicly as a story
+
+---
+
+# 🧠 Core Philosophy
+
+This project is NOT:
+
+* A startup
+* A scalable SaaS
+* A perfect system
+
+This project IS:
+
+* A **speed advantage tool**
+* A **personal decision system**
+* A **housing funnel tracker**
+* A **real-life narrative of the housing crisis**
+
+👉 Your biggest edge = **speed + clarity + consistency**
+
+---
+
+# 👤 User Profile (Core Input for System)
+
+Name: Tessa van Abkoude
+Age: 26
+Profession: Designer
+Employer: Accenture
+Location: Strijp T, Eindhoven
+Contract: Fixed
+Income: > 4x rent
+Goal: Long-term housing (≥ 1 year)
+
+Personal traits to emphasize:
+
+* Stable
+* Local
+* Reliable
+* Creative
+* Low risk tenant
+
+---
+
+# 🏡 RENTAL REQUIREMENTS
+
+## Hard Filters
+
+* City: Eindhoven
+* Max rent: €1150
+* Contract ≥ 12 months
+* Exclude:
+
+  * Student housing
+  * Anti-kraak
+  * Temporary housing
+
+---
+
+## Location Rules
+
+| Area            | Decision       |
+| --------------- | -------------- |
+| Inside ring     | ✅ Always good  |
+| Strijp          | ✅ Always good  |
+| Outside ring    | ⚠️ Only Strijp |
+| North Eindhoven | ❌ Never        |
+
+---
+
+## Preferred Neighborhoods
+
+* Strijp
+* Centrum
+* Bergen
+* Vonderkwartier
+* Engelsbergen
+* Schrijversbuurt
+
+---
+
+## Preferences
+
+* Balcony
+* Terrace
+* Garden
+* Any outdoor space
+
+---
+
+# 🏡 BUYING REQUIREMENTS (Funda)
+
+## Criteria
+
+* Max price: €250,000
+* Location:
+
+  * Inside ring OR
+  * Strijp
+* MUST HAVE:
+
+  * Balcony OR garden OR terrace
+
+---
+
+# 🏗️ SYSTEM ARCHITECTURE
+
+```text
+[Scrapers]
+   ↓
+[Normalize data]
+   ↓
+[Deduplicate listings]
+   ↓
+[Score listings]
+   ↓
+[Store in SQLite]
+   ↓
+[Telegram alert]
+   ↓
+[User applies manually]
+   ↓
+[Dashboard tracking]
+```
+
+---
+
+# 📦 TECH STACK (STRICT)
+
+Use only:
+
+* Python 3.11
+* FastAPI (dashboard)
+* SQLite (database)
+* Requests + BeautifulSoup (default scraping)
+* Playwright (only if required)
+* Jinja2 (HTML templates)
+* python-telegram-bot
+* RapidFuzz (dedupe)
+
+❌ No React
+❌ No microservices
+❌ No overengineering
+
+---
+
+# 🔁 DEDUPLICATION LOGIC
+
+Listings are duplicates if:
+
+* Same street (fuzzy match)
+* Rent within ± €50
+* Size within ± 5 m²
+
+Example:
+
+```python
+from rapidfuzz import fuzz
+
+if fuzz.ratio(a.street, b.street) > 85:
+    # possible duplicate
+```
+
+---
+
+# 🧮 SCORING SYSTEM
+
+## Rentals
+
+| Factor                 | Points |
+| ---------------------- | ------ |
+| Inside ring            | +30    |
+| Strijp                 | +25    |
+| Preferred neighborhood | +20    |
+| Rent ≤ €1150           | +15    |
+| Outdoor space          | +15    |
+| Long-term contract     | +10    |
+| Direct contact found   | +10    |
+
+---
+
+## Buying
+
+| Factor        | Points |
+| ------------- | ------ |
+| Inside ring   | +30    |
+| Strijp        | +25    |
+| Outdoor space | +20    |
+| Price ≤ €250k | +15    |
+
+---
+
+## Penalties
+
+| Condition         | Points |
+| ----------------- | ------ |
+| North Eindhoven   | -40    |
+| Outside ring      | -30    |
+| Short contract    | -30    |
+| Paid-only listing | -15    |
+
+---
+
+# 📲 TELEGRAM ALERT SYSTEM
+
+## Message Format
+
+```text
+🏠 New match!
+
+📍 Address: ...
+💶 Rent: €...
+📐 Size: ...m²
+🌿 Outside: Yes
+⭐ Score: 84
+
+🔗 Link: ...
+
+Suggested action:
+→ Apply immediately
+→ Call if possible
+
+💬 Ready message:
+[paste message]
+```
+
+---
+
+# 💬 MOTIVATION LETTER (FINAL)
+
+```text
+Beste heer/mevrouw,
+
+Mijn naam is Tessa van Abkoude (26), ontwerper uit Eindhoven. Momenteel werk ik op Strijp T en heb ik een vast contract bij Accenture. Mijn inkomen voldoet ruim aan de inkomenseis (meer dan 4x de huur).
+
+Ik ben opgegroeid in (de omgeving van) Eindhoven en ben op zoek naar een fijne, langdurige woonplek. Vanwege mijn werk en mijn sterke binding met Strijp spreekt deze woning mij erg aan.
+
+In mijn vrije tijd ben ik graag actief en creatief bezig, zoals hockeyen, longboarden en illustreren.
+
+Ik ben per direct / vanaf 1 juni beschikbaar en kom graag op korte termijn bezichtigen.
+
+Met vriendelijke groet,  
+Tessa van Abkoude
+```
+
+---
+
+# 📊 DASHBOARD
+
+## Tech
+
+* FastAPI
+* SQLite
+* Simple HTML
+
+---
+
+## Table
+
+| Status | Address | Rent | m² | €/m² | Outside | Source | Applied | Link | Notes |
+
+---
+
+## Statuses
+
+* new
+* applied
+* no_response
+* viewing
+* rejected
+* accepted
+
+---
+
+## Logic
+
+* Highlight:
+
+  * no response after 48h
+* Sort:
+
+  * newest
+  * best score
+  * cheapest €/m²
+
+---
+
+## Price per m²
+
+```python
+price_per_m2 = rent / size
+```
+
+---
+
+# 🌍 PUBLIC STORY PAGE
+
+## Purpose
+
+* Show real struggle
+* Make it relatable
+* Tell a story
+
+---
+
+## Text
+
+```text
+I studied hard, got a stable job at Accenture, and still struggle to find housing in Eindhoven.
+
+This dashboard shows my real journey trying to find a place close to where I work.
+```
+
+---
+
+# ⚙️ DEPLOYMENT STRATEGY
+
+## Phase 1 — Local
+
+Run locally every 5 min
+
+---
+
+## Phase 2 — GitHub Actions
+
+* Runs every 5 min
+* Free
+* Good MVP
+
+---
+
+## Phase 3 — VPS (optional)
+
+Use if:
+
+* Need faster than 5 min
+* Need persistent login sessions
+* Want stability
+
+---
+
+# 🧠 ENGINEERING TIPS (VERY IMPORTANT)
+
+### 1. Don’t scrape everything with Playwright
+
+Use:
+
+* Requests first
+* Playwright only when necessary
+
+---
+
+### 2. Cache everything
+
+Avoid re-processing same listings
+
+---
+
+### 3. Be polite to websites
+
+* Add delays
+* Don’t hammer endpoints
+
+---
+
+### 4. Human-in-the-loop > full automation
+
+Never auto-send messages at first
+
+---
+
+### 5. Build in layers
+
+1. Scraper
+2. Alerts
+3. Deduplication
+4. Dashboard
+
+---
+
+# 📚 REAL-WORLD REFERENCES
+
+## Apartment bots
+
+People commonly:
+
+* scrape listings
+* store them
+* send alerts (SMS/Telegram)
+
+👉 Key insight: **speed wins**
+
+---
+
+## GitHub: House-Alert
+
+* Multi-source scraping
+* Filters
+* Telegram notifications
+
+---
+
+## changedetection.io
+
+* Tracks page changes
+* Sends alerts
+* Simpler but less smart
+
+---
+
+## Playwright + GitHub Actions
+
+* Scheduled scraping
+* Good MVP approach
+
+---
+
+## Data pipeline insight
+
+A solo dev scraped 99 sources using:
+
+* async Python
+* simple DB
+* dedupe
+
+👉 No complex infra needed
+
+---
+
+# 📍 EINDHOVEN MARKET INSIGHT
+
+* High demand
+* Fast-moving listings
+* Rising rents (~€19/m² average)
+
+👉 Listings often gone within hours
+
+---
+
+# 🧠 FINAL STRATEGY
+
+Your advantage:
+
+1. Respond within minutes
+2. Apply via multiple channels
+3. Be a “safe tenant”
+4. Track everything
+5. Improve over time
+
+---
+
+# 🏁 PRIORITY ORDER
+
+1. Scraper works
+2. Telegram alerts
+3. Deduplication
+4. Dashboard
+5. Buying scraper
+6. Public story
+
+---
+
+# 🚫 DO NOT DO
+
+* No spam bots
+* No CAPTCHA bypass
+* No overengineering
+* No unnecessary complexity
+
+---
+
+# 💡 FINAL THOUGHT
+
+This is not about building software.
+
+This is about:
+👉 Getting a house faster than everyone else
+👉 Showing you’re the best candidate
+👉 Turning chaos into clarity
+
+---
+
+If you want next step:
+I can generate the **actual working starter code (files + functions)** so Cursor builds it instantly.
+
+read all relevant stuff here: https://chatgpt.com/share/69fa29ca-5f24-8388-87a7-055da083568d
+
+ensure its free so use github actions and github to host the website: my github is:https://github.com/Tessavana
+
+
+
+
