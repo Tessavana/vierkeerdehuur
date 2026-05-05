@@ -11,8 +11,8 @@
     <main class="container">
       <section class="hero">
         <div class="clock" id="clock">--:--:--</div>
-        <h1>Vier keer de huur. Vast contract. Geen bezichtigingen.</h1>
-        <p>Dit is mijn live zoektocht naar een woning in Eindhoven.<br />Een realistisch beeld van huren in 2026.</p>
+        <h1>Vier Keer de Huur</h1>
+        <p>Vier keer de huur. Vast contract. Geen bezichtigingen.<br />Dit is mijn live zoektocht naar een woning in Eindhoven.<br />Een realistisch beeld van huren in 2026.</p>
         <p><b>Deadline: 3 maanden</b></p>
         <p class="sarcastic" id="headline-status">
           Laatste update: 21:41<br />
@@ -27,16 +27,17 @@
         </article>
         <article class="panel side-panel">
           <h2>Overzicht</h2>
-          <ul class="stats" id="status-stats"></ul>
-          <div class="muted" id="run-meta"></div>
-          <h3>Afwijzingen die pijn doen</h3>
-          <ul id="rejected-list" class="bullet-list"></ul>
+          <table id="status-table" class="overview-table"></table>
+          <h3>Geselecteerde match</h3>
+          <div id="selected-match" class="muted">Klik op een pin op de kaart om details te zien.</div>
+          <h3>Matches</h3>
+          <div id="match-list"></div>
         </article>
       </section>
 
       <section class="panel">
-        <h2>Provider resultaten</h2>
-        <p class="muted">Inclusief afgewezen listings, zodat we kunnen debuggen waarom iets eruit valt.</p>
+        <h2>Resultaten</h2>
+        <p class="muted" id="results-subtitle">Alle woningen gevonden op ...</p>
         <div id="providers"></div>
       </section>
     </main>

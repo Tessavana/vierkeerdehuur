@@ -1,11 +1,17 @@
 {
-  "applications_sent": 23,
-  "viewings": 3,
-  "rejections": 12,
-  "no_response": 8,
+  "applications_sent": 5,
+  "viewings": 0,
+  "rejections": 3,
+  "no_response": 2,
   "rejected_addresses": [
     "PSV-laan 233",
-    "Schootsestraat 94 A",
-    "300+ social housing listings at Wooniezie"
-  ]
+    "Schootsestraat 94 A"
+  ],
+  "sociale_huur": {
+    "platform": "Wooniezie",
+    "inschrijfduur": "4 jaar en 3 maanden",
+    "reacties_verstuurd": "230+",
+    "actief_gezocht": "2 jaar",
+    "bezichtigingen": 0
+  }
 }

@@ -23,6 +23,15 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Restore scan state cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            data/listings.db
+            data/application_status.json
+            data/telegram_offset.txt
+          key: housing-state-v1
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -34,7 +43,7 @@ jobs:
 
       - name: Run one scan
         env:
-          SEARCH_URLS: ${{ vars.SEARCH_URLS || 'https://kamernet.nl/en/for-rent/apartment-eindhoven,https://www.pararius.com/apartments/eindhoven,https://www.funda.nl/zoeken/huur?selected_area=%5B%22eindhoven%22%5D,https://www.vesteda.com/nl/huurwoningen-eindhoven,https://www.vbtverhuurmakelaars.nl/huurwoningen-eindhoven' }}
+          SEARCH_URLS: ${{ vars.SEARCH_URLS || 'https://kamernet.nl/en/for-rent/apartment-eindhoven,https://www.pararius.com/apartments/eindhoven,https://www.funda.nl/zoeken/huur?selected_area=%5B%22eindhoven%22%5D,https://www.vesteda.com/nl/huurwoningen-eindhoven,https://www.vbtverhuurmakelaars.nl/huurwoningen-eindhoven,https://www.huurwoningen.nl/in/eindhoven/,https://www.huislijn.nl/huurwoningen/nederland/noord-brabant/eindhoven,https://rentfinder.nl' }}
           MAX_RENT: ${{ vars.MAX_RENT || '1150' }}
           MIN_SIZE: ${{ vars.MIN_SIZE || '20' }}
           POLL_INTERVAL_SECONDS: "300"

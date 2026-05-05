@@ -1,10 +1,11 @@
 {
-  "generated_at_utc": "2026-05-05T20:11:19.154479+00:00",
+  "generated_at_utc": "2026-05-05T20:50:13.398858+00:00",
   "city": "Eindhoven",
   "max_rent": 1150,
   "provider_results": [
     {
       "provider": "KamernetProvider",
+      "provider_name": "Kamernet",
       "status": "ok",
       "parsed": 10,
       "suitable": 2,
@@ -13,6 +14,7 @@
     },
     {
       "provider": "ParariusProvider",
+      "provider_name": "Pararius",
       "status": "error",
       "parsed": 0,
       "suitable": 0,
@@ -21,6 +23,7 @@
     },
     {
       "provider": "FundaProvider",
+      "provider_name": "Funda",
       "status": "ok",
       "parsed": 0,
       "suitable": 0,
@@ -29,22 +32,34 @@
     },
     {
       "provider": "VestedaProvider",
+      "provider_name": "Vesteda",
       "status": "ok",
-      "parsed": 4,
+      "parsed": 3,
       "suitable": 0,
-      "excluded": 4,
+      "excluded": 3,
       "error": null
     },
     {
       "provider": "VbtProvider",
+      "provider_name": "Vbt",
       "status": "ok",
-      "parsed": 18,
+      "parsed": 10,
       "suitable": 0,
-      "excluded": 18,
+      "excluded": 10,
       "error": null
     },
     {
+      "provider": "HuurwoningenProvider",
+      "provider_name": "Huurwoningen",
+      "status": "error",
+      "parsed": 0,
+      "suitable": 0,
+      "excluded": 0,
+      "error": "403 Client Error: Forbidden for url: https://www.huurwoningen.nl/in/eindhoven/"
+    },
+    {
       "provider": "HuislijnProvider",
+      "provider_name": "Huislijn",
       "status": "error",
       "parsed": 0,
       "suitable": 0,
@@ -53,16 +68,18 @@
     },
     {
       "provider": "RentfinderProvider",
+      "provider_name": "Rentfinder",
       "status": "ok",
-      "parsed": 13,
+      "parsed": 9,
       "suitable": 0,
-      "excluded": 13,
+      "excluded": 9,
       "error": null
     }
   ],
   "listings": [
     {
       "provider": "KamernetProvider",
+      "provider_name": "Kamernet",
       "source": "kamernet",
       "title": "Kronehoefstraat , Eindhoven 42 m\u00b2 unfurnished Apartment From 1 Apr 2026 \u20ac1,000 /month",
       "location": "Eindhoven",
@@ -70,10 +87,12 @@
       "size_m2": 42,
       "outdoor_space": false,
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/kronehoefstraat/apartment-2365695",
-      "score": 15
+      "match_tag": "Twijfelgeval",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "KamernetProvider",
+      "provider_name": "Kamernet",
       "source": "kamernet",
       "title": "Blauwe Loper , Eindhoven 36 m\u00b2 furnished Apartment 1 Oct 2026 - 1 Feb 2027 \u20ac925 /month incl. utilities",
       "location": "Eindhoven",
@@ -81,450 +100,387 @@
       "size_m2": 36,
       "outdoor_space": false,
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/blauwe-loper/apartment-2374435",
-      "score": 15
+      "match_tag": "Twijfelgeval",
+      "neighborhood": "Eindhoven"
     }
   ],
   "excluded_listings": [
     {
       "provider": "KamernetProvider",
+      "provider_name": "Kamernet",
       "source": "kamernet",
       "title": "Willem de Zwijgerstraat , Eindhoven 70 m\u00b2 unfurnished Apartment From 30 Apr 2026 \u20ac1,360 /month",
       "location": "Eindhoven",
       "rent_eur": 1360,
       "size_m2": 70,
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/willem-de-zwijgerstraat/apartment-2373474",
-      "reason": "above_budget"
+      "reason": "above_budget",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "KamernetProvider",
+      "provider_name": "Kamernet",
       "source": "kamernet",
       "title": "Heezerweg , Eindhoven 66 m\u00b2 unfurnished Apartment From 30 Apr 2026 \u20ac1,325 /month",
       "location": "Eindhoven",
       "rent_eur": 1325,
       "size_m2": 66,
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/heezerweg/apartment-2373473",
-      "reason": "above_budget"
+      "reason": "above_budget",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "KamernetProvider",
+      "provider_name": "Kamernet",
       "source": "kamernet",
       "title": "React for free Heeghtakker , Eindhoven 73 m\u00b2 furnished Apartment From 9 May 2026 \u20ac1,825 /month",
       "location": "Eindhoven",
       "rent_eur": 1825,
       "size_m2": 73,
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/heeghtakker/apartment-2373353",
-      "reason": "above_budget"
+      "reason": "above_budget",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "KamernetProvider",
+      "provider_name": "Kamernet",
       "source": "kamernet",
       "title": "Methusalemplein , Eindhoven 70 m\u00b2 furnished Apartment From 1 Jun 2026 \u20ac1,595 /month",
       "location": "Eindhoven",
       "rent_eur": 1595,
       "size_m2": 70,
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/methusalemplein/apartment-2372498",
-      "reason": "above_budget"
+      "reason": "above_budget",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "KamernetProvider",
+      "provider_name": "Kamernet",
       "source": "kamernet",
       "title": "Kruisstraat , Eindhoven 84 m\u00b2 unfurnished Apartment From 1 May 2026 \u20ac1,750 /month",
       "location": "Eindhoven",
       "rent_eur": 1750,
       "size_m2": 84,
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/kruisstraat/apartment-2371853",
-      "reason": "above_budget"
+      "reason": "above_budget",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "KamernetProvider",
+      "provider_name": "Kamernet",
       "source": "kamernet",
       "title": "Genneperweg , Eindhoven 85 m\u00b2 unfurnished Apartment From 16 Apr 2026 \u20ac1,275 /month",
       "location": "Eindhoven",
       "rent_eur": 1275,
       "size_m2": 85,
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/genneperweg/apartment-2370707",
-      "reason": "above_budget"
+      "reason": "above_budget",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "KamernetProvider",
+      "provider_name": "Kamernet",
       "source": "kamernet",
       "title": "Pastoor van Leeuwenstraat , Helmond 70 m\u00b2 unfurnished Apartment From 15 Apr 2026 \u20ac1,100 /month incl. utilities",
       "location": "Helmond",
       "rent_eur": 1100,
       "size_m2": 70,
       "url": "https://kamernet.nl/en/for-rent/apartment-helmond/pastoor-van-leeuwenstraat/apartment-2370593",
-      "reason": "outside_city"
+      "reason": "outside_city",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "KamernetProvider",
+      "provider_name": "Kamernet",
       "source": "kamernet",
       "title": "Paradijslaan , Eindhoven 88 m\u00b2 furnished Apartment From 11 Apr 2026 \u20ac2,100 /month",
       "location": "Eindhoven",
       "rent_eur": 2100,
       "size_m2": 88,
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/paradijslaan/apartment-2369610",
-      "reason": "above_budget"
+      "reason": "above_budget",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "VestedaProvider",
-      "source": "vesteda",
-      "title": "Voorrang verlaten sociale huurwoning",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://www.vesteda.com/nl/consument/huren-op-maat/voorrang-verlaten-sociale-huurwoning",
-      "reason": "missing_data"
-    },
-    {
-      "provider": "VestedaProvider",
+      "provider_name": "Vesteda",
       "source": "vesteda",
       "title": "Opwettensemolen I",
       "location": "Eindhoven",
       "rent_eur": null,
       "size_m2": null,
       "url": "https://www.vesteda.com/nl/huurwoningen-eindhoven/opwettensemolen-i",
-      "reason": "missing_data"
+      "reason": "missing_data",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "VestedaProvider",
+      "provider_name": "Vesteda",
       "source": "vesteda",
       "title": "Picushof Appartementen",
       "location": "Eindhoven",
       "rent_eur": null,
       "size_m2": null,
       "url": "https://www.vesteda.com/nl/huurwoningen-eindhoven/picushof-appartementen",
-      "reason": "missing_data"
+      "reason": "missing_data",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "VestedaProvider",
+      "provider_name": "Vesteda",
       "source": "vesteda",
       "title": "Kloosterdreef",
       "location": "Eindhoven",
       "rent_eur": null,
       "size_m2": null,
       "url": "https://www.vesteda.com/nl/huurwoningen-eindhoven/kloosterdreef",
-      "reason": "missing_data"
+      "reason": "missing_data",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "VbtProvider",
-      "source": "vbt",
-      "title": "Ik huur bij vb&t",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://portaal.ikhuurbijvbt.nl",
-      "reason": "missing_data"
-    },
-    {
-      "provider": "VbtProvider",
-      "source": "vbt",
-      "title": "Direct te huur",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://vbtverhuurmakelaars.nl/woningen",
-      "reason": "missing_data"
-    },
-    {
-      "provider": "VbtProvider",
-      "source": "vbt",
-      "title": "inkomenseisen",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://www.vbtverhuurmakelaars.nl/toewijzingscriteria/",
-      "reason": "missing_data"
-    },
-    {
-      "provider": "VbtProvider",
+      "provider_name": "Vbt",
       "source": "vbt",
       "title": "De Baron",
       "location": "Eindhoven",
       "rent_eur": null,
       "size_m2": null,
       "url": "https://vbtverhuurmakelaars.nl/project/de-baron-eindhoven",
-      "reason": "missing_data"
+      "reason": "missing_data",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "VbtProvider",
+      "provider_name": "Vbt",
       "source": "vbt",
       "title": "De Jonkheer",
       "location": "Eindhoven",
       "rent_eur": null,
       "size_m2": null,
       "url": "https://vbtverhuurmakelaars.nl/project/de-jonkheer-eindhoven",
-      "reason": "missing_data"
+      "reason": "missing_data",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "VbtProvider",
+      "provider_name": "Vbt",
       "source": "vbt",
       "title": "Picuskade",
       "location": "Eindhoven",
       "rent_eur": null,
       "size_m2": null,
       "url": "https://vbtverhuurmakelaars.nl/project/picuskade-eindhoven",
-      "reason": "missing_data"
+      "reason": "missing_data",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "VbtProvider",
+      "provider_name": "Vbt",
       "source": "vbt",
       "title": "De Regent",
       "location": "Eindhoven",
       "rent_eur": null,
       "size_m2": null,
       "url": "https://vbtverhuurmakelaars.nl/project/de-regent-eindhoven",
-      "reason": "missing_data"
+      "reason": "missing_data",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "VbtProvider",
+      "provider_name": "Vbt",
       "source": "vbt",
       "title": "Hartje Eindhoven",
       "location": "Eindhoven",
       "rent_eur": null,
       "size_m2": null,
       "url": "https://vbtverhuurmakelaars.nl/project/hartje-eindhoven-eindhoven",
-      "reason": "missing_data"
+      "reason": "missing_data",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "VbtProvider",
+      "provider_name": "Vbt",
       "source": "vbt",
       "title": "Fontainebleau-, Finistere- en Neverslaan",
       "location": "Eindhoven",
       "rent_eur": null,
       "size_m2": null,
       "url": "https://vbtverhuurmakelaars.nl/project/fontainebleau-finistere-en-neverslaan-eindhoven",
-      "reason": "missing_data"
+      "reason": "missing_data",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "VbtProvider",
+      "provider_name": "Vbt",
       "source": "vbt",
       "title": "Blixembosch",
       "location": "Eindhoven",
       "rent_eur": null,
       "size_m2": null,
       "url": "https://vbtverhuurmakelaars.nl/project/blixembosch-eindhoven",
-      "reason": "missing_data"
+      "reason": "missing_data",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "VbtProvider",
+      "provider_name": "Vbt",
       "source": "vbt",
       "title": "Meerrijk",
       "location": "Eindhoven",
       "rent_eur": null,
       "size_m2": null,
       "url": "https://vbtverhuurmakelaars.nl/project/meerrijk-antony-fokker-blok-b5-eindhoven",
-      "reason": "missing_data"
+      "reason": "missing_data",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "VbtProvider",
+      "provider_name": "Vbt",
       "source": "vbt",
       "title": "Anthony Fokker",
       "location": "Eindhoven",
       "rent_eur": null,
       "size_m2": null,
       "url": "https://vbtverhuurmakelaars.nl/project/meerrijk-anthony-fokker-b3-eindhoven",
-      "reason": "missing_data"
+      "reason": "missing_data",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "VbtProvider",
-      "source": "vbt",
-      "title": "Amsterdam",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://vbtverhuurmakelaars.nl/huurwoningen-amsterdam",
-      "reason": "missing_data"
-    },
-    {
-      "provider": "VbtProvider",
+      "provider_name": "Vbt",
       "source": "vbt",
       "title": "Eindhoven",
       "location": "Eindhoven",
       "rent_eur": null,
       "size_m2": null,
       "url": "https://vbtverhuurmakelaars.nl/huurwoningen-eindhoven",
-      "reason": "missing_data"
-    },
-    {
-      "provider": "VbtProvider",
-      "source": "vbt",
-      "title": "'s-Hertogenbosch",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://vbtverhuurmakelaars.nl/huurwoningen-denbosch",
-      "reason": "missing_data"
-    },
-    {
-      "provider": "VbtProvider",
-      "source": "vbt",
-      "title": "Den Haag",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://vbtverhuurmakelaars.nl/huurwoningen-denhaag",
-      "reason": "missing_data"
-    },
-    {
-      "provider": "VbtProvider",
-      "source": "vbt",
-      "title": "Maastricht",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://vbtverhuurmakelaars.nl/huurwoningen-maastricht",
-      "reason": "missing_data"
-    },
-    {
-      "provider": "VbtProvider",
-      "source": "vbt",
-      "title": "Rotterdam",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://vbtverhuurmakelaars.nl/huurwoningen-rotterdam",
-      "reason": "missing_data"
+      "reason": "missing_data",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "RentfinderProvider",
+      "provider_name": "Rentfinder",
       "source": "rentfinder",
-      "title": "Woningen",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://rentfinder.nl/properties",
-      "reason": "missing_data"
+      "title": "Nieuw Beschikbaar per : 15-5-2026",
+      "location": "Unknown",
+      "rent_eur": 15,
+      "size_m2": 15,
+      "url": "https://rentfinder.nl/properties/te-huur-studio-prinsestraat-in-den-haag",
+      "reason": "invalid_price",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "RentfinderProvider",
+      "provider_name": "Rentfinder",
       "source": "rentfinder",
-      "title": "Inloggen",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://rentfinder.nl/login",
-      "reason": "missing_data"
+      "title": "Nieuw Beschikbaar per : 15-5-2026",
+      "location": "Unknown",
+      "rent_eur": 15,
+      "size_m2": 15,
+      "url": "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-zwaardvegersgaarde-in-den-haag",
+      "reason": "invalid_price",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "RentfinderProvider",
+      "provider_name": "Rentfinder",
       "source": "rentfinder",
-      "title": "Inschrijven",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://rentfinder.nl/packages",
-      "reason": "missing_data"
+      "title": "Nieuw Beschikbaar per : 15-5-2026",
+      "location": "Unknown",
+      "rent_eur": 15,
+      "size_m2": 15,
+      "url": "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-zijldonk-in-leiden",
+      "reason": "invalid_price",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "RentfinderProvider",
+      "provider_name": "Rentfinder",
       "source": "rentfinder",
-      "title": "Uitschrijven",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://rentfinder.nl/info/uitschrijven",
-      "reason": "missing_data"
+      "title": "Nieuw Beschikbaar per : 15-5-2026",
+      "location": "Unknown",
+      "rent_eur": 15,
+      "size_m2": 15,
+      "url": "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-kasteel-bleienbeekstraat-in-maastricht",
+      "reason": "invalid_price",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "RentfinderProvider",
+      "provider_name": "Rentfinder",
       "source": "rentfinder",
-      "title": "Veelgestelde vragen",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://rentfinder.nl/info/veelgestelde-vragen",
-      "reason": "missing_data"
+      "title": "Nieuw Beschikbaar per : 15-5-2026",
+      "location": "Unknown",
+      "rent_eur": 15,
+      "size_m2": 15,
+      "url": "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-hoogoord-in-amsterdam",
+      "reason": "invalid_price",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "RentfinderProvider",
+      "provider_name": "Rentfinder",
       "source": "rentfinder",
-      "title": "Klachten en feedback",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://rentfinder.nl/info/klachten-en-feedback",
-      "reason": "missing_data"
+      "title": "Nieuw Beschikbaar per : 15-5-2026",
+      "location": "Unknown",
+      "rent_eur": 15,
+      "size_m2": 15,
+      "url": "https://rentfinder.nl/properties/te-huur-1-kamer-appartement-bos-en-lommerplantsoen-in-amsterdam-2",
+      "reason": "invalid_price",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "RentfinderProvider",
+      "provider_name": "Rentfinder",
       "source": "rentfinder",
-      "title": "Wat is RentFinder?",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://rentfinder.nl/info/over-ons",
-      "reason": "missing_data"
+      "title": "Direct bij eigenaar Beschikbaar per : 1-5-2026",
+      "location": "Unknown",
+      "rent_eur": 1,
+      "size_m2": 1,
+      "url": "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-kanunnik-boenenstraat-in-nijmegen-1",
+      "reason": "invalid_price",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "RentfinderProvider",
+      "provider_name": "Rentfinder",
       "source": "rentfinder",
-      "title": "Begrippen",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://rentfinder.nl/info/begrippen",
-      "reason": "missing_data"
+      "title": "Direct bij eigenaar Beschikbaar per : 1-5-2026",
+      "location": "Unknown",
+      "rent_eur": 1,
+      "size_m2": 1,
+      "url": "https://rentfinder.nl/properties/te-huur-3-appartement-millingenhof-in-amsterdam-1",
+      "reason": "invalid_price",
+      "neighborhood": "Eindhoven"
     },
     {
       "provider": "RentfinderProvider",
+      "provider_name": "Rentfinder",
       "source": "rentfinder",
-      "title": "Veilig huren",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://rentfinder.nl/info/veilig-huren",
-      "reason": "missing_data"
-    },
-    {
-      "provider": "RentfinderProvider",
-      "source": "rentfinder",
-      "title": "Herroepingsrecht",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://rentfinder.nl/info/herroepingsrecht",
-      "reason": "missing_data"
-    },
-    {
-      "provider": "RentfinderProvider",
-      "source": "rentfinder",
-      "title": "Privacyverklaring",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://rentfinder.nl/info/privacyverklaring",
-      "reason": "missing_data"
-    },
-    {
-      "provider": "RentfinderProvider",
-      "source": "rentfinder",
-      "title": "Algemene voorwaarden",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://rentfinder.nl/info/algemene-voorwaarden",
-      "reason": "missing_data"
-    },
-    {
-      "provider": "RentfinderProvider",
-      "source": "rentfinder",
-      "title": "Abonneren op nieuwsbrief",
-      "location": "Eindhoven",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://rentfinder.nl/subscribe-newsletter",
-      "reason": "missing_data"
+      "title": "Direct bij eigenaar Beschikbaar per : 1-5-2026",
+      "location": "Unknown",
+      "rent_eur": 1,
+      "size_m2": 1,
+      "url": "https://rentfinder.nl/properties/te-huur-studio-scheepstimmermanslaan-in-rotterdam",
+      "reason": "invalid_price",
+      "neighborhood": "Eindhoven"
     }
   ],
   "application_status": {
-    "applications_sent": 23,
-    "viewings": 3,
-    "rejections": 12,
-    "no_response": 8,
+    "applications_sent": 5,
+    "viewings": 0,
+    "rejections": 3,
+    "no_response": 2,
     "rejected_addresses": [
       "PSV-laan 233",
-      "Schootsestraat 94 A",
-      "300+ social housing listings at Wooniezie"
-    ]
+      "Schootsestraat 94 A"
+    ],
+    "sociale_huur": {
+      "platform": "Wooniezie",
+      "inschrijfduur": "4 jaar en 3 maanden",
+      "reacties_verstuurd": "230+",
+      "actief_gezocht": "2 jaar",
+      "bezichtigingen": 0
+    }
   }
 }

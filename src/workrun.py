@@ -7,6 +7,7 @@ from src.filters import evaluate_rental, score_rental
 from src.providers import (
     FundaProvider,
     HuislijnProvider,
+    HuurwoningenProvider,
     JsonFileProvider,
     KamernetProvider,
     ListingProvider,
@@ -39,6 +40,7 @@ def run_workrun() -> dict:
                     excluded_items.append(
                         {
                             "provider": provider_name,
+                            "provider_name": _clean_provider_name(provider_name),
                             "source": listing.source,
                             "title": listing.title,
                             "location": listing.location,
@@ -46,11 +48,13 @@ def run_workrun() -> dict:
                             "size_m2": listing.size_m2,
                             "url": listing.url,
                             "reason": reason,
+                            "neighborhood": _extract_neighborhood(listing.title, listing.location),
                         }
                     )
             normalized = [
                 {
                     "provider": provider_name,
+                    "provider_name": _clean_provider_name(provider_name),
                     "source": l.source,
                     "title": l.title,
                     "location": l.location,
@@ -58,7 +62,8 @@ def run_workrun() -> dict:
                     "size_m2": l.size_m2,
                     "outdoor_space": l.outdoor_space,
                     "url": l.url,
-                    "score": score_rental(l, config),
+                    "match_tag": _match_tag(score_rental(l, config)),
+                    "neighborhood": _extract_neighborhood(l.title, l.location),
                 }
                 for l in suitable
             ]
@@ -66,6 +71,7 @@ def run_workrun() -> dict:
             provider_results.append(
                 {
                     "provider": provider_name,
+                    "provider_name": _clean_provider_name(provider_name),
                     "status": "ok",
                     "parsed": len(listings),
                     "suitable": len(suitable),
@@ -77,6 +83,7 @@ def run_workrun() -> dict:
             provider_results.append(
                 {
                     "provider": provider_name,
+                    "provider_name": _clean_provider_name(provider_name),
                     "status": "error",
                     "parsed": 0,
                     "suitable": 0,
@@ -86,7 +93,7 @@ def run_workrun() -> dict:
             )
 
     deduped = _dedupe_by_url(all_matches)
-    deduped.sort(key=lambda x: (x["score"], x["rent_eur"] is None, x["rent_eur"] or 10**9), reverse=True)
+    deduped.sort(key=lambda x: (x["rent_eur"] is None, -(x["rent_eur"] or 10**9)), reverse=False)
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "city": "Eindhoven",
@@ -136,6 +143,8 @@ def _build_providers(urls: list[str]) -> list[ListingProvider]:
             providers.append(VestedaProvider(url))
         elif "huislijn.nl" in lower:
             providers.append(HuislijnProvider(url))
+        elif "huurwoningen.nl" in lower:
+            providers.append(HuurwoningenProvider(url))
         elif "rentfinder" in lower:
             providers.append(RentfinderProvider(url))
         else:
@@ -147,13 +156,52 @@ def _load_application_status() -> dict:
     path = Path("data/application_status.json")
     if not path.exists():
         return {
-            "applications_sent": 23,
-            "viewings": 3,
-            "rejections": 12,
-            "no_response": 8,
-            "rejected_addresses": ["PSV-laan 233", "Schootsestraat 94 A", "300+ social housing listings at Wooniezie"],
+            "applications_sent": 5,
+            "viewings": 0,
+            "rejections": 3,
+            "no_response": 2,
+            "rejected_addresses": ["PSV-laan 233", "Schootsestraat 94 A"],
+            "sociale_huur": {
+                "platform": "Wooniezie",
+                "inschrijfduur": "4 jaar en 3 maanden",
+                "reacties_verstuurd": "230+",
+                "actief_gezocht": "2 jaar",
+                "bezichtigingen": 0,
+            },
         }
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _clean_provider_name(name: str) -> str:
+    return name.replace("Provider", "")
+
+
+def _match_tag(score: int) -> str:
+    if score >= 45:
+        return "Instant reageren"
+    if score >= 20:
+        return "Kansrijk"
+    return "Twijfelgeval"
+
+
+def _extract_neighborhood(title: str, location: str) -> str:
+    searchable = f"{title} {location}".lower()
+    neighborhoods = [
+        "strijp",
+        "stratum",
+        "centrum",
+        "bergen",
+        "vonderkwartier",
+        "engelsbergen",
+        "schrijversbuurt",
+        "woensel",
+        "tongelre",
+        "gestel",
+    ]
+    for neighborhood in neighborhoods:
+        if neighborhood in searchable:
+            return neighborhood.capitalize()
+    return "Eindhoven"
 
 
 if __name__ == "__main__":

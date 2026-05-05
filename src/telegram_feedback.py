@@ -41,16 +41,19 @@ def sync_feedback() -> None:
 
 
 def _apply_command(state: dict, text: str) -> None:
-    if text.lower().startswith("/applied "):
+    normalized = " ".join(text.strip().split())
+    lowered = normalized.lower()
+
+    if lowered.startswith("/applied "):
         state["applications_sent"] = int(state.get("applications_sent", 0)) + 1
-    elif text.lower().startswith("/viewing "):
+    elif lowered.startswith("/viewing "):
         state["viewings"] = int(state.get("viewings", 0)) + 1
-    elif text.lower().startswith("/rejected "):
+    elif lowered.startswith("/rejected "):
         state["rejections"] = int(state.get("rejections", 0)) + 1
-        address = text[10:].strip()
+        address = normalized[10:].strip().strip("<>").strip()
         if address:
             state.setdefault("rejected_addresses", []).append(address)
-    elif text.lower().startswith("/noresponse "):
+    elif lowered.startswith("/noresponse "):
         state["no_response"] = int(state.get("no_response", 0)) + 1
 
 
@@ -58,11 +61,18 @@ def _load_state() -> dict:
     if STATUS_FILE.exists():
         return json.loads(STATUS_FILE.read_text(encoding="utf-8"))
     return {
-        "applications_sent": 23,
-        "viewings": 3,
-        "rejections": 12,
-        "no_response": 8,
-        "rejected_addresses": ["PSV-laan 233", "Schootsestraat 94 A", "300+ social housing listings at Wooniezie"],
+        "applications_sent": 5,
+        "viewings": 0,
+        "rejections": 3,
+        "no_response": 2,
+        "rejected_addresses": ["PSV-laan 233", "Schootsestraat 94 A"],
+        "sociale_huur": {
+            "platform": "Wooniezie",
+            "inschrijfduur": "4 jaar en 3 maanden",
+            "reacties_verstuurd": "230+",
+            "actief_gezocht": "2 jaar",
+            "bezichtigingen": 0,
+        },
     }
 
 

@@ -137,10 +137,15 @@ class VbtProvider(ListingProvider):
         fetched = fetch_html_with_fallback(self.url)
         soup = BeautifulSoup(fetched.html, "html.parser")
         listings: list[Listing] = []
-        for link in soup.select("a[href*='huur'], a[href*='woning']"):
+        for link in soup.select("a[href*='/project/'], a[href*='/woning/'], a[href*='/huurwoningen-eindhoven']"):
             href = link.get("href", "")
             title = link.get_text(" ", strip=True)
             if not href or len(title) < 8:
+                continue
+            lower_href = href.lower()
+            if any(skip in lower_href for skip in ("/huurwoningen-amsterdam", "/huurwoningen-den", "/huurwoningen-rotterdam", "/huurwoningen-maastricht")):
+                continue
+            if "eindhoven" not in (title + " " + href).lower():
                 continue
             listings.append(
                 Listing(
@@ -166,10 +171,12 @@ class VestedaProvider(ListingProvider):
         fetched = fetch_html_with_fallback(self.url)
         soup = BeautifulSoup(fetched.html, "html.parser")
         listings: list[Listing] = []
-        for link in soup.select("a[href*='huurwoning'], a[href*='rent']"):
+        for link in soup.select("a[href*='/nl/huurwoningen-eindhoven/']"):
             href = link.get("href", "")
             title = link.get_text(" ", strip=True)
             if not href or len(title) < 8:
+                continue
+            if any(skip in href.lower() for skip in ("consumer", "huren-op-maat", "sociale-huurwoning")):
                 continue
             listings.append(
                 Listing(
@@ -195,10 +202,12 @@ class HuislijnProvider(ListingProvider):
         fetched = fetch_html_with_fallback(self.url)
         soup = BeautifulSoup(fetched.html, "html.parser")
         listings: list[Listing] = []
-        for link in soup.select("a[href*='huurwoning'], a[href*='eindhoven']"):
+        for link in soup.select("a[href*='/huurwoning/']"):
             href = link.get("href", "")
             title = link.get_text(" ", strip=True)
             if not href or len(title) < 8:
+                continue
+            if "eindhoven" not in (title + " " + href).lower():
                 continue
             listings.append(
                 Listing(
@@ -224,10 +233,12 @@ class RentfinderProvider(ListingProvider):
         fetched = fetch_html_with_fallback(self.url)
         soup = BeautifulSoup(fetched.html, "html.parser")
         listings: list[Listing] = []
-        for link in soup.select("a[href*='rent'], a[href*='eindhoven']"):
+        for link in soup.select("a[href*='/properties/'], a[href*='/property/']"):
             href = link.get("href", "")
             title = link.get_text(" ", strip=True)
             if not href or len(title) < 8:
+                continue
+            if any(skip in href.lower() for skip in ("/info/", "/login", "/packages", "/subscribe", "/terms")):
                 continue
             listings.append(
                 Listing(
@@ -235,6 +246,35 @@ class RentfinderProvider(ListingProvider):
                     source_id=href.strip("/"),
                     title=title,
                     url=href if href.startswith("http") else f"https://rentfinder.nl{href}",
+                    location="Eindhoven" if "eindhoven" in (title + " " + href).lower() else "Unknown",
+                    rent_eur=_extract_int(title),
+                    size_m2=_extract_int(title),
+                    outdoor_space=_has_outdoor_keywords(title),
+                    contract_months=None,
+                )
+            )
+        return _dedupe_listings(listings)
+
+
+class HuurwoningenProvider(ListingProvider):
+    def __init__(self, url: str) -> None:
+        self.url = url
+
+    def fetch(self) -> list[Listing]:
+        fetched = fetch_html_with_fallback(self.url)
+        soup = BeautifulSoup(fetched.html, "html.parser")
+        listings: list[Listing] = []
+        for link in soup.select("a[href*='/huurwoning/']"):
+            href = link.get("href", "")
+            title = link.get_text(" ", strip=True)
+            if not href or len(title) < 8:
+                continue
+            listings.append(
+                Listing(
+                    source="huurwoningen",
+                    source_id=href.strip("/"),
+                    title=title,
+                    url=href if href.startswith("http") else f"https://www.huurwoningen.nl{href}",
                     location="Eindhoven",
                     rent_eur=_extract_int(title),
                     size_m2=_extract_int(title),

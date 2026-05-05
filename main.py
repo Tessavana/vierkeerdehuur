@@ -5,6 +5,7 @@ from src.config import load_config
 from src.providers import (
     FundaProvider,
     HuislijnProvider,
+    HuurwoningenProvider,
     JsonFileProvider,
     KamernetProvider,
     ListingProvider,
@@ -42,6 +43,8 @@ def build_providers(urls: list[str]) -> list[ListingProvider]:
             providers.append(VestedaProvider(url))
         elif "huislijn.nl" in url_lower:
             providers.append(HuislijnProvider(url))
+        elif "huurwoningen.nl" in url_lower:
+            providers.append(HuurwoningenProvider(url))
         elif "rentfinder" in url_lower:
             providers.append(RentfinderProvider(url))
         else:

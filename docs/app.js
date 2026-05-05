@@ -17,28 +17,31 @@ async function loadRun() {
   const data = await res.json();
 
   const status = data.application_status || {};
-  const stats = document.getElementById("status-stats");
-  stats.innerHTML = `
-    <li>Applications sent: <b>${status.applications_sent ?? 0}</b></li>
-    <li>Viewings: <b>${status.viewings ?? 0}</b></li>
-    <li>Rejections: <b>${status.rejections ?? 0}</b></li>
-    <li>No response: <b>${status.no_response ?? 0}</b></li>
-  `;
-  document.getElementById("run-meta").textContent =
-    `Laatste run: ${new Date(data.generated_at_utc).toLocaleString()} | ${
-      data.listings.length
-    } shortlist match(es).`;
-
-  const rej = document.getElementById("rejected-list");
-  rej.innerHTML = "";
-  (status.rejected_addresses || []).forEach((addr) => {
-    const li = document.createElement("li");
-    li.textContent = addr;
-    rej.appendChild(li);
-  });
+  renderOverviewTable(status);
+  document.getElementById("results-subtitle").textContent = `Alle woningen gevonden op ${new Date(data.generated_at_utc).toLocaleString()}`;
+  document.getElementById("headline-status").innerHTML = `Laatste update: ${new Date(data.generated_at_utc).toLocaleTimeString()}<br/>Nog steeds geen woning🙂`;
 
   renderProviders(data);
   await renderMap(data.listings);
+  renderMatchList(data.listings);
+}
+
+function renderOverviewTable(status) {
+  const table = document.getElementById("status-table");
+  const rejected = (status.rejected_addresses || []).join(", ");
+  const sh = status.sociale_huur || {};
+  table.innerHTML = `
+    <tr><td>Applications sent</td><td><b>${status.applications_sent ?? 5}</b></td></tr>
+    <tr><td>Viewings</td><td><b>${status.viewings ?? 0}</b></td></tr>
+    <tr><td>Rejections</td><td><b>${status.rejections ?? 3}</b></td></tr>
+    <tr><td>No response</td><td><b>${status.no_response ?? 2}</b></td></tr>
+    <tr><td>Afwijzingen tot nu toe</td><td>${rejected || "-"}</td></tr>
+    <tr><td>Sociale huur via</td><td>${sh.platform ?? "Wooniezie"}</td></tr>
+    <tr><td>Inschrijfduur</td><td>${sh.inschrijfduur ?? "4 jaar en 3 maanden"}</td></tr>
+    <tr><td>Reacties verstuurd</td><td>${sh.reacties_verstuurd ?? "230+"}</td></tr>
+    <tr><td>Actief gezocht</td><td>${sh.actief_gezocht ?? "2 jaar"}</td></tr>
+    <tr><td>Aantal bezichtigingen</td><td>${sh.bezichtigingen ?? 0}</td></tr>
+  `;
 }
 
 function renderProviders(data) {
@@ -54,8 +57,9 @@ function renderProviders(data) {
     const suitable = suitableByProvider[p.provider] || [];
     const excluded = excludedByProvider[p.provider] || [];
     const sectionId = `excluded-${p.provider}`;
+    const displayName = p.provider_name || p.provider.replace("Provider", "");
     block.innerHTML = `
-      <div><b>${p.provider}</b> <span class="${cls}">${p.status}</span></div>
+      <div><b>${displayName}</b> <span class="${cls}">${p.status}</span></div>
       <div class="muted">parsed=${p.parsed} | suitable=${p.suitable} | excluded=${p.excluded ?? 0}</div>
       ${p.error ? `<div class="muted">error: ${p.error}</div>` : ""}
       <div id="suitable-${p.provider}"></div>
@@ -87,10 +91,12 @@ function renderProviders(data) {
 }
 
 function listingRow(l, excluded) {
-  const reason = excluded ? `<span class="muted">${l.reason ?? "excluded"}</span>` : `<span>score=${l.score}</span>`;
+  const reason = excluded
+    ? `<span class="muted">${l.reason ?? "excluded"}</span>`
+    : `<span>${l.match_tag ?? "Kansrijk"} | ${l.neighborhood ?? "Eindhoven"}</span>`;
   return `
     <div class="listing-row">
-      <div><b>${l.title}</b><div class="muted">${l.location}</div></div>
+      <div><b>${l.title}</b><div class="muted">${l.location} | ${l.neighborhood ?? "Eindhoven"}</div></div>
       <div>EUR ${l.rent_eur ?? "?"}</div>
       <div>${l.size_m2 ?? "?"} m2</div>
       <div>${reason}<br/><a href="${l.url}" target="_blank" rel="noopener noreferrer">open</a></div>
@@ -103,22 +109,66 @@ async function renderMap(listings) {
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap contributors",
   }).addTo(map);
-  const shown = listings.slice(0, 10);
+  const shown = listings.slice(0, 20);
+  const usedCoords = new Map();
   for (const listing of shown) {
-    const q = encodeURIComponent(`${listing.location}, Eindhoven, Netherlands`);
+    const hint = listing.title.split(",")[0].trim();
+    const q = encodeURIComponent(`${hint}, Eindhoven, Netherlands`);
     try {
       const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`);
       const rows = await res.json();
       if (!rows.length) continue;
       const lat = Number(rows[0].lat);
       const lon = Number(rows[0].lon);
-      L.marker([lat, lon]).addTo(map).bindPopup(
-        `<b>${listing.title}</b><br/>EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m2`
-      );
+      const key = `${lat.toFixed(4)},${lon.toFixed(4)}`;
+      const offset = usedCoords.get(key) || 0;
+      usedCoords.set(key, offset + 1);
+      const latAdj = lat + offset * 0.00035;
+      const lonAdj = lon + offset * 0.00035;
+
+      const marker = L.circleMarker([latAdj, lonAdj], {
+        radius: 7,
+        color: "#000",
+        fillColor: "#000",
+        fillOpacity: 1,
+      }).addTo(map);
+      marker.bindPopup(`<b>${listing.title}</b><br/>EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m2`);
+      marker.on("click", () => {
+        showSelectedMatch(listing);
+      });
     } catch (_err) {
       // ignore map geocoding failures
     }
   }
+}
+
+function renderMatchList(listings) {
+  const container = document.getElementById("match-list");
+  container.innerHTML = "";
+  if (!listings.length) {
+    container.innerHTML = `<div class="muted">Nog geen shortlist matches.</div>`;
+    return;
+  }
+  listings.forEach((listing) => {
+    const row = document.createElement("div");
+    row.className = "listing-row";
+    row.innerHTML = `
+      <div><b>${listing.title}</b><div class="muted">${listing.neighborhood ?? "Eindhoven"} | EUR ${listing.rent_eur ?? "?"}</div></div>
+      <div><button class="toggle-btn">Bekijk</button></div>
+    `;
+    row.querySelector("button").addEventListener("click", () => showSelectedMatch(listing));
+    container.appendChild(row);
+  });
+}
+
+function showSelectedMatch(listing) {
+  document.getElementById("selected-match").innerHTML = `
+    <b>${listing.title}</b><br/>
+    ${listing.location} | ${listing.neighborhood ?? "Eindhoven"}<br/>
+    EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m2<br/>
+    <span class="muted">${listing.match_tag ?? "Kansrijk"}</span><br/>
+    <a href="${listing.url}" target="_blank" rel="noopener noreferrer">open listing</a>
+  `;
 }
 
 updateClock();

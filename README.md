@@ -115,3 +115,8 @@ Send commands to your bot in the same chat used for alerts:
 - `/noresponse <address>`
 
 These commands are synced into `data/application_status.json` and shown in the hosted dashboard overview.
+
+On GitHub Actions, `data/listings.db`, `data/application_status.json`, and `data/telegram_offset.txt` are cached between runs, so:
+
+- repeated matches are not re-notified every run
+- Telegram status commands are remembered across scheduled runs
