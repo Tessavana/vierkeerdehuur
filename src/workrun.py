@@ -3,13 +3,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from src.config import load_config
-from src.filters import is_rental_match, score_rental
+from src.filters import evaluate_rental, score_rental
 from src.providers import (
     FundaProvider,
+    HuislijnProvider,
     JsonFileProvider,
     KamernetProvider,
     ListingProvider,
     ParariusProvider,
+    RentfinderProvider,
     VbtProvider,
     VestedaProvider,
 )
@@ -20,14 +22,35 @@ def run_workrun() -> dict:
     providers = _build_providers(config.search_urls)
     provider_results: list[dict] = []
     all_matches: list[dict] = []
+    excluded_items: list[dict] = []
 
     for provider in providers:
         provider_name = provider.__class__.__name__
         try:
             listings = provider.fetch()
-            suitable = [l for l in listings if is_rental_match(l, config)]
+            suitable: list = []
+            excluded_count = 0
+            for listing in listings:
+                ok, reason = evaluate_rental(listing, config)
+                if ok:
+                    suitable.append(listing)
+                else:
+                    excluded_count += 1
+                    excluded_items.append(
+                        {
+                            "provider": provider_name,
+                            "source": listing.source,
+                            "title": listing.title,
+                            "location": listing.location,
+                            "rent_eur": listing.rent_eur,
+                            "size_m2": listing.size_m2,
+                            "url": listing.url,
+                            "reason": reason,
+                        }
+                    )
             normalized = [
                 {
+                    "provider": provider_name,
                     "source": l.source,
                     "title": l.title,
                     "location": l.location,
@@ -46,6 +69,7 @@ def run_workrun() -> dict:
                     "status": "ok",
                     "parsed": len(listings),
                     "suitable": len(suitable),
+                    "excluded": excluded_count,
                     "error": None,
                 }
             )
@@ -56,6 +80,7 @@ def run_workrun() -> dict:
                     "status": "error",
                     "parsed": 0,
                     "suitable": 0,
+                    "excluded": 0,
                     "error": str(exc),
                 }
             )
@@ -68,6 +93,8 @@ def run_workrun() -> dict:
         "max_rent": config.max_rent,
         "provider_results": provider_results,
         "listings": deduped,
+        "excluded_listings": excluded_items,
+        "application_status": _load_application_status(),
     }
     _write_outputs(payload)
     return payload
@@ -107,9 +134,26 @@ def _build_providers(urls: list[str]) -> list[ListingProvider]:
             providers.append(VbtProvider(url))
         elif "vesteda.com" in lower:
             providers.append(VestedaProvider(url))
+        elif "huislijn.nl" in lower:
+            providers.append(HuislijnProvider(url))
+        elif "rentfinder" in lower:
+            providers.append(RentfinderProvider(url))
         else:
             providers.append(ParariusProvider(url))
     return providers
+
+
+def _load_application_status() -> dict:
+    path = Path("data/application_status.json")
+    if not path.exists():
+        return {
+            "applications_sent": 23,
+            "viewings": 3,
+            "rejections": 12,
+            "no_response": 8,
+            "rejected_addresses": ["PSV-laan 233", "Schootsestraat 94 A", "300+ social housing listings at Wooniezie"],
+        }
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

@@ -1,31 +1,47 @@
 <!doctype html>
-<html lang="en">
+<html lang="nl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>vierkeerdehuur | Eindhoven Housing Run</title>
+    <title>Vier keer de huur</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <main class="container">
       <section class="hero">
-        <h1>vierkeerdehuur</h1>
-        <p class="subtitle">Fast Eindhoven listing monitor for rental reality.</p>
-        <div class="meta" id="meta">Loading latest run...</div>
+        <div class="clock" id="clock">--:--:--</div>
+        <h1>Vier keer de huur. Vast contract. Geen bezichtigingen.</h1>
+        <p>Dit is mijn live zoektocht naar een woning in Eindhoven.<br />Een realistisch beeld van huren in 2026.</p>
+        <p><b>Deadline: 3 maanden</b></p>
+        <p class="sarcastic" id="headline-status">
+          Laatste update: 21:41<br />
+          Nog steeds geen woning🙂
+        </p>
       </section>
 
-      <section class="cards">
-        <article class="panel">
-          <h2>Provider Status</h2>
-          <div id="providers" class="provider-list"></div>
+      <section class="map-grid">
+        <article class="panel map-panel">
+          <h2>Matches op de kaart</h2>
+          <div id="map"></div>
         </article>
-        <article class="panel">
-          <h2>Top Matches</h2>
-          <div id="listings" class="listing-list"></div>
+        <article class="panel side-panel">
+          <h2>Overzicht</h2>
+          <ul class="stats" id="status-stats"></ul>
+          <div class="muted" id="run-meta"></div>
+          <h3>Afwijzingen die pijn doen</h3>
+          <ul id="rejected-list" class="bullet-list"></ul>
         </article>
+      </section>
+
+      <section class="panel">
+        <h2>Provider resultaten</h2>
+        <p class="muted">Inclusief afgewezen listings, zodat we kunnen debuggen waarom iets eruit valt.</p>
+        <div id="providers"></div>
       </section>
     </main>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>

@@ -6,3 +6,4 @@ data/listings.db
 data/events.log
 data/playwright_state.json
 data/latest_listings.json
+data/telegram_offset.txt

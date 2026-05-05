@@ -4,10 +4,12 @@ from pathlib import Path
 from src.config import load_config
 from src.providers import (
     FundaProvider,
+    HuislijnProvider,
     JsonFileProvider,
     KamernetProvider,
     ListingProvider,
     ParariusProvider,
+    RentfinderProvider,
     VbtProvider,
     VestedaProvider,
 )
@@ -38,6 +40,10 @@ def build_providers(urls: list[str]) -> list[ListingProvider]:
             providers.append(VbtProvider(url))
         elif "vesteda.com" in url_lower:
             providers.append(VestedaProvider(url))
+        elif "huislijn.nl" in url_lower:
+            providers.append(HuislijnProvider(url))
+        elif "rentfinder" in url_lower:
+            providers.append(RentfinderProvider(url))
         else:
             providers.append(ParariusProvider(url))
     return providers

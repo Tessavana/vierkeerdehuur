@@ -187,6 +187,64 @@ class VestedaProvider(ListingProvider):
         return _dedupe_listings(listings)
 
 
+class HuislijnProvider(ListingProvider):
+    def __init__(self, url: str) -> None:
+        self.url = url
+
+    def fetch(self) -> list[Listing]:
+        fetched = fetch_html_with_fallback(self.url)
+        soup = BeautifulSoup(fetched.html, "html.parser")
+        listings: list[Listing] = []
+        for link in soup.select("a[href*='huurwoning'], a[href*='eindhoven']"):
+            href = link.get("href", "")
+            title = link.get_text(" ", strip=True)
+            if not href or len(title) < 8:
+                continue
+            listings.append(
+                Listing(
+                    source="huislijn",
+                    source_id=href.strip("/"),
+                    title=title,
+                    url=href if href.startswith("http") else f"https://www.huislijn.nl{href}",
+                    location="Eindhoven",
+                    rent_eur=_extract_int(title),
+                    size_m2=_extract_int(title),
+                    outdoor_space=_has_outdoor_keywords(title),
+                    contract_months=None,
+                )
+            )
+        return _dedupe_listings(listings)
+
+
+class RentfinderProvider(ListingProvider):
+    def __init__(self, url: str) -> None:
+        self.url = url
+
+    def fetch(self) -> list[Listing]:
+        fetched = fetch_html_with_fallback(self.url)
+        soup = BeautifulSoup(fetched.html, "html.parser")
+        listings: list[Listing] = []
+        for link in soup.select("a[href*='rent'], a[href*='eindhoven']"):
+            href = link.get("href", "")
+            title = link.get_text(" ", strip=True)
+            if not href or len(title) < 8:
+                continue
+            listings.append(
+                Listing(
+                    source="rentfinder",
+                    source_id=href.strip("/"),
+                    title=title,
+                    url=href if href.startswith("http") else f"https://rentfinder.nl{href}",
+                    location="Eindhoven",
+                    rent_eur=_extract_int(title),
+                    size_m2=_extract_int(title),
+                    outdoor_space=_has_outdoor_keywords(title),
+                    contract_months=None,
+                )
+            )
+        return _dedupe_listings(listings)
+
+
 class JsonFileProvider(ListingProvider):
     def __init__(self, path: Path) -> None:
         self.path = path

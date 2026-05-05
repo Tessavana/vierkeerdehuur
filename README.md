@@ -104,3 +104,14 @@ Static site files live in `docs/`.
 - Data feed: `docs/data/latest_listings.json`
 
 After enabling GitHub Pages (Source: GitHub Actions), each scheduled run updates the website with the latest Eindhoven listing workrun.
+
+### Telegram feedback commands for application tracking
+
+Send commands to your bot in the same chat used for alerts:
+
+- `/applied <address>`
+- `/viewing <address>`
+- `/rejected <address>`
+- `/noresponse <address>`
+
+These commands are synced into `data/application_status.json` and shown in the hosted dashboard overview.

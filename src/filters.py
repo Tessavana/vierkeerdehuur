@@ -14,23 +14,28 @@ BLOCKED_KEYWORDS = {"student", "anti-kraak", "antikraak", "temporary", "tijdelij
 
 
 def is_rental_match(listing: Listing, config: AppConfig) -> bool:
+    ok, _reason = evaluate_rental(listing, config)
+    return ok
+
+
+def evaluate_rental(listing: Listing, config: AppConfig) -> tuple[bool, str]:
     searchable = f"{listing.title} {listing.location}".lower()
     # Keep the shortlist actionable: require concrete rent/size data.
     if listing.rent_eur is None or listing.size_m2 is None:
-        return False
+        return False, "missing_data"
     if listing.rent_eur < 300:
-        return False
+        return False, "invalid_price"
     if any(word in searchable for word in BLOCKED_KEYWORDS):
-        return False
+        return False, "blocked_keyword"
     if listing.rent_eur > config.max_rent:
-        return False
+        return False, "above_budget"
     if listing.size_m2 < config.min_size:
-        return False
+        return False, "too_small"
     if "eindhoven" not in searchable:
-        return False
+        return False, "outside_city"
     if "noord" in searchable:
-        return False
-    return True
+        return False, "north_eindhoven"
+    return True, "ok"
 
 
 def score_rental(listing: Listing, config: AppConfig) -> int:
