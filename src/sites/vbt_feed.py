@@ -1,8 +1,11 @@
 """VB&T: listings from public eye-move XML export (full Eindhoven inventory)."""
 
+import os
 import re
+import time
 import xml.etree.ElementTree as ET
 from io import BytesIO
+from pathlib import Path
 
 import requests
 
@@ -21,15 +24,9 @@ def _outdoor_from_text(text: str) -> bool:
     return any(k in lowered for k in ("balkon", "tuin", "terras", "dakterras", "buitenruimte"))
 
 
-def fetch_vbt_eindhoven_listings(timeout: int = 120) -> list[Listing]:
-    response = requests.get(
-        VBT_PROJECT_FEED_URL,
-        timeout=timeout,
-        headers={"User-Agent": "Mozilla/5.0"},
-    )
-    response.raise_for_status()
+def _parse_vbt_xml_bytes(content: bytes) -> list[Listing]:
     listings: list[Listing] = []
-    for _event, elem in ET.iterparse(BytesIO(response.content), events=("end",)):
+    for _event, elem in ET.iterparse(BytesIO(content), events=("end",)):
         if elem.tag != "Project":
             continue
         plaats = (elem.findtext("Adres/Plaats") or "").strip()
@@ -109,3 +106,22 @@ def fetch_vbt_eindhoven_listings(timeout: int = 120) -> list[Listing]:
     for item in listings:
         dedup[item.source_id] = item
     return list(dedup.values())
+
+
+def fetch_vbt_eindhoven_listings(timeout: int = 120) -> list[Listing]:
+    cache_path = Path(os.getenv("VBT_FEED_CACHE_PATH", "data/cache/vbt_projecten.xml"))
+    ttl = int(os.getenv("VBT_FEED_CACHE_TTL_SECONDS", "0"))
+    if ttl > 0 and cache_path.exists():
+        age = time.time() - cache_path.stat().st_mtime
+        if age < ttl:
+            return _parse_vbt_xml_bytes(cache_path.read_bytes())
+
+    response = requests.get(
+        VBT_PROJECT_FEED_URL,
+        timeout=timeout,
+        headers={"User-Agent": "Mozilla/5.0"},
+    )
+    response.raise_for_status()
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    cache_path.write_bytes(response.content)
+    return _parse_vbt_xml_bytes(response.content)

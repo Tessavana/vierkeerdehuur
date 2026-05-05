@@ -1,5 +1,6 @@
 """Vesteda: project links from index, then detail pages (Playwright when needed) for rent/m²."""
 
+import os
 import re
 from urllib.parse import urljoin
 
@@ -73,7 +74,9 @@ def _project_links(list_url: str) -> list[tuple[str, str]]:
     return out
 
 
-def fetch_vesteda_eindhoven_listings(list_url: str, max_detail_pages: int = 18) -> list[Listing]:
+def fetch_vesteda_eindhoven_listings(list_url: str, max_detail_pages: int | None = None) -> list[Listing]:
+    if max_detail_pages is None:
+        max_detail_pages = int(os.getenv("VESTEDA_MAX_DETAIL_PAGES", "18"))
     links = _project_links(list_url)[:max_detail_pages]
     listings: list[Listing] = []
     for url, label in links:

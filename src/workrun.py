@@ -5,6 +5,8 @@ from pathlib import Path
 
 from src.config import load_config
 from src.filters import evaluate_rental, score_rental
+from src.scan_bundle import load_scan_bundle, save_scan_bundle
+from src.scan_schedule import provider_should_fetch_live
 from src.providers import (
     FundaProvider,
     HuislijnProvider,
@@ -22,12 +24,33 @@ from src.providers import (
 def run_workrun() -> dict:
     config = load_config()
     providers = _build_providers(config.search_urls)
+    bundle = load_scan_bundle()
     provider_results: list[dict] = []
     all_matches: list[dict] = []
     excluded_items: list[dict] = []
 
     for provider in providers:
         provider_name = provider.__class__.__name__
+        live = provider_should_fetch_live(provider_name)
+        cached = bundle.get(provider_name) if not live else None
+        if not live and cached:
+            all_matches.extend(cached)
+            provider_results.append(
+                {
+                    "provider": provider_name,
+                    "provider_name": _clean_provider_name(provider_name),
+                    "status": "cached",
+                    "parsed": len(cached),
+                    "suitable": len(cached),
+                    "excluded": 0,
+                    "error": None,
+                }
+            )
+            continue
+
+        if not live and not cached:
+            live = True
+
         try:
             listings = provider.fetch()
             suitable: list = []
@@ -73,6 +96,7 @@ def run_workrun() -> dict:
                 for l in suitable
             ]
             all_matches.extend(normalized)
+            bundle[provider_name] = normalized
             provider_results.append(
                 {
                     "provider": provider_name,
@@ -85,17 +109,34 @@ def run_workrun() -> dict:
                 }
             )
         except Exception as exc:
-            provider_results.append(
-                {
-                    "provider": provider_name,
-                    "provider_name": _clean_provider_name(provider_name),
-                    "status": "error",
-                    "parsed": 0,
-                    "suitable": 0,
-                    "excluded": 0,
-                    "error": str(exc),
-                }
-            )
+            fallback = bundle.get(provider_name)
+            if fallback:
+                all_matches.extend(fallback)
+                provider_results.append(
+                    {
+                        "provider": provider_name,
+                        "provider_name": _clean_provider_name(provider_name),
+                        "status": "error_fallback_cache",
+                        "parsed": len(fallback),
+                        "suitable": len(fallback),
+                        "excluded": 0,
+                        "error": str(exc),
+                    }
+                )
+            else:
+                provider_results.append(
+                    {
+                        "provider": provider_name,
+                        "provider_name": _clean_provider_name(provider_name),
+                        "status": "error",
+                        "parsed": 0,
+                        "suitable": 0,
+                        "excluded": 0,
+                        "error": str(exc),
+                    }
+                )
+
+    save_scan_bundle(bundle)
 
     deduped = _dedupe_by_url(all_matches)
     deduped.sort(key=lambda x: (x["rent_eur"] is None, -(x["rent_eur"] or 10**9)), reverse=False)
@@ -164,7 +205,7 @@ def _build_providers(urls: list[str]) -> list[ListingProvider]:
             providers.append(VestedaProvider(url))
         elif "huislijn.nl" in lower:
             providers.append(HuislijnProvider(url))
-        elif "huurwoningen.nl" in lower:
+        elif "huurwoningen.nl" in lower or "huurwoningen.com" in lower:
             providers.append(HuurwoningenProvider(url))
         elif "rentfinder" in lower:
             providers.append(RentfinderProvider(url))

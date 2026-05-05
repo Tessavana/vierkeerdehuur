@@ -31,6 +31,8 @@ jobs:
             data/listings.db
             data/application_status.json
             data/telegram_offset.txt
+            data/scan_bundle.json
+            data/cache
           key: housing-state-${{ github.run_id }}
           restore-keys: |
             housing-state-
@@ -52,6 +54,14 @@ jobs:
           POLL_INTERVAL_SECONDS: "300"
           SQLITE_PATH: data/listings.db
           ENABLE_PLAYWRIGHT_FALLBACK: "true"
+          INCREMENTAL_SCAN: "true"
+          SCAN_ROTATION: "3"
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+          HUURWONINGEN_MAX_PAGES: "4"
+          HUURWONINGEN_MAX_DETAILS: "90"
+          RENTFINDER_MAX_PAGES: "12"
+          VESTEDA_MAX_DETAIL_PAGES: "8"
+          VBT_FEED_CACHE_TTL_SECONDS: "2700"
           TELEGRAM_ENABLED: ${{ secrets.TELEGRAM_BOT_TOKEN != '' && secrets.TELEGRAM_CHAT_ID != '' }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -72,6 +82,8 @@ jobs:
             data/listings.db
             data/application_status.json
             data/telegram_offset.txt
+            data/scan_bundle.json
+            data/cache
           key: ${{ steps.restore-state.outputs.cache-primary-key }}
 
   deploy:

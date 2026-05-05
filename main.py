@@ -15,6 +15,7 @@ from src.providers import (
     VestedaProvider,
 )
 from src.runner import run_loop, run_once
+from src.scan_schedule import filter_providers_for_incremental
 from src.status_app import run_status_server
 from src.store import ListingStore
 
@@ -58,7 +59,7 @@ def main() -> None:
         run_status_server(port=args.port)
         return
     config = load_config()
-    providers = build_providers(config.search_urls)
+    providers = filter_providers_for_incremental(build_providers(config.search_urls))
     store = ListingStore(config.sqlite_path)
     if args.once:
         run_once(config, providers, store)

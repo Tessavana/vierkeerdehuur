@@ -1,6 +1,7 @@
 """RentFinder: Eindhoven listings via Inertia JSON (price, m², availability in API)."""
 
 import json
+import os
 from typing import Any
 
 import requests
@@ -36,7 +37,9 @@ def _parse_int(val: Any) -> int | None:
     return int(s) if s.isdigit() else None
 
 
-def fetch_rentfinder_eindhoven_listings(max_pages: int = 30) -> list[Listing]:
+def fetch_rentfinder_eindhoven_listings(max_pages: int | None = None) -> list[Listing]:
+    if max_pages is None:
+        max_pages = int(os.getenv("RENTFINDER_MAX_PAGES", "30"))
     session = requests.Session()
     session.headers.update(RF_HEADERS)
     version = _rentfinder_inertia_version(session)
