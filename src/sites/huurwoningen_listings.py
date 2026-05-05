@@ -89,13 +89,33 @@ def _listing_urls_playwright(list_base_url: str, max_pages: int = 40) -> list[st
     return [urljoin("https://www.huurwoningen.com", p) for p in ordered]
 
 
-def _parse_detail(html: str, page_url: str) -> tuple[str, int | None, int | None, str | None]:
+def _detail_page_inactive(html: str) -> bool:
+    soup = BeautifulSoup(html, "html.parser")
+    text = soup.get_text(" ", strip=True).lower()
+    markers = (
+        "niet meer beschikbaar",
+        "niet langer beschikbaar",
+        "deze advertentie is verwijderd",
+        "advertentie niet gevonden",
+        "woning is verhuurd",
+        "is verhuurd",
+        "reeds verhuurd",
+        "aanmelding gesloten",
+        "inschrijving gesloten",
+        "geen woning gevonden",
+        "pagina niet gevonden",
+    )
+    return any(m in text for m in markers)
+
+
+def _parse_detail(html: str, page_url: str) -> tuple[str, int | None, int | None, str | None, str | None]:
     soup = BeautifulSoup(html, "html.parser")
     title = ""
     if soup.title and soup.title.string:
         title = soup.title.string.strip()
     meta = soup.find("meta", attrs={"name": "description"})
-    blob = f"{title} {meta.get('content', '') if meta else ''}"
+    meta_content = (meta.get("content", "").strip() if meta else "")[:2000]
+    blob = f"{title} {meta_content}"
     rent = None
     clean = blob.replace("\xa0", " ").replace("\u20ac", "€")
     m_rent = re.search(r"(?:€\s*|EUR\s*)(\d[\d\.]*)", clean, re.I)
@@ -147,7 +167,9 @@ def fetch_huurwoningen_eindhoven_listings(
             r = session.get(rel, timeout=25)
             if r.status_code >= 400:
                 continue
-            title, rent, size, avail = _parse_detail(r.text, rel)
+            if _detail_page_inactive(r.text):
+                continue
+            title, rent, size, avail, notes = _parse_detail(r.text, rel)
             path = urlparse(rel).path.strip("/")
             source_id = path.replace("/", "_") if path else rel
             listings.append(
@@ -161,6 +183,7 @@ def fetch_huurwoningen_eindhoven_listings(
                     size_m2=size,
                     outdoor_space=_outdoor(title + " " + (r.text[:8000] or "")),
                     available_from=avail,
+                    notes=notes,
                 )
             )
         except requests.RequestException:

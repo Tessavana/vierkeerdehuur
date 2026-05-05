@@ -14,3 +14,4 @@ class Listing:
     outdoor_space: bool
     contract_months: Optional[int] = None
     available_from: Optional[str] = None
+    notes: Optional[str] = None

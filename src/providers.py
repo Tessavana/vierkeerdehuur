@@ -223,6 +223,7 @@ class JsonFileProvider(ListingProvider):
                     outdoor_space=bool(item.get("outdoor_space", False)),
                     contract_months=item.get("contract_months"),
                     available_from=item.get("available_from"),
+                    notes=item.get("notes"),
                 )
             )
         return listings

@@ -68,6 +68,11 @@ def fetch_vbt_eindhoven_listings(timeout: int = 120) -> list[Listing]:
             hm = ot.findtext("prijzen/HuurprijsTm")
             wv = ot.findtext("Kenmerken/WoonoppVan")
             wm = ot.findtext("Kenmerken/WoonoppTm")
+            vrij = (ot.findtext("Kenmerken/AantalVrijeEenheden") or "").strip()
+            if vrij.isdigit() and int(vrij) == 0:
+                continue
+            if (ot.findtext("Internet") or "").strip().lower() == "nee":
+                continue
             rent = int(hv) if hv and hv.isdigit() else None
             if rent is None and hm and hm.isdigit():
                 rent = int(hm)
@@ -81,6 +86,8 @@ def fetch_vbt_eindhoven_listings(timeout: int = 120) -> list[Listing]:
             if hv and hm and hv != hm:
                 title = f"{title} (€{hv}–€{hm})"
             blob = f"{title} {location} {project_naam}"
+            eenheden = (ot.findtext("Kenmerken/AantalEenheden") or "").strip()
+            notes = f"Vrije eenheden: {vrij or '?'} / {eenheden or '?'}" if vrij or eenheden else None
             listings.append(
                 Listing(
                     source="vbt",
@@ -93,6 +100,7 @@ def fetch_vbt_eindhoven_listings(timeout: int = 120) -> list[Listing]:
                     outdoor_space=_outdoor_from_text(blob),
                     contract_months=None,
                     available_from=None,
+                    notes=notes,
                 )
             )
         elem.clear()

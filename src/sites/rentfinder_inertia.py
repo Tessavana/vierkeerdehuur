@@ -63,6 +63,8 @@ def fetch_rentfinder_eindhoven_listings(max_pages: int = 30) -> list[Listing]:
             slug = row.get("slug") or ""
             if not slug:
                 continue
+            if row.get("deleted_at"):
+                continue
             title = (row.get("title") or "").strip() or slug
             place = (row.get("place") or "").strip()
             street = (row.get("street") or "").strip()
@@ -71,6 +73,8 @@ def fetch_rentfinder_eindhoven_listings(max_pages: int = 30) -> list[Listing]:
             size = _parse_int(details.get("living_area"))
             rent = _parse_int(row.get("price"))
             avail = (row.get("available_at") or "").strip() or None
+            desc = (row.get("description") or "").strip()
+            notes = f"{desc} {details}".strip()[:2500] or None
             listings.append(
                 Listing(
                     source="rentfinder",
@@ -83,6 +87,7 @@ def fetch_rentfinder_eindhoven_listings(max_pages: int = 30) -> list[Listing]:
                     outdoor_space=_outdoor_from_text(title + " " + str(details)),
                     contract_months=None,
                     available_from=avail,
+                    notes=notes,
                 )
             )
         page += 1

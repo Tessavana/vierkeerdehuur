@@ -50,6 +50,7 @@ def run_workrun() -> dict:
                             "reason": reason,
                             "neighborhood": _extract_neighborhood(listing.title, listing.location),
                             "available_from": listing.available_from,
+                            "notes": listing.notes,
                         }
                     )
             normalized = [
@@ -66,6 +67,7 @@ def run_workrun() -> dict:
                     "match_tag": _match_tag(score_rental(l, config)),
                     "neighborhood": _extract_neighborhood(l.title, l.location),
                     "available_from": l.available_from,
+                    "notes": l.notes,
                 }
                 for l in suitable
             ]

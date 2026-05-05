@@ -99,6 +99,7 @@ def fetch_vesteda_eindhoven_listings(list_url: str, max_detail_pages: int = 18) 
                 outdoor_space=_outdoor_from_text(text),
                 contract_months=None,
                 available_from=avail,
+                notes=text[:1800] if text else None,
             )
         )
     return listings
