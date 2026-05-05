@@ -32,6 +32,7 @@ jobs:
             data/application_status.json
             data/telegram_offset.txt
             data/scan_bundle.json
+            data/geocode_cache.json
             data/cache
           key: housing-state-${{ github.run_id }}
           restore-keys: |
@@ -83,6 +84,7 @@ jobs:
             data/application_status.json
             data/telegram_offset.txt
             data/scan_bundle.json
+            data/geocode_cache.json
             data/cache
           key: ${{ steps.restore-state.outputs.cache-primary-key }}
 

@@ -23,7 +23,26 @@ function matchTagClass(tag) {
   return "tag tag-kans";
 }
 
-/** Matches src/workrun.py _add_map_coordinates when Web Crypto is available (HTTPS). */
+const MAP_VISITED_KEY = "housing_map_visited_urls_v1";
+
+function loadVisitedUrls() {
+  try {
+    const raw = localStorage.getItem(MAP_VISITED_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return new Set(Array.isArray(arr) ? arr : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function addVisitedUrl(url) {
+  const s = loadVisitedUrls();
+  s.add(url);
+  localStorage.setItem(MAP_VISITED_KEY, JSON.stringify([...s]));
+  return s;
+}
+
+/** Matches src/map_geocode.py _hash_fallback_coords when Web Crypto is available (HTTPS). */
 async function mapCoordsForListing(listing) {
   const key = `${listing.url}|${listing.location}|${listing.title}`;
   try {
@@ -182,6 +201,7 @@ async function renderMap(listings) {
 
   const usedCoords = new Map();
   const layerGroup = L.layerGroup().addTo(map);
+  const visitedUrls = loadVisitedUrls();
 
   for (const listing of listings) {
     let lat = listing.map_lat != null ? Number(listing.map_lat) : null;
@@ -197,11 +217,12 @@ async function renderMap(listings) {
     const latAdj = lat + offset * 0.00025;
     const lonAdj = lon + offset * 0.00025;
 
+    const isVisited = visitedUrls.has(listing.url);
     const marker = L.circleMarker([latAdj, lonAdj], {
       radius: 8,
-      color: "#000",
+      color: isVisited ? "#4b5563" : "#000",
       weight: 2,
-      fillColor: "#000",
+      fillColor: isVisited ? "#9ca3af" : "#000",
       fillOpacity: 1,
     });
     const wijk = dash(listing.neighborhood);
@@ -209,6 +230,8 @@ async function renderMap(listings) {
       `<b>${listing.title}</b><br/>${wijk !== "-" ? `${wijk} · ` : ""}EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²<br/>${listing.available_from ? `Vanaf ${listing.available_from}<br/>` : ""}`
     );
     marker.on("click", () => {
+      addVisitedUrl(listing.url);
+      marker.setStyle({ color: "#4b5563", weight: 2, fillColor: "#9ca3af", fillOpacity: 1 });
       showSelectedMatch(listing);
     });
     layerGroup.addLayer(marker);

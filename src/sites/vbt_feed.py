@@ -9,6 +9,7 @@ from pathlib import Path
 
 import requests
 
+from src.filters import INACTIVE_LISTING_MARKERS
 from src.models import Listing
 
 VBT_PROJECT_FEED_URL = "https://vbth.eye-move.nl/export/Projecten.xml"
@@ -56,6 +57,14 @@ def _parse_vbt_xml_bytes(content: bytes) -> list[Listing]:
                 continue
             lowered = type_naam.lower()
             type_obj = (ot.findtext("TypeObject") or "").lower()
+            status_parts = " ".join(
+                ((ot.findtext(t) or "").strip().lower() for t in ("Status", "Huurstatus", "Verhuurd", "Beschikbaarheid"))
+            )
+            if status_parts.strip() and any(
+                w in status_parts
+                for w in ("verhuurd", "niet beschik", "bezet", "opgezegd", "archief", "gesloten")
+            ):
+                continue
             if "parkeer" in lowered or "parkeerplaats" in type_obj:
                 continue
             koop_huur = (ot.findtext("prijzen/KoopHuur") or "").strip().lower()
@@ -108,20 +117,68 @@ def _parse_vbt_xml_bytes(content: bytes) -> list[Listing]:
     return list(dedup.values())
 
 
+_EXTRA_VBT_HTML_MARKERS = (
+    "inschrijving gesloten",
+    "reactietermijn verstreken",
+    "geen inschrijving",
+    "momenteel niet beschikbaar",
+    "wonen voor deze woning is niet meer mogelijk",
+)
+
+
+def _dead_vbt_project_urls(listings: list[Listing]) -> set[str]:
+    flag = os.getenv("VBT_VALIDATE_PROJECT_URLS", "true").strip().lower()
+    if flag in {"0", "false", "no", "off"}:
+        return set()
+    by_url: dict[str, list[Listing]] = {}
+    for item in listings:
+        if "/project/" not in item.url.lower():
+            continue
+        by_url.setdefault(item.url, []).append(item)
+    session = requests.Session()
+    session.headers.update({"User-Agent": "Mozilla/5.0"})
+    dead: set[str] = set()
+    for url in by_url:
+        try:
+            time.sleep(float(os.getenv("VBT_VALIDATE_INTERVAL", "0.12")))
+            r = session.get(url, timeout=25)
+            if r.status_code == 404:
+                dead.add(url)
+                continue
+            if r.status_code >= 400:
+                continue
+            lowered = r.text.lower()
+            if any(m in lowered for m in INACTIVE_LISTING_MARKERS):
+                dead.add(url)
+                continue
+            if any(m in lowered for m in _EXTRA_VBT_HTML_MARKERS):
+                dead.add(url)
+                continue
+        except requests.RequestException:
+            continue
+    return dead
+
+
 def fetch_vbt_eindhoven_listings(timeout: int = 120) -> list[Listing]:
     cache_path = Path(os.getenv("VBT_FEED_CACHE_PATH", "data/cache/vbt_projecten.xml"))
     ttl = int(os.getenv("VBT_FEED_CACHE_TTL_SECONDS", "0"))
+    content: bytes | None = None
     if ttl > 0 and cache_path.exists():
         age = time.time() - cache_path.stat().st_mtime
         if age < ttl:
-            return _parse_vbt_xml_bytes(cache_path.read_bytes())
-
-    response = requests.get(
-        VBT_PROJECT_FEED_URL,
-        timeout=timeout,
-        headers={"User-Agent": "Mozilla/5.0"},
-    )
-    response.raise_for_status()
-    cache_path.parent.mkdir(parents=True, exist_ok=True)
-    cache_path.write_bytes(response.content)
-    return _parse_vbt_xml_bytes(response.content)
+            content = cache_path.read_bytes()
+    if content is None:
+        response = requests.get(
+            VBT_PROJECT_FEED_URL,
+            timeout=timeout,
+            headers={"User-Agent": "Mozilla/5.0"},
+        )
+        response.raise_for_status()
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        cache_path.write_bytes(response.content)
+        content = response.content
+    listings = _parse_vbt_xml_bytes(content)
+    dead_urls = _dead_vbt_project_urls(listings)
+    if dead_urls:
+        listings = [x for x in listings if x.url not in dead_urls]
+    return listings

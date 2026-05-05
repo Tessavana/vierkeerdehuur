@@ -13,7 +13,8 @@ from playwright.sync_api import sync_playwright
 from src.models import Listing
 from src.web_fetch import HEADERS
 
-LISTING_PATH_RE = re.compile(r"^/huren/eindhoven/[0-9a-f]{8}/[^/]+/?$", re.I)
+# Listing URLs look like /huren/eindhoven/{8-char-id}/{slug}/ (hex id).
+LISTING_PATH_RE = re.compile(r"^/huren/eindhoven/(?P<id>[0-9a-f]{8})/(?P<slug>[^/?#]+)/?$", re.I)
 
 
 def _to_com_base(url: str) -> str:
@@ -68,9 +69,19 @@ def _listing_urls_playwright(list_base_url: str, max_pages: int = 40) -> list[st
             url = list_base_url.rstrip("/") + ("" if page_num == 1 else f"{sep}page={page_num}")
             page.goto(url, wait_until="domcontentloaded", timeout=90000)
             _accept_cookies(page)
-            page.wait_for_timeout(6000)
             try:
-                page.wait_for_load_state("networkidle", timeout=60000)
+                page.wait_for_selector("a[href*='/huren/eindhoven/']", timeout=45000)
+            except Exception:
+                pass
+            page.wait_for_timeout(2000)
+            for _ in range(16):
+                try:
+                    page.evaluate("window.scrollTo(0, document.documentElement.scrollHeight)")
+                except Exception:
+                    break
+                page.wait_for_timeout(500)
+            try:
+                page.wait_for_load_state("networkidle", timeout=45000)
             except Exception:
                 pass
             batch = _collect_listing_hrefs_from_page(page)
@@ -140,7 +151,8 @@ def _parse_detail(html: str, page_url: str) -> tuple[str, int | None, int | None
     if not title:
         og = soup.find("meta", property="og:title")
         title = og.get("content", "").strip() if og else page_url.rstrip("/").rsplit("/", 2)[-2]
-    return title, rent, size, avail
+    notes = meta_content[:800].strip() if meta_content else None
+    return title, rent, size, avail, notes
 
 
 def _outdoor(blob: str) -> bool:
