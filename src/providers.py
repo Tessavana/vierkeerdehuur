@@ -147,6 +147,8 @@ class VbtProvider(ListingProvider):
                 continue
             if "eindhoven" not in (title + " " + href).lower():
                 continue
+            rent = _extract_currency_amount(title)
+            size = _extract_size_m2(title)
             listings.append(
                 Listing(
                     source="vbt",
@@ -154,8 +156,8 @@ class VbtProvider(ListingProvider):
                     title=title,
                     url=href if href.startswith("http") else f"https://vbtverhuurmakelaars.nl{href}",
                     location="Eindhoven",
-                    rent_eur=_extract_int(title),
-                    size_m2=_extract_int(title),
+                    rent_eur=rent,
+                    size_m2=size,
                     outdoor_space=_has_outdoor_keywords(title),
                     contract_months=None,
                 )
@@ -178,6 +180,8 @@ class VestedaProvider(ListingProvider):
                 continue
             if any(skip in href.lower() for skip in ("consumer", "huren-op-maat", "sociale-huurwoning")):
                 continue
+            rent = _extract_currency_amount(title)
+            size = _extract_size_m2(title)
             listings.append(
                 Listing(
                     source="vesteda",
@@ -185,8 +189,8 @@ class VestedaProvider(ListingProvider):
                     title=title,
                     url=href if href.startswith("http") else f"https://www.vesteda.com{href}",
                     location="Eindhoven",
-                    rent_eur=_extract_int(title),
-                    size_m2=_extract_int(title),
+                    rent_eur=rent,
+                    size_m2=size,
                     outdoor_space=_has_outdoor_keywords(title),
                     contract_months=None,
                 )
@@ -209,6 +213,8 @@ class HuislijnProvider(ListingProvider):
                 continue
             if "eindhoven" not in (title + " " + href).lower():
                 continue
+            rent = _extract_currency_amount(title)
+            size = _extract_size_m2(title)
             listings.append(
                 Listing(
                     source="huislijn",
@@ -216,8 +222,8 @@ class HuislijnProvider(ListingProvider):
                     title=title,
                     url=href if href.startswith("http") else f"https://www.huislijn.nl{href}",
                     location="Eindhoven",
-                    rent_eur=_extract_int(title),
-                    size_m2=_extract_int(title),
+                    rent_eur=rent,
+                    size_m2=size,
                     outdoor_space=_has_outdoor_keywords(title),
                     contract_months=None,
                 )
@@ -240,6 +246,8 @@ class RentfinderProvider(ListingProvider):
                 continue
             if any(skip in href.lower() for skip in ("/info/", "/login", "/packages", "/subscribe", "/terms")):
                 continue
+            rent = _extract_currency_amount(title)
+            size = _extract_size_m2(title)
             listings.append(
                 Listing(
                     source="rentfinder",
@@ -247,8 +255,8 @@ class RentfinderProvider(ListingProvider):
                     title=title,
                     url=href if href.startswith("http") else f"https://rentfinder.nl{href}",
                     location="Eindhoven" if "eindhoven" in (title + " " + href).lower() else "Unknown",
-                    rent_eur=_extract_int(title),
-                    size_m2=_extract_int(title),
+                    rent_eur=rent,
+                    size_m2=size,
                     outdoor_space=_has_outdoor_keywords(title),
                     contract_months=None,
                 )
@@ -269,6 +277,8 @@ class HuurwoningenProvider(ListingProvider):
             title = link.get_text(" ", strip=True)
             if not href or len(title) < 8:
                 continue
+            rent = _extract_currency_amount(title)
+            size = _extract_size_m2(title)
             listings.append(
                 Listing(
                     source="huurwoningen",
@@ -276,8 +286,8 @@ class HuurwoningenProvider(ListingProvider):
                     title=title,
                     url=href if href.startswith("http") else f"https://www.huurwoningen.nl{href}",
                     location="Eindhoven",
-                    rent_eur=_extract_int(title),
-                    size_m2=_extract_int(title),
+                    rent_eur=rent,
+                    size_m2=size,
                     outdoor_space=_has_outdoor_keywords(title),
                     contract_months=None,
                 )
@@ -332,3 +342,18 @@ def _dedupe_listings(listings: list[Listing]) -> list[Listing]:
         seen.add(listing.source_id)
         deduped.append(listing)
     return deduped
+
+
+def _extract_currency_amount(text: str) -> int | None:
+    match = re.search(r"[€\u20ac]\s?(\d[\d\.,]*)", text)
+    if not match:
+        return None
+    normalized = re.sub(r"[^\d]", "", match.group(1))
+    return int(normalized) if normalized else None
+
+
+def _extract_size_m2(text: str) -> int | None:
+    match = re.search(r"(\d{2,3})\s?m", text.lower())
+    if not match:
+        return None
+    return int(match.group(1))

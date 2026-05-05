@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-05-05T20:50:13.398858+00:00",
+  "generated_at_utc": "2026-05-05T20:56:35.227929+00:00",
   "city": "Eindhoven",
   "max_rent": 1150,
   "provider_results": [
@@ -363,10 +363,10 @@
       "source": "rentfinder",
       "title": "Nieuw Beschikbaar per : 15-5-2026",
       "location": "Unknown",
-      "rent_eur": 15,
-      "size_m2": 15,
-      "url": "https://rentfinder.nl/properties/te-huur-studio-prinsestraat-in-den-haag",
-      "reason": "invalid_price",
+      "rent_eur": null,
+      "size_m2": null,
+      "url": "https://rentfinder.nl/properties/te-huur-2-kamer-appartement-sint-janskruidlaan-in-amstelveen",
+      "reason": "missing_data",
       "neighborhood": "Eindhoven"
     },
     {
@@ -375,10 +375,10 @@
       "source": "rentfinder",
       "title": "Nieuw Beschikbaar per : 15-5-2026",
       "location": "Unknown",
-      "rent_eur": 15,
-      "size_m2": 15,
-      "url": "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-zwaardvegersgaarde-in-den-haag",
-      "reason": "invalid_price",
+      "rent_eur": null,
+      "size_m2": null,
+      "url": "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-wildenborglaan-in-arnhem",
+      "reason": "missing_data",
       "neighborhood": "Eindhoven"
     },
     {
@@ -387,10 +387,10 @@
       "source": "rentfinder",
       "title": "Nieuw Beschikbaar per : 15-5-2026",
       "location": "Unknown",
-      "rent_eur": 15,
-      "size_m2": 15,
-      "url": "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-zijldonk-in-leiden",
-      "reason": "invalid_price",
+      "rent_eur": null,
+      "size_m2": null,
+      "url": "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-van-eysingalaan-in-utrecht",
+      "reason": "missing_data",
       "neighborhood": "Eindhoven"
     },
     {
@@ -399,10 +399,10 @@
       "source": "rentfinder",
       "title": "Nieuw Beschikbaar per : 15-5-2026",
       "location": "Unknown",
-      "rent_eur": 15,
-      "size_m2": 15,
-      "url": "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-kasteel-bleienbeekstraat-in-maastricht",
-      "reason": "invalid_price",
+      "rent_eur": null,
+      "size_m2": null,
+      "url": "https://rentfinder.nl/properties/te-huur-kamer-aleidisstraat-in-rotterdam-2",
+      "reason": "missing_data",
       "neighborhood": "Eindhoven"
     },
     {
@@ -411,22 +411,10 @@
       "source": "rentfinder",
       "title": "Nieuw Beschikbaar per : 15-5-2026",
       "location": "Unknown",
-      "rent_eur": 15,
-      "size_m2": 15,
-      "url": "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-hoogoord-in-amsterdam",
-      "reason": "invalid_price",
-      "neighborhood": "Eindhoven"
-    },
-    {
-      "provider": "RentfinderProvider",
-      "provider_name": "Rentfinder",
-      "source": "rentfinder",
-      "title": "Nieuw Beschikbaar per : 15-5-2026",
-      "location": "Unknown",
-      "rent_eur": 15,
-      "size_m2": 15,
-      "url": "https://rentfinder.nl/properties/te-huur-1-kamer-appartement-bos-en-lommerplantsoen-in-amsterdam-2",
-      "reason": "invalid_price",
+      "rent_eur": null,
+      "size_m2": null,
+      "url": "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-van-alkemadelaan-in-den-haag",
+      "reason": "missing_data",
       "neighborhood": "Eindhoven"
     },
     {
@@ -435,10 +423,10 @@
       "source": "rentfinder",
       "title": "Direct bij eigenaar Beschikbaar per : 1-5-2026",
       "location": "Unknown",
-      "rent_eur": 1,
-      "size_m2": 1,
-      "url": "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-kanunnik-boenenstraat-in-nijmegen-1",
-      "reason": "invalid_price",
+      "rent_eur": null,
+      "size_m2": null,
+      "url": "https://rentfinder.nl/properties/te-huur-2-kamer-appartement-milanenhorst-in-leiden-1",
+      "reason": "missing_data",
       "neighborhood": "Eindhoven"
     },
     {
@@ -447,10 +435,10 @@
       "source": "rentfinder",
       "title": "Direct bij eigenaar Beschikbaar per : 1-5-2026",
       "location": "Unknown",
-      "rent_eur": 1,
-      "size_m2": 1,
-      "url": "https://rentfinder.nl/properties/te-huur-3-appartement-millingenhof-in-amsterdam-1",
-      "reason": "invalid_price",
+      "rent_eur": null,
+      "size_m2": null,
+      "url": "https://rentfinder.nl/properties/te-huur-kamer-gansstraat-in-utrecht",
+      "reason": "missing_data",
       "neighborhood": "Eindhoven"
     },
     {
@@ -459,10 +447,22 @@
       "source": "rentfinder",
       "title": "Direct bij eigenaar Beschikbaar per : 1-5-2026",
       "location": "Unknown",
-      "rent_eur": 1,
-      "size_m2": 1,
-      "url": "https://rentfinder.nl/properties/te-huur-studio-scheepstimmermanslaan-in-rotterdam",
-      "reason": "invalid_price",
+      "rent_eur": null,
+      "size_m2": null,
+      "url": "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-hofgeest-in-amsterdam",
+      "reason": "missing_data",
+      "neighborhood": "Eindhoven"
+    },
+    {
+      "provider": "RentfinderProvider",
+      "provider_name": "Rentfinder",
+      "source": "rentfinder",
+      "title": "Direct bij eigenaar Beschikbaar per : 1-5-2026",
+      "location": "Unknown",
+      "rent_eur": null,
+      "size_m2": null,
+      "url": "https://rentfinder.nl/properties/te-huur-kamer-ndsm-pier-in-amsterdam-1",
+      "reason": "missing_data",
       "neighborhood": "Eindhoven"
     }
   ],

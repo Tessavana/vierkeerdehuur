@@ -18,8 +18,10 @@ async function loadRun() {
 
   const status = data.application_status || {};
   renderOverviewTable(status);
-  document.getElementById("results-subtitle").textContent = `Alle woningen gevonden op ${new Date(data.generated_at_utc).toLocaleString()}`;
-  document.getElementById("headline-status").innerHTML = `Laatste update: ${new Date(data.generated_at_utc).toLocaleTimeString()}<br/>Nog steeds geen woning🙂`;
+  const subtitle = document.getElementById("results-subtitle");
+  if (subtitle) subtitle.textContent = `Alle woningen gevonden op ${new Date(data.generated_at_utc).toLocaleString()}`;
+  const headline = document.getElementById("headline-status");
+  if (headline) headline.innerHTML = `Laatste update: ${new Date(data.generated_at_utc).toLocaleTimeString()}<br/>Nog steeds geen woning🙂`;
 
   renderProviders(data);
   await renderMap(data.listings);
@@ -28,6 +30,7 @@ async function loadRun() {
 
 function renderOverviewTable(status) {
   const table = document.getElementById("status-table");
+  if (!table) return;
   const rejected = (status.rejected_addresses || []).join(", ");
   const sh = status.sociale_huur || {};
   table.innerHTML = `
@@ -46,6 +49,7 @@ function renderOverviewTable(status) {
 
 function renderProviders(data) {
   const providersEl = document.getElementById("providers");
+  if (!providersEl) return;
   providersEl.innerHTML = "";
   const suitableByProvider = groupByProvider(data.listings);
   const excludedByProvider = groupByProvider(data.excluded_listings || []);
@@ -105,6 +109,7 @@ function listingRow(l, excluded) {
 }
 
 async function renderMap(listings) {
+  if (!document.getElementById("map")) return;
   const map = L.map("map").setView([51.4416, 5.4697], 12);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap contributors",
@@ -144,6 +149,7 @@ async function renderMap(listings) {
 
 function renderMatchList(listings) {
   const container = document.getElementById("match-list");
+  if (!container) return;
   container.innerHTML = "";
   if (!listings.length) {
     container.innerHTML = `<div class="muted">Nog geen shortlist matches.</div>`;
@@ -162,7 +168,9 @@ function renderMatchList(listings) {
 }
 
 function showSelectedMatch(listing) {
-  document.getElementById("selected-match").innerHTML = `
+  const el = document.getElementById("selected-match");
+  if (!el) return;
+  el.innerHTML = `
     <b>${listing.title}</b><br/>
     ${listing.location} | ${listing.neighborhood ?? "Eindhoven"}<br/>
     EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m2<br/>
@@ -174,5 +182,8 @@ function showSelectedMatch(listing) {
 updateClock();
 setInterval(updateClock, 1000);
 loadRun().catch((err) => {
-  document.getElementById("headline-status").textContent = `Nog steeds geen woning. Ook de website had issues: ${err}`;
+  const headline = document.getElementById("headline-status");
+  if (headline) {
+    headline.textContent = `Nog steeds geen woning. Ook de website had issues: ${err}`;
+  }
 });
