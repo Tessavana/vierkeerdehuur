@@ -34,13 +34,13 @@ jobs:
 
       - name: Run one scan
         env:
-          SEARCH_URLS: ${{ secrets.SEARCH_URLS }}
-          MAX_RENT: ${{ secrets.MAX_RENT }}
-          MIN_SIZE: ${{ secrets.MIN_SIZE }}
+          SEARCH_URLS: ${{ vars.SEARCH_URLS || 'https://kamernet.nl/en/for-rent/apartment-eindhoven,https://www.pararius.com/apartments/eindhoven,https://www.funda.nl/zoeken/huur?selected_area=%5B%22eindhoven%22%5D,https://www.vesteda.com/nl/huurwoningen-eindhoven,https://www.vbtverhuurmakelaars.nl/huurwoningen-eindhoven' }}
+          MAX_RENT: ${{ vars.MAX_RENT || '1150' }}
+          MIN_SIZE: ${{ vars.MIN_SIZE || '20' }}
           POLL_INTERVAL_SECONDS: "300"
           SQLITE_PATH: data/listings.db
           ENABLE_PLAYWRIGHT_FALLBACK: "true"
-          TELEGRAM_ENABLED: "true"
+          TELEGRAM_ENABLED: ${{ secrets.TELEGRAM_BOT_TOKEN != '' && secrets.TELEGRAM_CHAT_ID != '' }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
