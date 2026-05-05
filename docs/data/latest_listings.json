@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-05-05T20:56:35.227929+00:00",
+  "generated_at_utc": "2026-05-05T21:04:10.410379+00:00",
   "city": "Eindhoven",
   "max_rent": 1150,
   "provider_results": [
@@ -43,9 +43,9 @@
       "provider": "VbtProvider",
       "provider_name": "Vbt",
       "status": "ok",
-      "parsed": 10,
+      "parsed": 9,
       "suitable": 0,
-      "excluded": 10,
+      "excluded": 9,
       "error": null
     },
     {
@@ -346,14 +346,14 @@
       "neighborhood": "Eindhoven"
     },
     {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Eindhoven",
-      "location": "Eindhoven",
+      "provider": "RentfinderProvider",
+      "provider_name": "Rentfinder",
+      "source": "rentfinder",
+      "title": "Nieuw Beschikbaar per : 15-5-2026",
+      "location": "Unknown",
       "rent_eur": null,
       "size_m2": null,
-      "url": "https://vbtverhuurmakelaars.nl/huurwoningen-eindhoven",
+      "url": "https://rentfinder.nl/properties/te-huur-kamer-buffelstraat-in-rotterdam",
       "reason": "missing_data",
       "neighborhood": "Eindhoven"
     },
@@ -365,7 +365,7 @@
       "location": "Unknown",
       "rent_eur": null,
       "size_m2": null,
-      "url": "https://rentfinder.nl/properties/te-huur-2-kamer-appartement-sint-janskruidlaan-in-amstelveen",
+      "url": "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-marnixlaan-in-utrecht",
       "reason": "missing_data",
       "neighborhood": "Eindhoven"
     },
@@ -377,7 +377,7 @@
       "location": "Unknown",
       "rent_eur": null,
       "size_m2": null,
-      "url": "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-wildenborglaan-in-arnhem",
+      "url": "https://rentfinder.nl/properties/te-huur-studio-bogortuin-in-amsterdam",
       "reason": "missing_data",
       "neighborhood": "Eindhoven"
     },
@@ -389,7 +389,7 @@
       "location": "Unknown",
       "rent_eur": null,
       "size_m2": null,
-      "url": "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-van-eysingalaan-in-utrecht",
+      "url": "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-hofgeest-in-amsterdam",
       "reason": "missing_data",
       "neighborhood": "Eindhoven"
     },
@@ -401,19 +401,7 @@
       "location": "Unknown",
       "rent_eur": null,
       "size_m2": null,
-      "url": "https://rentfinder.nl/properties/te-huur-kamer-aleidisstraat-in-rotterdam-2",
-      "reason": "missing_data",
-      "neighborhood": "Eindhoven"
-    },
-    {
-      "provider": "RentfinderProvider",
-      "provider_name": "Rentfinder",
-      "source": "rentfinder",
-      "title": "Nieuw Beschikbaar per : 15-5-2026",
-      "location": "Unknown",
-      "rent_eur": null,
-      "size_m2": null,
-      "url": "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-van-alkemadelaan-in-den-haag",
+      "url": "https://rentfinder.nl/properties/te-huur-2-kamer-appartement-marnixstraat-in-amsterdam",
       "reason": "missing_data",
       "neighborhood": "Eindhoven"
     },
@@ -425,7 +413,7 @@
       "location": "Unknown",
       "rent_eur": null,
       "size_m2": null,
-      "url": "https://rentfinder.nl/properties/te-huur-2-kamer-appartement-milanenhorst-in-leiden-1",
+      "url": "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-adriaan-mulderstraat-in-utrecht-1",
       "reason": "missing_data",
       "neighborhood": "Eindhoven"
     },
@@ -437,7 +425,7 @@
       "location": "Unknown",
       "rent_eur": null,
       "size_m2": null,
-      "url": "https://rentfinder.nl/properties/te-huur-kamer-gansstraat-in-utrecht",
+      "url": "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-valkhof-in-amsterdam-1",
       "reason": "missing_data",
       "neighborhood": "Eindhoven"
     },
@@ -449,7 +437,7 @@
       "location": "Unknown",
       "rent_eur": null,
       "size_m2": null,
-      "url": "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-hofgeest-in-amsterdam",
+      "url": "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-stalpaertstraat-in-rotterdam-1",
       "reason": "missing_data",
       "neighborhood": "Eindhoven"
     },
@@ -461,7 +449,7 @@
       "location": "Unknown",
       "rent_eur": null,
       "size_m2": null,
-      "url": "https://rentfinder.nl/properties/te-huur-kamer-ndsm-pier-in-amsterdam-1",
+      "url": "https://rentfinder.nl/properties/te-huur-studio-madurastraat-in-amsterdam-1",
       "reason": "missing_data",
       "neighborhood": "Eindhoven"
     }

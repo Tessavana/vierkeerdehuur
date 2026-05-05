@@ -3,6 +3,7 @@ import json
 from abc import ABC, abstractmethod
 from pathlib import Path
 
+import requests
 from bs4 import BeautifulSoup
 
 from src.models import Listing
@@ -134,16 +135,30 @@ class VbtProvider(ListingProvider):
         self.url = url
 
     def fetch(self) -> list[Listing]:
-        fetched = fetch_html_with_fallback(self.url)
-        soup = BeautifulSoup(fetched.html, "html.parser")
+        # Use VB&T's pagecontent API for more stable extraction than scraping rendered HTML.
+        api_url = "https://vbtverhuurmakelaars.nl/api/pagecontent?path=/huurwoningen-eindhoven"
+        response = requests.get(api_url, timeout=20, headers={"User-Agent": "Mozilla/5.0"})
+        response.raise_for_status()
+        payload = response.json()
+
+        content_html = ""
+        content = payload.get("content", {})
+        if isinstance(content, dict):
+            for value in content.values():
+                if isinstance(value, dict):
+                    for text in value.values():
+                        if isinstance(text, str):
+                            content_html += text + "\n"
+
+        soup = BeautifulSoup(content_html, "html.parser")
         listings: list[Listing] = []
-        for link in soup.select("a[href*='/project/'], a[href*='/woning/'], a[href*='/huurwoningen-eindhoven']"):
+        for link in soup.select("a[href*='/project/'], a[href*='/huurwoningen-eindhoven']"):
             href = link.get("href", "")
             title = link.get_text(" ", strip=True)
             if not href or len(title) < 8:
                 continue
             lower_href = href.lower()
-            if any(skip in lower_href for skip in ("/huurwoningen-amsterdam", "/huurwoningen-den", "/huurwoningen-rotterdam", "/huurwoningen-maastricht")):
+            if any(skip in lower_href for skip in ("/huurwoningen-amsterdam", "/huurwoningen-den", "/huurwoningen-rotterdam", "/huurwoningen-maastricht", "toewijzingscriteria")):
                 continue
             if "eindhoven" not in (title + " " + href).lower():
                 continue

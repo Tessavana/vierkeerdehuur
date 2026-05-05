@@ -35,6 +35,9 @@ class ListingStore:
             conn.execute(
                 "CREATE UNIQUE INDEX IF NOT EXISTS idx_source_source_id ON listings(source, source_id)"
             )
+            conn.execute(
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_listing_url ON listings(listing_url)"
+            )
 
     def is_new_listing(self, listing: Listing) -> bool:
         with self._connect() as conn:
