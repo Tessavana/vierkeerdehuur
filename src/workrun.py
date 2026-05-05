@@ -1,3 +1,4 @@
+import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -98,6 +99,7 @@ def run_workrun() -> dict:
 
     deduped = _dedupe_by_url(all_matches)
     deduped.sort(key=lambda x: (x["rent_eur"] is None, -(x["rent_eur"] or 10**9)), reverse=False)
+    _add_map_coordinates(deduped)
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "city": "Eindhoven",
@@ -117,6 +119,21 @@ def _write_outputs(payload: dict) -> None:
     Path("data").mkdir(exist_ok=True)
     (docs_data / "latest_listings.json").write_text(json.dumps(payload, indent=2, ensure_ascii=True), encoding="utf-8")
     (Path("data") / "latest_listings.json").write_text(json.dumps(payload, indent=2, ensure_ascii=True), encoding="utf-8")
+
+
+EINDHOVEN_LAT = 51.4416
+EINDHOVEN_LON = 5.4697
+
+
+def _add_map_coordinates(items: list[dict]) -> None:
+    """Stable pins around Eindhoven (browser Nominatim is rate-limited / blocks anonymous calls)."""
+    for item in items:
+        key = f"{item.get('url', '')}|{item.get('location', '')}|{item.get('title', '')}"
+        h = int(hashlib.sha256(key.encode("utf-8")).hexdigest()[:12], 16)
+        dlat = (h % 2000) / 2000 * 0.035 - 0.0175
+        dlon = ((h // 2000) % 2000) / 2000 * 0.05 - 0.025
+        item["map_lat"] = round(EINDHOVEN_LAT + dlat, 6)
+        item["map_lon"] = round(EINDHOVEN_LON + dlon, 6)
 
 
 def _dedupe_by_url(items: list[dict]) -> list[dict]:

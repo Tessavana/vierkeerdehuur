@@ -23,6 +23,32 @@ function matchTagClass(tag) {
   return "tag tag-kans";
 }
 
+/** Matches src/workrun.py _add_map_coordinates when Web Crypto is available (HTTPS). */
+async function mapCoordsForListing(listing) {
+  const key = `${listing.url}|${listing.location}|${listing.title}`;
+  try {
+    if (globalThis.crypto?.subtle) {
+      const buf = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(key));
+      const hex = Array.from(new Uint8Array(buf))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("")
+        .slice(0, 12);
+      const h = parseInt(hex, 16);
+      const dlat = (h % 2000) / 2000 * 0.035 - 0.0175;
+      const dlon = (Math.floor(h / 2000) % 2000) / 2000 * 0.05 - 0.025;
+      return { lat: 51.4416 + dlat, lon: 5.4697 + dlon };
+    }
+  } catch (_e) {
+    /* http://localhost has no subtle crypto */
+  }
+  let h = 2166136261;
+  for (let j = 0; j < key.length; j++) h = Math.imul(h ^ key.charCodeAt(j), 16777619);
+  h = Math.abs(h) >>> 0;
+  const dlat = (h % 2000) / 2000 * 0.035 - 0.0175;
+  const dlon = (Math.floor(h / 2000) % 2000) / 2000 * 0.05 - 0.025;
+  return { lat: 51.4416 + dlat, lon: 5.4697 + dlon };
+}
+
 async function loadRun() {
   const res = await fetch("./data/latest_listings.json", { cache: "no-store" });
   const data = await res.json();
@@ -142,47 +168,62 @@ function listingRow(l, excluded) {
 async function renderMap(listings) {
   const mapEl = document.getElementById("map");
   if (!mapEl) return;
+  if (window.__housingMap) {
+    window.__housingMap.remove();
+    window.__housingMap = null;
+  }
   const map = L.map("map").setView([51.4416, 5.4697], 12);
+  window.__housingMap = map;
   L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
     attribution: "&copy; OpenStreetMap &copy; CARTO",
     subdomains: "abcd",
     maxZoom: 20,
   }).addTo(map);
-  const shown = listings.slice(0, 20);
-  const usedCoords = new Map();
-  for (const listing of shown) {
-    const hint = listing.title.split(",")[0].trim();
-    const q = encodeURIComponent(`${hint}, Eindhoven, Netherlands`);
-    try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`);
-      const rows = await res.json();
-      if (!rows.length) continue;
-      const lat = Number(rows[0].lat);
-      const lon = Number(rows[0].lon);
-      const key = `${lat.toFixed(4)},${lon.toFixed(4)}`;
-      const offset = usedCoords.get(key) || 0;
-      usedCoords.set(key, offset + 1);
-      const latAdj = lat + offset * 0.00035;
-      const lonAdj = lon + offset * 0.00035;
 
-      const marker = L.circleMarker([latAdj, lonAdj], {
-        radius: 8,
-        color: "#000",
-        weight: 2,
-        fillColor: "#000",
-        fillOpacity: 1,
-      }).addTo(map);
-      const wijk = dash(listing.neighborhood);
-      marker.bindPopup(
-        `<b>${listing.title}</b><br/>${wijk !== "-" ? `${wijk} · ` : ""}EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²<br/>${listing.available_from ? `Vanaf ${listing.available_from}<br/>` : ""}`
-      );
-      marker.on("click", () => {
-        showSelectedMatch(listing);
-      });
-    } catch (_err) {
-      // ignore map geocoding failures
+  const usedCoords = new Map();
+  const layerGroup = L.layerGroup().addTo(map);
+
+  for (const listing of listings) {
+    let lat = listing.map_lat != null ? Number(listing.map_lat) : null;
+    let lon = listing.map_lon != null ? Number(listing.map_lon) : null;
+    if (lat == null || lon == null || Number.isNaN(lat) || Number.isNaN(lon)) {
+      const c = await mapCoordsForListing(listing);
+      lat = c.lat;
+      lon = c.lon;
+    }
+    const key = `${lat.toFixed(5)},${lon.toFixed(5)}`;
+    const offset = usedCoords.get(key) || 0;
+    usedCoords.set(key, offset + 1);
+    const latAdj = lat + offset * 0.00025;
+    const lonAdj = lon + offset * 0.00025;
+
+    const marker = L.circleMarker([latAdj, lonAdj], {
+      radius: 8,
+      color: "#000",
+      weight: 2,
+      fillColor: "#000",
+      fillOpacity: 1,
+    });
+    const wijk = dash(listing.neighborhood);
+    marker.bindPopup(
+      `<b>${listing.title}</b><br/>${wijk !== "-" ? `${wijk} · ` : ""}EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²<br/>${listing.available_from ? `Vanaf ${listing.available_from}<br/>` : ""}`
+    );
+    marker.on("click", () => {
+      showSelectedMatch(listing);
+    });
+    layerGroup.addLayer(marker);
+  }
+
+  if (listings.length > 0) {
+    try {
+      map.fitBounds(layerGroup.getBounds().pad(0.12));
+    } catch (_e) {
+      map.setView([51.4416, 5.4697], 12);
     }
   }
+  setTimeout(() => {
+    map.invalidateSize();
+  }, 200);
 }
 
 function showSelectedMatch(listing) {

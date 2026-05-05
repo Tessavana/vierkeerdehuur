@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-05-05T21:29:56.648344+00:00",
+  "generated_at_utc": "2026-05-05T22:06:27.286028+00:00",
   "city": "Eindhoven",
   "max_rent": 1150,
   "provider_results": [
@@ -43,9 +43,9 @@
       "provider": "VbtProvider",
       "provider_name": "Vbt",
       "status": "ok",
-      "parsed": 186,
-      "suitable": 145,
-      "excluded": 41,
+      "parsed": 15,
+      "suitable": 12,
+      "excluded": 3,
       "error": null
     },
     {
@@ -55,7 +55,7 @@
       "parsed": 0,
       "suitable": 0,
       "excluded": 0,
-      "error": "403 Client Error: Forbidden for url: https://www.huurwoningen.nl/in/eindhoven/"
+      "error": "not enough values to unpack (expected 5, got 4)"
     },
     {
       "provider": "HuislijnProvider",
@@ -89,7 +89,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-rietvinkstraat-in-eindhoven-1",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "1-5-2026"
+      "available_from": "1-5-2026",
+      "notes": "{'flag': 'Direct bij eigenaar', 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '67', 'delivery': 'Kaal'}",
+      "map_lat": 51.432167,
+      "map_lon": 5.454075
     },
     {
       "provider": "RentfinderProvider",
@@ -103,7 +106,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-vestdijk-in-eindhoven-1",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '57', 'delivery': 'Gemeubileerd'}",
+      "map_lat": 51.440078,
+      "map_lon": 5.4946
     },
     {
       "provider": "RentfinderProvider",
@@ -117,7 +123,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-hertogstraat-in-eindhoven-1",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per 10-06-2026"
+      "available_from": "Per 10-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '30', 'delivery': 'Gemeubileerd'}",
+      "map_lat": 51.45658,
+      "map_lon": 5.449825
     },
     {
       "provider": "RentfinderProvider",
@@ -131,7 +140,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-grote-berg-in-eindhoven",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per 10-05-2026"
+      "available_from": "Per 10-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '50', 'delivery': 'Gemeubileerd'}",
+      "map_lat": 51.450735,
+      "map_lon": 5.467075
     },
     {
       "provider": "RentfinderProvider",
@@ -145,77 +157,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-bomanshof-217-j-in-eindhoven-1",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per direct"
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Fosforstraat \u2014 Fosforstraat- Type A (\u20ac1130\u2013\u20ac1200)",
-      "location": "5651 HK Eindhoven",
-      "rent_eur": 1130,
-      "size_m2": 81,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/111981/Fosforstraat.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Velden \u2014 De Velden- Hoekwoning (\u20ac1125\u2013\u20ac1205)",
-      "location": "5629 TD Eindhoven",
-      "rent_eur": 1125,
-      "size_m2": 128,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/111980/Amfoor,%20Paalspoor,%20Klokbeker.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Waterfront \u2014 Waterfront- Type B1",
-      "location": "5658 SR Eindhoven",
-      "rent_eur": 1125,
-      "size_m2": 121,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/111978/Waterfront.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Meerrijk - Antony Fokker Blok B5 \u2014 Meerrijk Antony Fokker Blok B5 - Hoekwoning",
-      "location": "5658 LC Eindhoven",
-      "rent_eur": 1125,
-      "size_m2": 145,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/94048/Meerrijk%20-%20Antony%20Fokker%20Blok%20B5.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "Meerrijk",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Meerrijk - Albert Plesman Blok A5 \u2014 Meerrijk Albert Plesman Blok A5 - Hoekwoning",
-      "location": "5658 LC Eindhoven",
-      "rent_eur": 1125,
-      "size_m2": 143,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/94045/Meerrijk%20-%20Albert%20Plesman%20Blok%20A5.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "Meerrijk",
-      "available_from": null
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '62', 'delivery': 'Gestoffeerd'}",
+      "map_lat": 51.454147,
+      "map_lon": 5.4706
     },
     {
       "provider": "RentfinderProvider",
@@ -229,21 +174,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-boutenslaan-in-eindhoven-1",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Jonkheer \u2014 De Jonkheer - type A1 (\u20ac1120\u2013\u20ac1243)",
-      "location": "5611 XJ Eindhoven",
-      "rent_eur": 1120,
-      "size_m2": 105,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93832/De%20Jonkheer.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "",
-      "available_from": null
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '43', 'delivery': 'Gestoffeerd'}",
+      "map_lat": 51.454498,
+      "map_lon": 5.471975
     },
     {
       "provider": "RentfinderProvider",
@@ -257,21 +191,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-nederlandplein-in-eindhoven-1",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per 01-06-2026"
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Meerrijk - Anthony Fokker Blok B3 \u2014 Meerrijk Anthony Fokker B3 - Appartement type 1",
-      "location": "5658 LH Eindhoven",
-      "rent_eur": 1100,
-      "size_m2": 102,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/94046/Meerrijk%20-%20Anthony%20Fokker%20Blok%20B3.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "Meerrijk",
-      "available_from": null
+      "available_from": "Per 01-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '3', 'total_rooms': '4', 'living_area': '90', 'delivery': 'Gestoffeerd'}",
+      "map_lat": 51.432938,
+      "map_lon": 5.45565
     },
     {
       "provider": "RentfinderProvider",
@@ -285,7 +208,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-studio-nieuwstraat-in-eindhoven-1",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '27', 'delivery': 'Gemeubileerd'}",
+      "map_lat": 51.424712,
+      "map_lon": 5.475325
     },
     {
       "provider": "RentfinderProvider",
@@ -299,7 +225,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-studio-nieuwstraat-in-eindhoven-3",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '30', 'delivery': 'Gestoffeerd'}",
+      "map_lat": 51.441443,
+      "map_lon": 5.479875
     },
     {
       "provider": "RentfinderProvider",
@@ -313,7 +242,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-studio-nieuwstraat-in-eindhoven",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '30', 'delivery': 'Gemeubileerd'}",
+      "map_lat": 51.428265,
+      "map_lon": 5.472025
     },
     {
       "provider": "VbtProvider",
@@ -327,7 +259,10 @@
       "url": "https://vbtverhuurmakelaars.nl/Project/111979/Waterlinie.html",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": "Vrije eenheden: 1 / 1",
+      "map_lat": 51.44587,
+      "map_lon": 5.459775
     },
     {
       "provider": "RentfinderProvider",
@@ -341,21 +276,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-studio-willem-rosestraat-in-eindhoven",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per 08-06-2026"
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Blixembosch II / Engelse wijk \u2014 Blixembosch II/ Engelse wijk - Type C (\u20ac1083\u2013\u20ac1130)",
-      "location": "5629 LH Eindhoven",
-      "rent_eur": 1083,
-      "size_m2": 124,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93858/Blixembosch%20II%20_%20Engelse%20wijk.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "Blixembosch",
-      "available_from": null
+      "available_from": "Per 08-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '42', 'delivery': 'Gemeubileerd'}",
+      "map_lat": 51.435598,
+      "map_lon": 5.483275
     },
     {
       "provider": "RentfinderProvider",
@@ -369,21 +293,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-pisanostraat-in-eindhoven",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "1-5-2026"
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Flowcoatstraat \u2014 Flowcoatstraat- Type A (hoek) (\u20ac1060\u2013\u20ac1095)",
-      "location": "5651 HR Eindhoven",
-      "rent_eur": 1060,
-      "size_m2": 82,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/111982/Flowcoatstraat.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "",
-      "available_from": null
+      "available_from": "1-5-2026",
+      "notes": "{'flag': 'Direct bij eigenaar', 'bed_rooms': '3', 'total_rooms': '4', 'living_area': '82', 'delivery': 'Kaal'}",
+      "map_lat": 51.432605,
+      "map_lon": 5.479125
     },
     {
       "provider": "VbtProvider",
@@ -397,21 +310,10 @@
       "url": "https://vbtverhuurmakelaars.nl/Project/118586/NEXT.html",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Hof 24 \u2014 Hof 24 - Tussenwoning (\u20ac1050\u2013\u20ac1145)",
-      "location": "5628 CN Eindhoven",
-      "rent_eur": 1050,
-      "size_m2": 112,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118585/Hof%2024.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": "Vrije eenheden: 2 / 2",
+      "map_lat": 51.446605,
+      "map_lon": 5.45405
     },
     {
       "provider": "RentfinderProvider",
@@ -425,7 +327,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-5-kamer-appartement-nederlandplein-in-eindhoven",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "15-5-2026"
+      "available_from": "15-5-2026",
+      "notes": "{'flag': 'Nieuw', 'bed_rooms': '4', 'total_rooms': '5', 'living_area': '87', 'delivery': 'Kaal'}",
+      "map_lat": 51.43992,
+      "map_lon": 5.46855
     },
     {
       "provider": "RentfinderProvider",
@@ -439,7 +344,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-kamer-diekirchlaan-35-in-eindhoven-1",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '111', 'delivery': 'Gemeubileerd'}",
+      "map_lat": 51.43096,
+      "map_lon": 5.479275
     },
     {
       "provider": "RentfinderProvider",
@@ -453,35 +361,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-spiraeastraat-in-eindhoven",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Picuskade - Kadeblok \u2014 Picuskade - Type A",
-      "location": "5613 EA Eindhoven",
-      "rent_eur": 1035,
-      "size_m2": 86,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118591/Picuskade%20-%20Kadeblok.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Baron \u2014 De Baron - type D1 (\u20ac1025\u2013\u20ac1148)",
-      "location": "5611 XB Eindhoven",
-      "rent_eur": 1025,
-      "size_m2": 87,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93864/De%20Baron.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "",
-      "available_from": null
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '48', 'delivery': 'Gemeubileerd'}",
+      "map_lat": 51.43327,
+      "map_lon": 5.476875
     },
     {
       "provider": "RentfinderProvider",
@@ -495,35 +378,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-de-greide-in-eindhoven",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "1-5-2026"
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Blok61 (Strijp S) \u2014 Blok 61 - Type A1 Soho (\u20ac1005\u2013\u20ac1055)",
-      "location": "5617 AL Eindhoven",
-      "rent_eur": 1005,
-      "size_m2": 62,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118584/Blok61%20(Strijp%20S).html",
-      "match_tag": "Instant reageren",
-      "neighborhood": "Strijp",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Meerrijk - Anthony Fokker Blok B6 \u2014 Meerrijk Anthony fokker Blok B6 - Hoekappartement (\u20ac1002\u2013\u20ac1070)",
-      "location": "5658 LM Eindhoven",
-      "rent_eur": 1002,
-      "size_m2": 112,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/94047/Meerrijk%20-%20Anthony%20Fokker%20Blok%20B6.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "Meerrijk",
-      "available_from": null
+      "available_from": "1-5-2026",
+      "notes": "{'flag': 'Direct bij eigenaar', 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '120', 'delivery': 'Kaal'}",
+      "map_lat": 51.424537,
+      "map_lon": 5.48365
     },
     {
       "provider": "KamernetProvider",
@@ -537,49 +395,10 @@
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/kronehoefstraat/apartment-2365695",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Natuurlijk te Veld \u2014 Eikberg - Type 200  4-kamer",
-      "location": "5629 CG Eindhoven",
-      "rent_eur": 1000,
-      "size_m2": 87,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/114309/Natuurlijk%20te%20Veld.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Regent \u2014 De Regent - Type A (\u20ac1000\u2013\u20ac1400)",
-      "location": "5611 HW Eindhoven",
-      "rent_eur": 1000,
-      "size_m2": 75,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93839/De%20Regent.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Gebroeders - De Willem \u2014 De Willem - Tweekamerappartement (\u20ac995\u2013\u20ac1280)",
-      "location": "5616 GE Eindhoven",
-      "rent_eur": 995,
-      "size_m2": 69,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118588/De%20Gebroeders%20-%20De%20Willem.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": null,
+      "map_lat": 51.443438,
+      "map_lon": 5.47635
     },
     {
       "provider": "RentfinderProvider",
@@ -593,7 +412,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-pastoriestraat-in-eindhoven-1",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '50', 'delivery': 'Gemeubileerd'}",
+      "map_lat": 51.437663,
+      "map_lon": 5.45575
     },
     {
       "provider": "RentfinderProvider",
@@ -607,21 +429,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-vestdijk-in-eindhoven",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per 27-04-2026"
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Picuskade - Picusgebouw \u2014 Picuskade - Type F",
-      "location": "5613 EA Eindhoven",
-      "rent_eur": 985,
-      "size_m2": 82,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118590/Picuskade%20-%20Picusgebouw.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "",
-      "available_from": null
+      "available_from": "Per 27-04-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '40', 'delivery': 'Gemeubileerd'}",
+      "map_lat": 51.438293,
+      "map_lon": 5.455875
     },
     {
       "provider": "RentfinderProvider",
@@ -635,7 +446,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-studio-mauritsstraat-in-eindhoven",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '23', 'delivery': 'Gemeubileerd'}",
+      "map_lat": 51.447077,
+      "map_lon": 5.468875
     },
     {
       "provider": "RentfinderProvider",
@@ -649,7 +463,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-studio-boutenslaan-in-eindhoven-1",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '32', 'delivery': 'Gestoffeerd'}",
+      "map_lat": 51.424993,
+      "map_lon": 5.486925
     },
     {
       "provider": "RentfinderProvider",
@@ -663,21 +480,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-studio-boschdijk-in-eindhoven-2",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per 01-06-2026"
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Gebroeders - De Lodewijk \u2014 De Lodewijk - Studio (\u20ac930\u2013\u20ac965)",
-      "location": "5616 GG Eindhoven",
-      "rent_eur": 930,
-      "size_m2": 61,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118587/De%20Gebroeders%20-%20De%20Lodewijk.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "",
-      "available_from": null
+      "available_from": "Per 01-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '27', 'delivery': 'Gemeubileerd'}",
+      "map_lat": 51.452328,
+      "map_lon": 5.4694
     },
     {
       "provider": "KamernetProvider",
@@ -691,7 +497,10 @@
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/blauwe-loper/apartment-2374435",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": null,
+      "map_lat": 51.45756,
+      "map_lon": 5.47385
     },
     {
       "provider": "RentfinderProvider",
@@ -705,7 +514,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-kathodelaan-in-eindhoven-1",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '35', 'delivery': 'Gestoffeerd'}",
+      "map_lat": 51.427582,
+      "map_lon": 5.457275
     },
     {
       "provider": "RentfinderProvider",
@@ -719,7 +531,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-woenselsestraat-in-eindhoven",
       "match_tag": "Twijfelgeval",
       "neighborhood": "Woensel",
-      "available_from": "Per 01-06-2026"
+      "available_from": "Per 01-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '24', 'delivery': 'Gestoffeerd'}",
+      "map_lat": 51.437697,
+      "map_lon": 5.46405
     },
     {
       "provider": "RentfinderProvider",
@@ -733,7 +548,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-2-kamer-appartement-koppele-in-eindhoven",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "15-5-2026"
+      "available_from": "15-5-2026",
+      "notes": "{'flag': 'Nieuw', 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '48', 'delivery': 'Kaal'}",
+      "map_lat": 51.432237,
+      "map_lon": 5.489
     },
     {
       "provider": "RentfinderProvider",
@@ -747,7 +565,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-heeghtakker-in-eindhoven",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "15-5-2026"
+      "available_from": "15-5-2026",
+      "notes": "{'flag': 'Nieuw', 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '72', 'delivery': 'Kaal'}",
+      "map_lat": 51.443035,
+      "map_lon": 5.469725
     },
     {
       "provider": "RentfinderProvider",
@@ -761,7 +582,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-studio-korenbloemstraat-in-eindhoven",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "15-5-2026"
+      "available_from": "15-5-2026",
+      "notes": "{'flag': 'Nieuw', 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '30', 'delivery': 'Gestoffeerd'}",
+      "map_lat": 51.450088,
+      "map_lon": 5.49465
     },
     {
       "provider": "RentfinderProvider",
@@ -775,7 +599,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-2-kamer-appartement-greide-in-eindhoven-1",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "1-5-2026"
+      "available_from": "1-5-2026",
+      "notes": "{'flag': 'Direct bij eigenaar', 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '58', 'delivery': 'Kaal'}",
+      "map_lat": 51.433393,
+      "map_lon": 5.477425
     },
     {
       "provider": "RentfinderProvider",
@@ -789,21 +616,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-simon-van-leeuwenstraat-in-eindhoven",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "15-5-2026"
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Groot Hartje \u2014 Groot Hartje - 2-kamerappartement (\u20ac800\u2013\u20ac1100)",
-      "location": "5616 TS Eindhoven",
-      "rent_eur": 800,
-      "size_m2": 43,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/116146/Groot%20Hartje.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "",
-      "available_from": null
+      "available_from": "15-5-2026",
+      "notes": "{'flag': 'Nieuw', 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '67', 'delivery': 'Kaal'}",
+      "map_lat": 51.44195,
+      "map_lon": 5.454175
     },
     {
       "provider": "VbtProvider",
@@ -817,7 +633,10 @@
       "url": "https://vbtverhuurmakelaars.nl/Project/97261/Hermanus%20Boexstraat%2019%20A,B,C.html",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": "Vrije eenheden: 1 / 1",
+      "map_lat": 51.433638,
+      "map_lon": 5.445125
     },
     {
       "provider": "RentfinderProvider",
@@ -831,7 +650,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-amalia-van-anhaltstraat-in-eindhoven-1",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '6', 'total_rooms': '6', 'living_area': '175', 'delivery': 'Gemeubileerd'}",
+      "map_lat": 51.447322,
+      "map_lon": 5.48595
     },
     {
       "provider": "RentfinderProvider",
@@ -845,7 +667,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-hertog-hendrik-van-brabantplein-in-eindhoven",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '26', 'delivery': 'Gestoffeerd'}",
+      "map_lat": 51.456702,
+      "map_lon": 5.4613
     },
     {
       "provider": "RentfinderProvider",
@@ -859,21 +684,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-kamer-beukenlaan-in-eindhoven-1",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Hartje Eindhoven \u2014 Hartje Antwerpen (\u20ac718\u2013\u20ac882)",
-      "location": "5616 TW Eindhoven",
-      "rent_eur": 718,
-      "size_m2": 51,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/94052/Hartje%20Eindhoven.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "",
-      "available_from": null
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '21', 'delivery': None}",
+      "map_lat": 51.437663,
+      "map_lon": 5.460925
     },
     {
       "provider": "RentfinderProvider",
@@ -887,21 +701,10 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-leenderweg-in-eindhoven",
       "match_tag": "Twijfelgeval",
       "neighborhood": "",
-      "available_from": "Per direct"
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Karel de Grotelaan \u2014 Karel de Grotelaan - type A (\u20ac665\u2013\u20ac900)",
-      "location": "5615 SP Eindhoven",
-      "rent_eur": 665,
-      "size_m2": 65,
-      "outdoor_space": false,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93861/Karel%20de%20Grotelaan.html",
-      "match_tag": "Twijfelgeval",
-      "neighborhood": "",
-      "available_from": null
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '55', 'delivery': None}",
+      "map_lat": 51.453955,
+      "map_lon": 5.481125
     }
   ],
   "excluded_listings": [
@@ -916,7 +719,8 @@
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/willem-de-zwijgerstraat/apartment-2373474",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": null
     },
     {
       "provider": "KamernetProvider",
@@ -929,7 +733,8 @@
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/heezerweg/apartment-2373473",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": null
     },
     {
       "provider": "KamernetProvider",
@@ -942,7 +747,8 @@
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/heeghtakker/apartment-2373353",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": null
     },
     {
       "provider": "KamernetProvider",
@@ -955,7 +761,8 @@
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/methusalemplein/apartment-2372498",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": null
     },
     {
       "provider": "KamernetProvider",
@@ -968,7 +775,8 @@
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/kruisstraat/apartment-2371853",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": null
     },
     {
       "provider": "KamernetProvider",
@@ -981,7 +789,8 @@
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/genneperweg/apartment-2370707",
       "reason": "above_budget",
       "neighborhood": "Genneper",
-      "available_from": null
+      "available_from": null,
+      "notes": null
     },
     {
       "provider": "KamernetProvider",
@@ -994,7 +803,8 @@
       "url": "https://kamernet.nl/en/for-rent/apartment-helmond/pastoor-van-leeuwenstraat/apartment-2370593",
       "reason": "outside_city",
       "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": null
     },
     {
       "provider": "KamernetProvider",
@@ -1007,7 +817,8 @@
       "url": "https://kamernet.nl/en/for-rent/apartment-eindhoven/paradijslaan/apartment-2369610",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": null
     },
     {
       "provider": "VestedaProvider",
@@ -1020,7 +831,8 @@
       "url": "https://www.vesteda.com/nl/huurwoningen-eindhoven/opwettensemolen-i",
       "reason": "missing_data",
       "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": "Opwettensemolen I | Vesteda Ga naar het hoofdmenu Ga naar de inhoud Favorieten Opgeslagen producten Mijn bewaarde favorieten Sluit modal U heeft nog geen woningen toegevoegd om u in te schrijven.\n Log in bij Huren bij Vesteda om uw eerdere inschrijvingen te bekijken. Inloggen [street] [type] [city] Verwijder [streetName] uit favorieten Inschrijven Inloggen zonder inschrijving Inloggen Inloggen als... Sluit modal Nieuwe woningzoeker Huurder van een Vesteda woning Open menu Consument Zakelijk Menu sluiten Consument Aanbod bekijken Huren in 5 stappen Huren op maat Service en contact Over ons Consument Aanbod bekijken Parkeren Consument Huren in 5 stappen Inschrijven en bezichtigen Voorwaarden en toewijzing Consument Huren op maat Woningdelen 50+ Sleutelberoepen Tijdelijke kamerverhuur Middenhuur Bestaande huurders Voorrang verlaten sociale huurwoning Consument Service en contact Huurverhoging 2026 Energie besparen Storingen-reparaties Onderhoud Mijn huur Belangen-klachten Veelgestelde vragen woningzoekers Veelgestelde vragen huurders Protocol cameratoezicht Vesteda Nieuws Contact Zakelijk Over Vesteda ESG Investeren Transacties en projecten Nieuws Werken bij Contact Zakelijk Vesteda in het kort Strategie Management Supervisory Committee Structuur en governance Voor leveranciers Housing Market Indicator Zakelijk ESG Milieu Sociale duurzaamheid Wet- en regelgeving Zakelijk Investor Relations Equity Debt Jaarverslagen Zakelijk Transacties en projecten Recente transacties Renovatie en verduurzamingsprojecten Contact Acquisitions & Development Zoeken NL EN Consument Zakelijk NL EN Aanbod bekijken Aanbod bekijken Parkeren Huren in 5 stappen Huren in 5 stappen Inschrijven en bezichtigen Voorwaarden en toewijzing Huren op maat Huren op maat Woningdelen 50+ Sleutelberoepen Tijdelij"
     },
     {
       "provider": "VestedaProvider",
@@ -1033,7 +845,8 @@
       "url": "https://www.vesteda.com/nl/huurwoningen-eindhoven/picushof-appartementen",
       "reason": "missing_data",
       "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": "Picushof Appartementen | Vesteda Ga naar het hoofdmenu Ga naar de inhoud Favorieten Opgeslagen producten Mijn bewaarde favorieten Sluit modal U heeft nog geen woningen toegevoegd om u in te schrijven.\n Log in bij Huren bij Vesteda om uw eerdere inschrijvingen te bekijken. Inloggen [street] [type] [city] Verwijder [streetName] uit favorieten Inschrijven Inloggen zonder inschrijving Inloggen Inloggen als... Sluit modal Nieuwe woningzoeker Huurder van een Vesteda woning Open menu Consument Zakelijk Menu sluiten Consument Aanbod bekijken Huren in 5 stappen Huren op maat Service en contact Over ons Consument Aanbod bekijken Parkeren Consument Huren in 5 stappen Inschrijven en bezichtigen Voorwaarden en toewijzing Consument Huren op maat Woningdelen 50+ Sleutelberoepen Tijdelijke kamerverhuur Middenhuur Bestaande huurders Voorrang verlaten sociale huurwoning Consument Service en contact Huurverhoging 2026 Energie besparen Storingen-reparaties Onderhoud Mijn huur Belangen-klachten Veelgestelde vragen woningzoekers Veelgestelde vragen huurders Protocol cameratoezicht Vesteda Nieuws Contact Zakelijk Over Vesteda ESG Investeren Transacties en projecten Nieuws Werken bij Contact Zakelijk Vesteda in het kort Strategie Management Supervisory Committee Structuur en governance Voor leveranciers Housing Market Indicator Zakelijk ESG Milieu Sociale duurzaamheid Wet- en regelgeving Zakelijk Investor Relations Equity Debt Jaarverslagen Zakelijk Transacties en projecten Recente transacties Renovatie en verduurzamingsprojecten Contact Acquisitions & Development Zoeken NL EN Consument Zakelijk NL EN Aanbod bekijken Aanbod bekijken Parkeren Huren in 5 stappen Huren in 5 stappen Inschrijven en bezichtigen Voorwaarden en toewijzing Huren op maat Huren op maat Woningdelen 50+ Sleutelberoepen Tij"
     },
     {
       "provider": "VestedaProvider",
@@ -1044,22 +857,10 @@
       "rent_eur": 1315,
       "size_m2": 110,
       "url": "https://www.vesteda.com/nl/huurwoningen-eindhoven/kloosterdreef",
-      "reason": "above_budget",
+      "reason": "blocked_keyword",
       "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Blok61 (Strijp S) \u2014 Blok 61 - Type C High Line (\u20ac1260\u2013\u20ac1300)",
-      "location": "5617 AL Eindhoven",
-      "rent_eur": 1260,
-      "size_m2": 88,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118584/Blok61%20(Strijp%20S).html",
-      "reason": "above_budget",
-      "neighborhood": "Strijp",
-      "available_from": null
+      "available_from": null,
+      "notes": "Kloosterdreef | Vesteda Ga naar het hoofdmenu Ga naar de inhoud Favorieten Opgeslagen producten Mijn bewaarde favorieten Sluit modal U heeft nog geen woningen toegevoegd om u in te schrijven.\n Log in bij Huren bij Vesteda om uw eerdere inschrijvingen te bekijken. Inloggen [street] [type] [city] Verwijder [streetName] uit favorieten Inschrijven Inloggen zonder inschrijving Inloggen Inloggen als... Sluit modal Nieuwe woningzoeker Huurder van een Vesteda woning Open menu Consument Zakelijk Menu sluiten Consument Aanbod bekijken Huren in 5 stappen Huren op maat Service en contact Over ons Consument Aanbod bekijken Parkeren Consument Huren in 5 stappen Inschrijven en bezichtigen Voorwaarden en toewijzing Consument Huren op maat Woningdelen 50+ Sleutelberoepen Tijdelijke kamerverhuur Middenhuur Bestaande huurders Voorrang verlaten sociale huurwoning Consument Service en contact Huurverhoging 2026 Energie besparen Storingen-reparaties Onderhoud Mijn huur Belangen-klachten Veelgestelde vragen woningzoekers Veelgestelde vragen huurders Protocol cameratoezicht Vesteda Nieuws Contact Zakelijk Over Vesteda ESG Investeren Transacties en projecten Nieuws Werken bij Contact Zakelijk Vesteda in het kort Strategie Management Supervisory Committee Structuur en governance Voor leveranciers Housing Market Indicator Zakelijk ESG Milieu Sociale duurzaamheid Wet- en regelgeving Zakelijk Investor Relations Equity Debt Jaarverslagen Zakelijk Transacties en projecten Recente transacties Renovatie en verduurzamingsprojecten Contact Acquisitions & Development Zoeken NL EN Consument Zakelijk NL EN Aanbod bekijken Aanbod bekijken Parkeren Huren in 5 stappen Huren in 5 stappen Inschrijven en bezichtigen Voorwaarden en toewijzing Huren op maat Huren op maat Woningdelen 50+ Sleutelberoepen Tijdelijke k"
     },
     {
       "provider": "VbtProvider",
@@ -1072,215 +873,8 @@
       "url": "https://vbtverhuurmakelaars.nl/Project/118586/NEXT.html",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Picuskade - Kadeblok \u2014 Picuskade - Type C1",
-      "location": "5613 EA Eindhoven",
-      "rent_eur": 1185,
-      "size_m2": 98,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118591/Picuskade%20-%20Kadeblok.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Picuskade - Kadeblok \u2014 Picuskade - Type C2 (\u20ac1165\u2013\u20ac1175)",
-      "location": "5613 EA Eindhoven",
-      "rent_eur": 1165,
-      "size_m2": 101,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118591/Picuskade%20-%20Kadeblok.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Picuskade - Kadeblok \u2014 Picuskade - Type C3",
-      "location": "5613 EA Eindhoven",
-      "rent_eur": 1210,
-      "size_m2": 101,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118591/Picuskade%20-%20Kadeblok.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Picuskade - Kadeblok \u2014 Picuskade - Type D2 (\u20ac1180\u2013\u20ac1190)",
-      "location": "5613 EA Eindhoven",
-      "rent_eur": 1180,
-      "size_m2": 98,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118591/Picuskade%20-%20Kadeblok.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Picuskade - Kadeblok \u2014 Picuskade - Type D3",
-      "location": "5613 EA Eindhoven",
-      "rent_eur": 1215,
-      "size_m2": 98,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118591/Picuskade%20-%20Kadeblok.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Picuskade - Kadeblok \u2014 Picuskade - Type E3",
-      "location": "5613 EA Eindhoven",
-      "rent_eur": 1170,
-      "size_m2": 94,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118591/Picuskade%20-%20Kadeblok.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Picuskade - Kadeblok \u2014 Picuskade - Type F3",
-      "location": "5613 EA Eindhoven",
-      "rent_eur": 1185,
-      "size_m2": 95,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118591/Picuskade%20-%20Kadeblok.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Picuskade - Picusgebouw \u2014 Picuskade - Type N3",
-      "location": "5613 EA Eindhoven",
-      "rent_eur": 1175,
-      "size_m2": 74,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118590/Picuskade%20-%20Picusgebouw.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Picuskade - Picusgebouw \u2014 Picuskade - Type Q1",
-      "location": "5613 EA Eindhoven",
-      "rent_eur": 1300,
-      "size_m2": 102,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118590/Picuskade%20-%20Picusgebouw.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Picuskade - Picusgebouw \u2014 Picuskade - Type Q2",
-      "location": "5613 EA Eindhoven",
-      "rent_eur": 1500,
-      "size_m2": 118,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118590/Picuskade%20-%20Picusgebouw.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Gebroeders - De Lodewijk \u2014 De Lodewijk - Vierkamerappartement (\u20ac1400\u2013\u20ac1600)",
-      "location": "5616 GG Eindhoven",
-      "rent_eur": 1400,
-      "size_m2": 105,
-      "url": "https://vbtverhuurmakelaars.nl/Project/118587/De%20Gebroeders%20-%20De%20Lodewijk.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Natuurlijk te Veld \u2014 Noordhoek - Type 1",
-      "location": "5629 CG Eindhoven",
-      "rent_eur": 1123,
-      "size_m2": 75,
-      "url": "https://vbtverhuurmakelaars.nl/Project/114309/Natuurlijk%20te%20Veld.html",
-      "reason": "north_eindhoven",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Natuurlijk te Veld \u2014 Noordhoek - Type 2",
-      "location": "5629 CG Eindhoven",
-      "rent_eur": 1123,
-      "size_m2": 75,
-      "url": "https://vbtverhuurmakelaars.nl/Project/114309/Natuurlijk%20te%20Veld.html",
-      "reason": "north_eindhoven",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Fosforstraat \u2014 Fosforstraat- Type B",
-      "location": "5651 HK Eindhoven",
-      "rent_eur": 1275,
-      "size_m2": 101,
-      "url": "https://vbtverhuurmakelaars.nl/Project/111981/Fosforstraat.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Fosforstraat \u2014 Fosforstraat- Type C",
-      "location": "5651 HK Eindhoven",
-      "rent_eur": 1275,
-      "size_m2": 101,
-      "url": "https://vbtverhuurmakelaars.nl/Project/111981/Fosforstraat.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Residentie Genderstate \u2014 Genderstate - type A1 (\u20ac1380\u2013\u20ac1480)",
-      "location": "5616 EE Eindhoven",
-      "rent_eur": 1380,
-      "size_m2": 143,
-      "url": "https://vbtverhuurmakelaars.nl/Project/94043/Residentie%20Genderstate.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": "Vrije eenheden: 4 / 4"
     },
     {
       "provider": "VbtProvider",
@@ -1293,7 +887,8 @@
       "url": "https://vbtverhuurmakelaars.nl/Project/94041/Residentie%20Petruspark.html",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": "Vrije eenheden: 1 / 1"
     },
     {
       "provider": "VbtProvider",
@@ -1306,280 +901,8 @@
       "url": "https://vbtverhuurmakelaars.nl/Project/94041/Residentie%20Petruspark.html",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Residentie Petruspark \u2014 Residentie Petruspark type E (\u20ac1191\u2013\u20ac1192)",
-      "location": "5623 AC Eindhoven",
-      "rent_eur": 1191,
-      "size_m2": 108,
-      "url": "https://vbtverhuurmakelaars.nl/Project/94041/Residentie%20Petruspark.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Residentie Petruspark \u2014 Residentie Petruspark type F (\u20ac1370\u2013\u20ac1375)",
-      "location": "5623 AC Eindhoven",
-      "rent_eur": 1370,
-      "size_m2": 128,
-      "url": "https://vbtverhuurmakelaars.nl/Project/94041/Residentie%20Petruspark.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Residentie Petruspark \u2014 Residentie Petruspark type O (\u20ac1190\u2013\u20ac1375)",
-      "location": "5623 AC Eindhoven",
-      "rent_eur": 1190,
-      "size_m2": 128,
-      "url": "https://vbtverhuurmakelaars.nl/Project/94041/Residentie%20Petruspark.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Baron \u2014 De Baron - type G3 (\u20ac1495\u2013\u20ac1618)",
-      "location": "5611 XB Eindhoven",
-      "rent_eur": 1495,
-      "size_m2": 119,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93864/De%20Baron.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Baron \u2014 De Baron - type H3 (\u20ac1664\u2013\u20ac1787)",
-      "location": "5611 XB Eindhoven",
-      "rent_eur": 1664,
-      "size_m2": 137,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93864/De%20Baron.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Baron \u2014 De Baron - type J3 (\u20ac1765\u2013\u20ac1898)",
-      "location": "5611 XB Eindhoven",
-      "rent_eur": 1765,
-      "size_m2": 180,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93864/De%20Baron.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Baron \u2014 De Baron - type C3 (\u20ac1155\u2013\u20ac1278)",
-      "location": "5611 XB Eindhoven",
-      "rent_eur": 1155,
-      "size_m2": 101,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93864/De%20Baron.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Baron \u2014 De Baron - type C4 (\u20ac1160\u2013\u20ac1283)",
-      "location": "5611 XB Eindhoven",
-      "rent_eur": 1160,
-      "size_m2": 101,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93864/De%20Baron.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Baron \u2014 De Baron - type N2 (\u20ac1185\u2013\u20ac1308)",
-      "location": "5611 XB Eindhoven",
-      "rent_eur": 1185,
-      "size_m2": 103,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93864/De%20Baron.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Baron \u2014 De Baron - type N1 (\u20ac1185\u2013\u20ac1308)",
-      "location": "5611 XB Eindhoven",
-      "rent_eur": 1185,
-      "size_m2": 103,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93864/De%20Baron.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Baron \u2014 Type L3 (\u20ac1978\u2013\u20ac2101)",
-      "location": "5611 XB Eindhoven",
-      "rent_eur": 1978,
-      "size_m2": 256,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93864/De%20Baron.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Blixembosch II / Engelse wijk \u2014 Blixembosch II/ Engelse wijk - Type H (\u20ac1153\u2013\u20ac1155)",
-      "location": "5629 LH Eindhoven",
-      "rent_eur": 1153,
-      "size_m2": 129,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93858/Blixembosch%20II%20_%20Engelse%20wijk.html",
-      "reason": "above_budget",
-      "neighborhood": "Blixembosch",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Blixembosch II / Engelse wijk \u2014 Blixembosch II/ Engelse wijk - Type J",
-      "location": "5629 LH Eindhoven",
-      "rent_eur": 1160,
-      "size_m2": 132,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93858/Blixembosch%20II%20_%20Engelse%20wijk.html",
-      "reason": "above_budget",
-      "neighborhood": "Blixembosch",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Beryl / Diamantring \u2014 Beryl & Diamantring Type A - B",
-      "location": "5629 GG Eindhoven",
-      "rent_eur": 1180,
-      "size_m2": 123,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93857/Beryl%20_%20Diamantring.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Beryl / Diamantring \u2014 Beryl & Diamantring Type C",
-      "location": "5629 GG Eindhoven",
-      "rent_eur": 1180,
-      "size_m2": 123,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93857/Beryl%20_%20Diamantring.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "Fontainebleau-, Finistere- en Neverslaan \u2014 Fontainebleau-, Finistere- en Neverslaan Type A",
-      "location": "5627 TM Eindhoven",
-      "rent_eur": 1180,
-      "size_m2": 118,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93856/Fontainebleau-,%20Finistere-%20en%20Neverslaan.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Jonkheer \u2014 De Jonkheer - type E3 (\u20ac1280\u2013\u20ac1403)",
-      "location": "5611 XJ Eindhoven",
-      "rent_eur": 1280,
-      "size_m2": 123,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93832/De%20Jonkheer.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Jonkheer \u2014 De Jonkheer - type K2 (\u20ac1335\u2013\u20ac1463)",
-      "location": "5611 XJ Eindhoven",
-      "rent_eur": 1335,
-      "size_m2": 135,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93832/De%20Jonkheer.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Jonkheer \u2014 De Jonkheer - type K3 (\u20ac1435\u2013\u20ac1558)",
-      "location": "5611 XJ Eindhoven",
-      "rent_eur": 1435,
-      "size_m2": 140,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93832/De%20Jonkheer.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Jonkheer \u2014 De Jonkheer - type K6 (\u20ac1430\u2013\u20ac1553)",
-      "location": "5611 XJ Eindhoven",
-      "rent_eur": 1430,
-      "size_m2": 140,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93832/De%20Jonkheer.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
-    },
-    {
-      "provider": "VbtProvider",
-      "provider_name": "Vbt",
-      "source": "vbt",
-      "title": "De Jonkheer \u2014 De Jonkheer - type K7 (\u20ac1360\u2013\u20ac1483)",
-      "location": "5611 XJ Eindhoven",
-      "rent_eur": 1360,
-      "size_m2": 135,
-      "url": "https://vbtverhuurmakelaars.nl/Project/93832/De%20Jonkheer.html",
-      "reason": "above_budget",
-      "neighborhood": "",
-      "available_from": null
+      "available_from": null,
+      "notes": "Vrije eenheden: 1 / 1"
     },
     {
       "provider": "RentfinderProvider",
@@ -1592,7 +915,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-kamer-schelfhoutstraat-in-eindhoven-1",
       "reason": "too_small",
       "neighborhood": "",
-      "available_from": "1-5-2026"
+      "available_from": "1-5-2026",
+      "notes": "{'flag': 'Direct bij eigenaar', 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '12', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1605,7 +929,8 @@
       "url": "https://rentfinder.nl/properties/appartement-te-huur-strijp-s-philitelaan-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "Strijp",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '66', 'delivery': None}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1618,7 +943,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-kamer-willemstraat-in-eindhoven",
       "reason": "too_small",
       "neighborhood": "",
-      "available_from": "Per 01-07-2026"
+      "available_from": "Per 01-07-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '12', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1631,7 +957,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-kastanjelaan-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 22-05-2026"
+      "available_from": "Per 22-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '66', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1644,7 +971,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-wal-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 08-06-2026"
+      "available_from": "Per 08-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '72', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1657,7 +985,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-borchmolen-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '75', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1670,7 +999,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-victoriapark-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 06-05-2026"
+      "available_from": "Per 06-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '112', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1683,7 +1013,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-sallandlaan-56-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 04-05-2026"
+      "available_from": "Per 04-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '4', 'total_rooms': '5', 'living_area': '114', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1696,7 +1027,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-deken-van-somerenstraat-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '70', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1709,7 +1041,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-deken-van-somerenstraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '73', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1722,7 +1055,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-korianderstraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-07-2026"
+      "available_from": "Per 01-07-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '77', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1735,7 +1069,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-pastoor-sickingstraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-07-2026"
+      "available_from": "Per 01-07-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '84', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1748,7 +1083,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-biesterweg-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '90', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1761,7 +1097,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-hoogstraat-in-eindhoven",
       "reason": "too_small",
       "neighborhood": "",
-      "available_from": "Per 15-05-2026"
+      "available_from": "Per 15-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '15', 'delivery': None}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1774,7 +1111,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-keizersgracht-in-eindhoven-3",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '37', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1787,7 +1125,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-deken-van-somerenstraat-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-06-2026"
+      "available_from": "Per 01-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '83', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1800,7 +1139,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-don-boscostraat-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '72', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1813,7 +1153,8 @@
       "url": "https://rentfinder.nl/properties/appartement-te-huur-meerrijk-meerwater-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "Meerrijk",
-      "available_from": "Per 01-07-2026"
+      "available_from": "Per 01-07-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '95', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1826,7 +1167,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-frans-halsstraat-1-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-07-2026"
+      "available_from": "Per 01-07-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '100', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1839,7 +1181,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-kamer-hulstbosakker-in-eindhoven",
       "reason": "too_small",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '8', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1852,7 +1195,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-de-vriesstraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '60', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1865,7 +1209,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-kastanjelaan-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 08-05-2026"
+      "available_from": "Per 08-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '67', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1878,7 +1223,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-victoriapark-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-06-2026"
+      "available_from": "Per 01-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '82', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1891,7 +1237,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-busonilaan-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '4', 'living_area': '104', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1904,7 +1251,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-chrysantenstraat-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 25-07-2026"
+      "available_from": "Per 25-07-2026",
+      "notes": "{'flag': None, 'bed_rooms': '5', 'total_rooms': '6', 'living_area': '188', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1917,7 +1265,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-woenselse-markt-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "Woensel",
-      "available_from": "Per 15-05-2026"
+      "available_from": "Per 15-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '71', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1930,7 +1279,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-stratumseind-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "Stratum",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '50', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1943,7 +1293,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-hastelweg-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-06-2026"
+      "available_from": "Per 01-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '53', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1956,7 +1307,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-akkerstraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '74', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1969,7 +1321,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-pastoor-van-arslaan-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-06-2026"
+      "available_from": "Per 01-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '61', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1982,7 +1335,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-samuel-de-langestraat-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '3', 'total_rooms': '4', 'living_area': '81', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -1995,7 +1349,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-kamer-stephensonstraat-in-eindhoven-1",
       "reason": "too_small",
       "neighborhood": "",
-      "available_from": "In overleg"
+      "available_from": "In overleg",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '16', 'delivery': None}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2008,7 +1363,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-tongelresestraat-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "Tongelre",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '41', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2021,7 +1377,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-kastanjelaan-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 08-05-2026"
+      "available_from": "Per 08-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '73', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2034,7 +1391,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-victoriapark-in-eindhoven-3",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 06-05-2026"
+      "available_from": "Per 06-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '75', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2047,7 +1405,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-kromakkerweg-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 15-05-2026"
+      "available_from": "Per 15-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '65', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2060,7 +1419,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-pisanostraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '3', 'total_rooms': '4', 'living_area': '90', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2073,7 +1433,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-zeeheldenlaan-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '3', 'total_rooms': '4', 'living_area': '147', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2086,7 +1447,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-de-stoutheuvel-146-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-06-2026"
+      "available_from": "Per 01-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '4', 'total_rooms': '5', 'living_area': '122', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2099,7 +1461,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-ericastraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '47', 'delivery': 'Kaal'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2112,7 +1475,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-pastoor-van-arslaan-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-06-2026"
+      "available_from": "Per 01-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '61', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2125,7 +1489,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-de-vriesstraat-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '50', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2138,7 +1503,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-gabriel-metsulaan-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 05-06-2026"
+      "available_from": "Per 05-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '60', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2151,7 +1517,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-hertog-hendrik-van-brabantplein-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '67', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2164,7 +1531,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-heezerweg-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '90', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2177,7 +1545,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-kerkstraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '76', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2190,7 +1559,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-lichtstraat-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-08-2026"
+      "available_from": "Per 01-08-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '103', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2203,7 +1573,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-ir-kalffstraat-252-nieuw-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-06-2026"
+      "available_from": "Per 01-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '70', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2216,7 +1587,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-tongelresestraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "Tongelre",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '25', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2229,7 +1601,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-kastanjelaan-in-eindhoven-3",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 25-06-2026"
+      "available_from": "Per 25-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '66', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2242,7 +1615,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-victoriapark-in-eindhoven-4",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '82', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2255,7 +1629,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-pastoor-van-arslaan-in-eindhoven-4",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-06-2026"
+      "available_from": "Per 01-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '61', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2268,7 +1643,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-lichtstraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 02-06-2026"
+      "available_from": "Per 02-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '103', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2281,7 +1657,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-veldmaarschalk-montgomerylaan-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-06-2026"
+      "available_from": "Per 01-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '75', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2294,7 +1671,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-edenstraat-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '123', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2307,7 +1685,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-edenstraat-in-eindhoven-2-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '127', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2320,7 +1699,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-kleine-berg-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 11-05-2026"
+      "available_from": "Per 11-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '48', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2333,7 +1713,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-wal-in-eindhoven-3",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-06-2026"
+      "available_from": "Per 01-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '51', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2346,7 +1727,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-prins-hendrikstraat-40-j-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '55', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2359,7 +1741,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-kastanjelaan-in-eindhoven-4",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 25-06-2026"
+      "available_from": "Per 25-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '66', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2372,7 +1755,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-victoriapark-in-eindhoven-5",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 30-04-2026"
+      "available_from": "Per 30-04-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '70', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2385,7 +1769,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-graslinnen-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '4', 'total_rooms': '5', 'living_area': '140', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2398,7 +1783,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-jeroen-boschlaan-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '69', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2411,7 +1797,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-mainelaan-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-06-2026"
+      "available_from": "Per 01-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '4', 'total_rooms': '5', 'living_area': '134', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2424,7 +1811,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-dommelhoefstraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-07-2026"
+      "available_from": "Per 01-07-2026",
+      "notes": "{'flag': None, 'bed_rooms': '3', 'total_rooms': '4', 'living_area': '190', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2437,7 +1825,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-krabbendampad-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 22-05-2026"
+      "available_from": "Per 22-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '65', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2450,7 +1839,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-de-regent-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '91', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2463,7 +1853,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-frederik-van-eedenplein-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 21-05-2026"
+      "available_from": "Per 21-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '3', 'total_rooms': '4', 'living_area': '150', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2476,7 +1867,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-byrdstraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 15-05-2026"
+      "available_from": "Per 15-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '3', 'total_rooms': '6', 'living_area': '151', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2489,7 +1881,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-kruisstraat-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '64', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2502,7 +1895,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-graaf-adolfstraat-2-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '100', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2515,7 +1909,8 @@
       "url": "https://rentfinder.nl/properties/appartement-te-huur-bergen-deken-van-somerenstraat-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "Bergen",
-      "available_from": "Per 01-07-2026"
+      "available_from": "Per 01-07-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '72', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2528,7 +1923,8 @@
       "url": "https://rentfinder.nl/properties/appartement-te-huur-bergen-deken-van-somerenstraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "Bergen",
-      "available_from": "Per 01-07-2026"
+      "available_from": "Per 01-07-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '80', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2541,7 +1937,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-kastanjelaan-in-eindhoven-5",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '73', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2554,7 +1951,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-victoriapark-in-eindhoven-6",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '103', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2567,7 +1965,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-dommelhoefstraat-68-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-07-2026"
+      "available_from": "Per 01-07-2026",
+      "notes": "{'flag': None, 'bed_rooms': '3', 'total_rooms': '4', 'living_area': '190', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2580,7 +1979,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-iepenlaan-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 16-05-2026"
+      "available_from": "Per 16-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '50', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2593,7 +1993,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-paradijslaan-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '103', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2606,7 +2007,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-honore-de-balzaclaan-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '3', 'total_rooms': '4', 'living_area': '107', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2619,7 +2021,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-cassandraplein-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-12-2026"
+      "available_from": "Per 01-12-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '37', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2632,7 +2035,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-schoenmakerstraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '4', 'total_rooms': '4', 'living_area': '118', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2645,7 +2049,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-meerring-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '99', 'delivery': None}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2658,7 +2063,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-deken-van-somerenstraat-in-eindhoven-6",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '64', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2671,7 +2077,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-kamer-odysseuslaan-in-eindhoven",
       "reason": "too_small",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '12', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2684,7 +2091,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-de-vriesstraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '101', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2697,7 +2105,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-gerard-philipslaan-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '104', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2710,7 +2119,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-hoogstraat-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '50', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2723,7 +2133,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-don-boscostraat-in-eindhoven",
       "reason": "too_small",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '13', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2736,7 +2147,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-bergstraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '71', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2749,7 +2161,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-kees-de-beverpad-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '4', 'total_rooms': '5', 'living_area': '116', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2762,7 +2175,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-meerring-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '101', 'delivery': None}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2775,7 +2189,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-volderhof-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 05-06-2026"
+      "available_from": "Per 05-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '65', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2788,7 +2203,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-grasbaan-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 15-05-2026"
+      "available_from": "Per 15-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '110', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2801,7 +2217,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-hoefkestraat-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '4', 'total_rooms': '5', 'living_area': '141', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2814,7 +2231,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-keizersgracht-in-eindhoven-4",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '70', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2827,7 +2245,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-lichttoren-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '82', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2840,7 +2259,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-geldropseweg-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '81', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2853,7 +2273,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-henriettestraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '55', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2866,7 +2287,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-prins-hendrikstraat-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '64', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2879,7 +2301,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-lichtstraat-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '105', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2892,7 +2315,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-van-thienenlaan-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '3', 'total_rooms': '4', 'living_area': '98', 'delivery': None}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2905,7 +2329,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-studio-beukenlaan-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 15-05-2026"
+      "available_from": "Per 15-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '20', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2918,7 +2343,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-leenderweg-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '5', 'total_rooms': '6', 'living_area': '144', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2931,7 +2357,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-vincent-van-den-heuvellaan-311-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "In overleg"
+      "available_from": "In overleg",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '57', 'delivery': None}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2944,7 +2371,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-vincent-van-den-heuvellaan-109-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "In overleg"
+      "available_from": "In overleg",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '84', 'delivery': None}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2957,7 +2385,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-heeghtakker-40-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 09-05-2026"
+      "available_from": "Per 09-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '73', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2970,7 +2399,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-anjelierstraat-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '78', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2983,7 +2413,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-bisschop-bekkerslaan-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '250', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -2996,7 +2427,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-hoogstraat-in-eindhoven-4",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '3', 'total_rooms': '4', 'living_area': '80', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3009,7 +2441,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-don-boscostraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '50', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3022,7 +2455,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-kamer-tinelstraat-in-eindhoven-1",
       "reason": "too_small",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '7', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3035,7 +2469,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-waterlinie-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '50', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3048,7 +2483,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-le-sage-ten-broeklaan-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '62', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3061,7 +2497,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-hugo-de-grootplein-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '80', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3074,7 +2511,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-kleine-berg-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 15-06-2026"
+      "available_from": "Per 15-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '65', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3087,7 +2525,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-heeghtakker-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 15-06-2026"
+      "available_from": "Per 15-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '3', 'total_rooms': '4', 'living_area': '115', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3100,7 +2539,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-atrechtlaan-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "In overleg"
+      "available_from": "In overleg",
+      "notes": "{'flag': None, 'bed_rooms': '3', 'total_rooms': '4', 'living_area': '103', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3113,7 +2553,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-havensingel-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '4', 'total_rooms': '5', 'living_area': '106', 'delivery': None}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3126,7 +2567,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-kerkakkerstraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '4', 'total_rooms': '5', 'living_area': '125', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3139,7 +2581,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-odysseuslaan-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '4', 'total_rooms': '5', 'living_area': '113', 'delivery': None}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3152,7 +2595,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-hoogstraat-in-eindhoven-4-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 05-05-2026"
+      "available_from": "Per 05-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '97', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3165,7 +2609,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-stratumsedijk-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "Stratum",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '83', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3178,7 +2623,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-frederik-hendrikplein-36-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '5', 'living_area': '106', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3191,7 +2637,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-princessenlaan-47-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '3', 'total_rooms': '5', 'living_area': '118', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3204,7 +2651,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-bomanshof-97-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '95', 'delivery': None}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3217,7 +2665,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-hartelstein-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "In overleg"
+      "available_from": "In overleg",
+      "notes": "{'flag': None, 'bed_rooms': '5', 'total_rooms': '7', 'living_area': '156', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3230,7 +2679,8 @@
       "url": "https://rentfinder.nl/properties/appartement-te-huur-bergen-deken-van-somerenstraat-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "Bergen",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '84', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3243,7 +2693,8 @@
       "url": "https://rentfinder.nl/properties/appartement-te-huur-philipsdorp-gerard-philipslaan-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '104', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3256,7 +2707,8 @@
       "url": "https://rentfinder.nl/properties/appartement-te-huur-philipsdorp-gerard-philipslaan-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '118', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3269,7 +2721,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-karel-de-grotelaan-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '74', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3282,7 +2735,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-vestdijk-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '142', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3295,7 +2749,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-meerring-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '97', 'delivery': 'Kaal'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3308,7 +2763,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-pastoor-sickingstraat-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '4', 'living_area': '81', 'delivery': None}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3321,7 +2777,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-paradijslaan-37-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "In overleg"
+      "available_from": "In overleg",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '88', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3334,7 +2791,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-juliusstraat-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '5', 'total_rooms': '6', 'living_area': '160', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3347,7 +2805,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-geldropseweg-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '57', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3360,7 +2819,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-veldmaarschalk-montgomerylaan-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '3', 'total_rooms': '4', 'living_area': '158', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3373,7 +2833,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-kamer-nieuwe-fellenoord-in-eindhoven-1",
       "reason": "too_small",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '9', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3386,7 +2847,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-grasveld-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '3', 'total_rooms': '4', 'living_area': '120', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3399,7 +2861,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-kamer-tongelresestraat-in-eindhoven",
       "reason": "too_small",
       "neighborhood": "Tongelre",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '1', 'living_area': '12', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3412,7 +2875,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-deken-van-somerenstraat-in-eindhoven-4",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '78', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3425,7 +2889,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-deken-van-somerenstraat-in-eindhoven-4-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '85', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3438,7 +2903,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-deken-van-somerenstraat-in-eindhoven-4-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '85', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3451,7 +2917,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-deken-van-somerenstraat-in-eindhoven-4-3",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '89', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3464,7 +2931,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-deken-van-somerenstraat-in-eindhoven-4-4",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '93', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3477,7 +2945,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-korianderstraat-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '70', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3490,7 +2959,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-wal-in-eindhoven-4",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 02-06-2026"
+      "available_from": "Per 02-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '67', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3503,7 +2973,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-studio-hoogstraat-in-eindhoven-1",
       "reason": "too_small",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '15', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3516,7 +2987,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-frederik-van-eedenplein-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 04-05-2026"
+      "available_from": "Per 04-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '95', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3529,7 +3001,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-deken-van-somerenstraat-in-eindhoven-4-5",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '99', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3542,7 +3015,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-vestdijk-in-eindhoven-3",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "In overleg"
+      "available_from": "In overleg",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '119', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3555,7 +3029,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-cassandraplein-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-06-2026"
+      "available_from": "Per 01-06-2026",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '47', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3568,7 +3043,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-deken-van-somerenstraat-in-eindhoven-4-6",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '78', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3581,7 +3057,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-stationsplein-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '107', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3594,7 +3071,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-mendelssohnlaan-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '68', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3607,7 +3085,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-mignot-en-de-blockplein-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '100', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3620,7 +3099,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-graspieper-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '4', 'total_rooms': '5', 'living_area': '138', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3633,7 +3113,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-de-regent-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '120', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3646,7 +3127,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-anton-philipslaan-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '102', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3659,7 +3141,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-huis-verbeeklaan-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '5', 'total_rooms': '6', 'living_area': '228', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3672,7 +3155,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-pastoor-petersstraat-165-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '70', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3685,7 +3169,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-nijverheidsweg-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '100', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3698,7 +3183,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-hessen-kasselstraat-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '149', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3711,7 +3197,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-ir-kalffstraat-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '89', 'delivery': None}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3724,7 +3211,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-deken-van-somerenstraat-in-eindhoven-5",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per 01-05-2026"
+      "available_from": "Per 01-05-2026",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '81', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3737,7 +3225,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-volderhof-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '2', 'total_rooms': '3', 'living_area': '63', 'delivery': 'Gestoffeerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3750,7 +3239,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-keizersgracht-in-eindhoven",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '37', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3763,7 +3253,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-keizersgracht-in-eindhoven-1",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '37', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3776,7 +3267,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-keizersgracht-in-eindhoven-2",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '37', 'delivery': 'Gemeubileerd'}"
     },
     {
       "provider": "RentfinderProvider",
@@ -3789,7 +3281,8 @@
       "url": "https://rentfinder.nl/properties/te-huur-appartement-keizersgracht-in-eindhoven-3",
       "reason": "above_budget",
       "neighborhood": "",
-      "available_from": "Per direct"
+      "available_from": "Per direct",
+      "notes": "{'flag': None, 'bed_rooms': '1', 'total_rooms': '2', 'living_area': '37', 'delivery': 'Gemeubileerd'}"
     }
   ],
   "application_status": {
