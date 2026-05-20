@@ -11,23 +11,30 @@ body {
   margin-bottom: 18px;
   border-bottom: 2px solid #171717;
   padding-bottom: 12px;
-  padding-right: 0;
 }
 .hero-top-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  text-align: right;
+}
+.hero-meta {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #d0d0d0;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 14px;
+  align-items: flex-start;
 }
-.deadline-pill {
-  font-size: 13px;
-  font-weight: 700;
-  border: 1px solid #171717;
-  border-radius: 999px;
-  padding: 6px 12px;
-  background: #fff;
-  white-space: nowrap;
+.hero-deadline {
+  margin: 0;
+  font-size: 15px;
+  color: #3e3e3e;
+}
+.hero-deadline-label {
+  font-weight: 800;
+  color: #171717;
 }
 .support-btn {
   display: inline-flex;
@@ -44,6 +51,19 @@ body {
 .support-btn:hover:not(:disabled) { background: #f0f0f0; }
 .support-btn.support-done { opacity: 0.7; cursor: default; }
 .support-heart { color: #171717; flex-shrink: 0; }
+.support-count-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 4px;
+}
+.support-count-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #5f5f5f;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
 .support-count {
   background: #171717;
   color: #fff;
@@ -53,8 +73,11 @@ body {
   min-width: 1.5em;
   text-align: center;
 }
-.last-updated { font-size: 13px; color: #5f5f5f; text-align: right; }
-.hero-status { font-size: 15px; color: #3e3e3e; text-align: right; }
+.support-btn.support-done {
+  pointer-events: none;
+}
+.last-updated { font-size: 13px; color: #5f5f5f; }
+.hero-status { margin: 0; font-size: 15px; color: #3e3e3e; }
 h1 { margin: 0 0 12px; font-size: clamp(28px, 6vw, 44px); line-height: 1.05; }
 .hero-lead { margin-top: 4px; font-size: clamp(16px, 2.5vw, 20px); line-height: 1.45; }
 h2 { margin: 0 0 10px; font-size: clamp(22px, 4vw, 28px); }
@@ -157,7 +180,10 @@ h3 { margin: 0 0 8px; font-size: 18px; }
 .tag-okay { background: #e8e8e8; color: #333; }
 .tag-meh { background: #f5f5f5; color: #666; }
 .tag-new { background: #ffe5cc; color: #b35900; font-weight: 700; }
-.listing-row.is-new-today { background: #fff8f0; }
+.listing-row.is-new-today {
+  background: #fff0e0;
+  box-shadow: inset 4px 0 0 #e67e22;
+}
 .platform-cell { font-size: 14px; }
 
 .stats-dashboard {
@@ -183,7 +209,9 @@ h3 { margin: 0 0 8px; font-size: 18px; }
 }
 .market-card-title { font-size: 22px; font-weight: 800; }
 .market-card-divider { border: none; border-top: 1px solid #e0e0e0; margin: 12px 0; }
-.market-card-lead { margin: 0 0 12px; font-size: 15px; color: #444; }
+.market-card-lead { margin: 0 0 8px; font-size: 15px; color: #444; }
+.market-card-hint { margin: 0 0 12px; font-size: 12px; line-height: 1.4; }
+.metric-mini-val-text { font-size: 15px; line-height: 1.3; font-weight: 700; }
 .market-card-metric { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .market-big { font-size: 48px; font-weight: 800; line-height: 1; }
 .market-trend {
@@ -278,14 +306,7 @@ h3 { margin: 0 0 8px; font-size: 18px; }
 .platform-bar-fill { height: 100%; background: #171717; }
 
 @media (min-width: 900px) {
-  .hero-top-right {
-    position: absolute;
-    right: 0;
-    top: 0;
-    max-width: 340px;
-    margin-bottom: 0;
-  }
-  .hero { padding-right: 360px; min-height: 140px; }
+  .hero { padding-right: 200px; }
 }
 
 @media (max-width: 899px) {

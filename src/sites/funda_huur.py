@@ -185,6 +185,9 @@ def _fetch_funda_api_listings(max_results: int) -> list[Listing]:
             listed = None
             if item.publication_date:
                 listed = str(item.publication_date)[:10]
+            map_lat = map_lon = None
+            if item.location and item.location.coordinates:
+                map_lat, map_lon = item.location.coordinates
             listings.append(
                 Listing(
                     source="funda",
@@ -200,6 +203,8 @@ def _fetch_funda_api_listings(max_results: int) -> list[Listing]:
                     available_from=None,
                     notes=desc or None,
                     platform_listed_date=listed,
+                    map_lat=map_lat,
+                    map_lon=map_lon,
                 )
             )
     return listings

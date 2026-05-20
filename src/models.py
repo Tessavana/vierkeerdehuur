@@ -17,3 +17,5 @@ class Listing:
     available_from: Optional[str] = None
     notes: Optional[str] = None
     platform_listed_date: Optional[str] = None  # YYYY-MM-DD on source site
+    map_lat: Optional[float] = None
+    map_lon: Optional[float] = None

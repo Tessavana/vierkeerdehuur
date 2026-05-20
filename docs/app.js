@@ -47,6 +47,22 @@ function formatRentFrom(v) {
   return s;
 }
 
+function todayAmsterdamIso() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Amsterdam",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+/** Orange highlight only when platform_listed_date is today (Amsterdam). */
+function isListedToday(l) {
+  const raw = l.platform_listed_date;
+  if (!raw) return false;
+  return String(raw).slice(0, 10) === todayAmsterdamIso();
+}
+
 function matchTagClass(tag) {
   const t = (tag || "").toLowerCase();
   if (t === "super nice") return "tag tag-super";
@@ -90,9 +106,10 @@ function tagPassesFilter(listing) {
 function listingRow(l) {
   const wijk = dash(l.neighborhood);
   const platform = dash(l.platform || l.provider_name || l.source);
-  const newClass = l.is_new_today ? " is-new-today" : "";
+  const newToday = isListedToday(l);
+  const newClass = newToday ? " is-new-today" : "";
   const tag = `<span class="${matchTagClass(l.match_tag || "okay")}">${l.match_tag ?? "okay"}</span>`;
-  const newBadge = l.is_new_today ? ' <span class="tag tag-new">Nieuw vandaag</span>' : "";
+  const newBadge = newToday ? ' <span class="tag tag-new">Nieuw vandaag</span>' : "";
   return `
     <div class="listing-row${newClass}">
       <div class="platform-cell"><b>${platform}</b></div>
@@ -121,7 +138,7 @@ function renderStats(stats, maxRent, listingsCount) {
   const dashEl = document.getElementById("stats-dashboard");
   const subtitle = document.getElementById("stats-subtitle");
   if (subtitle) {
-    subtitle.textContent = `${stats.total_tracked ?? 0} woningen gevolgd · max huur €${maxRent}`;
+    subtitle.textContent = `Scanners zien ${stats.total_tracked ?? 0} unieke woningen in Eindhoven (alle prijzen) · max huur €${maxRent}`;
   }
 
   const tags = stats.tag_counts || {};
@@ -142,22 +159,16 @@ function renderStats(stats, maxRent, listingsCount) {
     })
     .join("");
 
-  const outdoorPct =
-    stats.outdoor_pct != null
-      ? `${stats.outdoor_pct}%`
-      : stats.outdoor_known_count
-        ? "—"
-        : "n.v.t.";
-  const outdoorNote =
-    stats.outdoor_known_count != null
-      ? `${stats.outdoor_yes_count ?? 0} van ${stats.outdoor_known_count} bekend`
-      : "";
+  const outdoorYes = stats.outdoor_yes_count ?? 0;
+  const outdoorText =
+    outdoorYes === 0
+      ? "Geen met buitenruimte"
+      : `${outdoorYes} woning${outdoorYes === 1 ? "" : "en"} gevonden met buitenruimte`;
 
   const inBudget = listingsCount ?? stats.active_in_budget ?? 0;
   const tracked = stats.total_tracked ?? 0;
-  const matchPct = tracked ? Math.round((100 * inBudget) / tracked) : 0;
   const segTotal = 24;
-  const filled = Math.round((matchPct / 100) * segTotal);
+  const filled = tracked ? Math.min(segTotal, Math.round((inBudget / tracked) * segTotal)) : 0;
 
   if (dashEl) {
     dashEl.innerHTML = `
@@ -169,11 +180,12 @@ function renderStats(stats, maxRent, listingsCount) {
         </div>
         <div class="market-card-title">Matches binnen budget</div>
         <hr class="market-card-divider" />
-        <p class="market-card-lead">${inBudget} woning${inBudget === 1 ? "" : "en"} passen nu in je filters.</p>
+        <p class="market-card-lead">${inBudget} woning${inBudget === 1 ? "" : "en"} passen nu in je filters (≤ €${maxRent}).</p>
         <div class="market-card-metric">
-          <span class="market-big">${matchPct}%</span>
-          <span class="market-trend">van ${tracked} gevolgd</span>
+          <span class="market-big">${inBudget}</span>
+          <span class="market-trend">binnen budget · ${tracked} uniek gezien door scanners</span>
         </div>
+        <p class="market-card-hint muted">“Gezien” = alle woningen die we vinden op Funda, Pararius, enz., ook boven je max huur.</p>
         <div class="market-segments" aria-hidden="true">
           ${Array.from({ length: segTotal }, (_, i) => `<span class="seg${i < filled ? " seg-on" : ""}"></span>`).join("")}
         </div>
@@ -186,9 +198,8 @@ function renderStats(stats, maxRent, listingsCount) {
         <div class="metric-mini"><span class="metric-mini-label">Goedkoopste</span><span class="metric-mini-val">${stats.cheapest_in_budget != null ? `€${stats.cheapest_in_budget}` : "—"}</span></div>
         <div class="metric-mini"><span class="metric-mini-label">€/m²</span><span class="metric-mini-val">${stats.avg_eur_per_m2 != null ? `€${stats.avg_eur_per_m2}` : "—"}</span></div>
         <div class="metric-mini metric-mini-wide">
-          <span class="metric-mini-label">Met buitenruimte (bekend)</span>
-          <span class="metric-mini-val">${outdoorPct}</span>
-          <span class="metric-mini-sub">${outdoorNote}</span>
+          <span class="metric-mini-label">Buitenruimte</span>
+          <span class="metric-mini-val metric-mini-val-text">${outdoorText}</span>
         </div>
         <div class="metric-mini"><span class="metric-mini-label">Strijp</span><span class="metric-mini-val">${stats.strijp_in_budget ?? 0}</span></div>
       </div>
@@ -298,7 +309,7 @@ function refreshMapMarkers() {
     const lonAdj = lon + offset * 0.00025;
 
     const isVisited = visitedUrls.has(listing.url);
-    const isNewToday = Boolean(listing.is_new_today);
+    const isNewToday = isListedToday(listing);
     const tag = (listing.match_tag || "okay").toLowerCase();
     const tagColors = {
       "super nice": "#145a2a",
@@ -333,9 +344,9 @@ function refreshMapMarkers() {
 
   if (filtered.length > 0) {
     try {
-      window.__housingMap.fitBounds(__mapLayerGroup.getBounds().pad(0.12));
+      window.__housingMap.fitBounds(__mapLayerGroup.getBounds().pad(0.06));
     } catch (_e) {
-      window.__housingMap.setView([51.4416, 5.4697], 12);
+      window.__housingMap.setView([51.4416, 5.4697], 13);
     }
   }
 }
@@ -345,7 +356,7 @@ async function renderMap(listings) {
   const mapEl = document.getElementById("map");
   if (!mapEl) return;
   if (!window.__housingMap) {
-    const map = L.map("map").setView([51.4416, 5.4697], 12);
+    const map = L.map("map").setView([51.4416, 5.4697], 13);
     window.__housingMap = map;
     L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
       attribution: "&copy; OpenStreetMap &copy; CARTO",
@@ -365,7 +376,7 @@ function showSelectedMatch(listing) {
   const wijk = dash(listing.neighborhood);
   const platform = dash(listing.platform || listing.source);
   el.innerHTML = `
-    <span class="${matchTagClass(listing.match_tag || "okay")}">${listing.match_tag ?? "okay"}</span>${listing.is_new_today ? ' <span class="tag tag-new">Nieuw vandaag</span>' : ""}<br/>
+    <span class="${matchTagClass(listing.match_tag || "okay")}">${listing.match_tag ?? "okay"}</span>${isListedToday(listing) ? ' <span class="tag tag-new">Nieuw vandaag</span>' : ""}<br/>
     <b>${listing.title}</b><br/>
     <span class="muted">${platform}</span><br/>
     ${listing.location}${wijk !== "-" ? ` · ${wijk}` : ""}<br/>
@@ -416,27 +427,35 @@ async function initSupportButton() {
     }
   }
 
-  await showCount();
-  if (localStorage.getItem(SUPPORT_CLICKED_KEY)) {
+  function lockButton() {
     btn.classList.add("support-done");
     btn.disabled = true;
+    btn.setAttribute("aria-disabled", "true");
   }
 
-  btn.addEventListener("click", async () => {
-    if (localStorage.getItem(SUPPORT_CLICKED_KEY)) return;
-    const prev = parseInt(countEl.textContent, 10) || 0;
-    countEl.textContent = String(prev + 1);
-    try {
-      const res = await fetch(`https://api.countapi.xyz/hit/${COUNTAPI_NS}/${COUNTAPI_KEY}`);
-      const data = await res.json();
-      if (data.value != null) countEl.textContent = String(data.value);
+  await showCount();
+  if (localStorage.getItem(SUPPORT_CLICKED_KEY)) {
+    lockButton();
+  }
+
+  btn.addEventListener(
+    "click",
+    async () => {
+      if (btn.disabled || localStorage.getItem(SUPPORT_CLICKED_KEY)) return;
+      lockButton();
       localStorage.setItem(SUPPORT_CLICKED_KEY, "1");
-      btn.classList.add("support-done");
-      btn.disabled = true;
-    } catch {
+      const prev = parseInt(countEl.textContent, 10) || 0;
       countEl.textContent = String(prev + 1);
-    }
-  });
+      try {
+        const res = await fetch(`https://api.countapi.xyz/hit/${COUNTAPI_NS}/${COUNTAPI_KEY}`);
+        const data = await res.json();
+        if (data.value != null) countEl.textContent = String(data.value);
+      } catch {
+        /* keep optimistic count */
+      }
+    },
+    { once: false }
+  );
 }
 
 async function loadRun() {

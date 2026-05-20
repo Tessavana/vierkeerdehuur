@@ -106,6 +106,8 @@ def run_workrun() -> dict:
                     "platform_listed_date": l.platform_listed_date,
                     "is_new_today": is_new_on_platform_today(l),
                     "notes": l.notes,
+                    "map_lat": l.map_lat,
+                    "map_lon": l.map_lon,
                 }
                 for l in suitable
             ]

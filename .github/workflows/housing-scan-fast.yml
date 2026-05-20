@@ -4,12 +4,10 @@ name: Housing Scan (fast)
 on:
   push:
     branches: ["main"]
-    paths-ignore:
-      - "docs/**"
-      - "*.md"
   workflow_dispatch:
   schedule:
-    - cron: "*/12 * * * *"
+    # Free tier: ~every 10 min keeps the site fresh without burning minutes.
+    - cron: "*/10 * * * *"
 
 concurrency:
   group: housing-scan
