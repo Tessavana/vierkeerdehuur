@@ -1,10 +1,12 @@
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
 from src.config import load_config
 from src.filters import evaluate_rental, score_rental
 from src.listing_registry import apply_listing_lifecycle
+from src.market_registry import build_market_stats, record_market_listings
 from src.map_geocode import attach_map_coordinates
 from src.scan_bundle import load_scan_bundle, save_scan_bundle
 from src.scan_schedule import provider_should_fetch_live
@@ -67,6 +69,9 @@ def run_workrun() -> dict:
                     excluded_items.append(
                         {
                             "provider": provider_name,
+                            "platform": _platform_label(
+                                listing.source, _clean_provider_name(provider_name)
+                            ),
                             "provider_name": _clean_provider_name(provider_name),
                             "source": listing.source,
                             "title": listing.title,
@@ -83,6 +88,7 @@ def run_workrun() -> dict:
             normalized = [
                 {
                     "provider": provider_name,
+                    "platform": _platform_label(l.source, _clean_provider_name(provider_name)),
                     "provider_name": _clean_provider_name(provider_name),
                     "source": l.source,
                     "title": l.title,
@@ -143,22 +149,28 @@ def run_workrun() -> dict:
 
     deduped = _dedupe_by_url(all_matches)
     apply_listing_lifecycle(deduped)
-    deduped.sort(
-        key=lambda x: (
-            not x.get("is_new_today", False),
-            x["rent_eur"] is None,
-            -(x["rent_eur"] or 10**9),
-        ),
-        reverse=False,
-    )
+    deduped.sort(key=_sort_newest_first)
+
+    market_rows = [
+        {**item, "in_budget": True}
+        for item in deduped
+    ] + [
+        {**item, "in_budget": False}
+        for item in excluded_items
+    ]
+    record_market_listings(market_rows)
+    market_stats = build_market_stats(deduped, excluded_items, config.max_rent)
+
     attach_map_coordinates(deduped)
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "city": "Eindhoven",
         "max_rent": config.max_rent,
+        "scan_profile": os.getenv("SCAN_PROFILE", "full"),
         "provider_results": provider_results,
         "listings": deduped,
         "excluded_listings": excluded_items,
+        "market_stats": market_stats,
         "application_status": _load_application_status(),
     }
     _write_outputs(payload)
@@ -171,6 +183,15 @@ def _write_outputs(payload: dict) -> None:
     Path("data").mkdir(exist_ok=True)
     (docs_data / "latest_listings.json").write_text(json.dumps(payload, indent=2, ensure_ascii=True), encoding="utf-8")
     (Path("data") / "latest_listings.json").write_text(json.dumps(payload, indent=2, ensure_ascii=True), encoding="utf-8")
+
+
+def _sort_newest_first(item: dict) -> tuple:
+    raw = item.get("first_seen_utc") or ""
+    try:
+        ts = datetime.fromisoformat(raw.replace("Z", "+00:00")).timestamp()
+    except ValueError:
+        ts = 0.0
+    return (-ts, not item.get("is_new_today", False))
 
 
 def _dedupe_by_url(items: list[dict]) -> list[dict]:
@@ -236,6 +257,22 @@ def _load_application_status() -> dict:
 
 def _clean_provider_name(name: str) -> str:
     return name.replace("Provider", "")
+
+
+def _platform_label(source: str, provider_name: str) -> str:
+    labels = {
+        "funda": "Funda",
+        "vbt": "VB&T",
+        "vesteda": "Vesteda",
+        "rotsvast": "Rotsvast",
+        "nmg": "NMG",
+        "pararius": "Pararius",
+        "kamernet": "Kamernet",
+        "huurwoningen": "Huurwoningen",
+        "huislijn": "Huislijn",
+        "rentfinder": "Rentfinder",
+    }
+    return labels.get((source or "").lower(), provider_name or source or "?")
 
 
 def _match_tag(score: int) -> str:

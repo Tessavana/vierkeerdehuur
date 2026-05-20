@@ -1,10 +1,15 @@
-# Full scan (~6–12 min): Playwright sources + Telegram alerts. Runs less often.
-name: Housing Scan (full)
+# Light scan (~2 min): API/HTML sources only. Runs often to stay within free minutes.
+name: Housing Scan (fast)
 
 on:
+  push:
+    branches: ["main"]
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
   workflow_dispatch:
   schedule:
-    - cron: "25 */2 * * *"
+    - cron: "*/12 * * * *"
 
 concurrency:
   group: housing-scan
@@ -37,54 +42,27 @@ jobs:
             data/listing_registry.json
             data/market_registry.json
             data/cache
-            data/playwright_state.json
           key: housing-state-${{ github.run_id }}
           restore-keys: |
             housing-state-
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ runner.os }}
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          python -m playwright install chromium
 
       - uses: actions/configure-pages@v5
 
-      - name: Full scan
+      - name: Fast workrun
         env:
-          SCAN_PROFILE: full
+          SCAN_PROFILE: fast
           SEARCH_URLS: ${{ vars.SEARCH_URLS || 'https://kamernet.nl/en/for-rent/apartment-eindhoven,https://www.pararius.com/apartments/eindhoven,https://www.funda.nl/zoeken/huur?selected_area=%5B%22eindhoven%22%5D,https://www.vesteda.com/nl/huurwoningen-eindhoven,https://www.vbtverhuurmakelaars.nl/huurwoningen-eindhoven,https://www.rotsvast.nl/woningaanbod/huur/eindhoven/,https://nmgwonen.nl/huurwoningen/eindhoven/,https://www.huurwoningen.nl/in/eindhoven/,https://www.huislijn.nl/huurwoningen/nederland/noord-brabant/eindhoven,https://rentfinder.nl' }}
           MAX_RENT: ${{ vars.MAX_RENT || '1150' }}
           MIN_SIZE: ${{ vars.MIN_SIZE || '20' }}
-          POLL_INTERVAL_SECONDS: "300"
           SQLITE_PATH: data/listings.db
-          ENABLE_PLAYWRIGHT_FALLBACK: "true"
-          INCREMENTAL_SCAN: "true"
-          SCAN_ROTATION: "3"
-          GITHUB_RUN_NUMBER: ${{ github.run_number }}
-          HUURWONINGEN_MAX_PAGES: "4"
-          HUURWONINGEN_MAX_DETAILS: "90"
-          RENTFINDER_MAX_PAGES: "12"
-          VESTEDA_MAX_DETAIL_PAGES: "20"
-          FUNDA_MAX_PAGES: "12"
-          FUNDA_MAX_DETAIL_PAGES: "40"
-          VBT_WONINGEN_CACHE_TTL_SECONDS: "2700"
-          NMG_MAX_PAGES: "6"
-          NMG_MAX_DETAIL_PAGES: "40"
+          VBT_WONINGEN_CACHE_TTL_SECONDS: "3600"
           GEOCODE_USE_PDOK: "true"
-          TELEGRAM_ENABLED: ${{ secrets.TELEGRAM_BOT_TOKEN != '' && secrets.TELEGRAM_CHAT_ID != '' }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          python -m src.telegram_feedback
-          python main.py --once
-          python -m src.workrun
+        run: python -m src.workrun
 
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -101,7 +79,6 @@ jobs:
             data/listing_registry.json
             data/market_registry.json
             data/cache
-            data/playwright_state.json
           key: ${{ steps.restore-state.outputs.cache-primary-key }}
 
   deploy:

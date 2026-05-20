@@ -41,9 +41,35 @@
       </section>
 
       <section class="panel">
-        <h2>Resultaten</h2>
-        <p class="muted" id="results-subtitle">Alle woningen gevonden op ...</p>
-        <div id="providers"></div>
+        <h2>Matches binnen budget</h2>
+        <p class="muted" id="results-subtitle">Nieuwste eerst · alleen woningen binnen je filters</p>
+        <div class="listing-header listings-table-header">
+          <div>Platform</div>
+          <div>Woning</div>
+          <div>Wijk</div>
+          <div>Huur</div>
+          <div>m²</div>
+          <div>Binnen</div>
+          <div>Tag / link</div>
+        </div>
+        <div id="listings-table"></div>
+      </section>
+
+      <section class="panel stats-section">
+        <h2>Markt in Eindhoven</h2>
+        <p class="muted" id="stats-subtitle">Op basis van alles wat de scanners vinden (inclusief boven budget)</p>
+        <div id="stats-cards" class="stats-cards"></div>
+        <div class="stats-charts">
+          <div class="chart-block">
+            <h3>Huurverdeling (alle gevonden woningen)</h3>
+            <canvas id="price-chart" width="560" height="220" aria-label="Huurverdeling"></canvas>
+          </div>
+          <div class="chart-block">
+            <h3>Per platform</h3>
+            <div id="platform-breakdown" class="platform-breakdown"></div>
+          </div>
+        </div>
+        <div id="fun-stats" class="fun-stats"></div>
       </section>
     </main>
 

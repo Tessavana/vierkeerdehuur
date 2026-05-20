@@ -1,10 +1,29 @@
-"""Incremental scan: rotate heavy providers across scheduled runs to reduce compute."""
+"""Incremental scan: rotate heavy providers; fast profile for frequent light runs."""
 
 import os
 
 NUM_PROVIDER_GROUPS = 3
 
-# Which fetch group (0..NUM_PROVIDER_GROUPS-1) each provider belongs to.
+# Fast = HTTP/API only (~1–2 min). Heavy = Playwright or many detail pages.
+_FAST_PROVIDERS = frozenset(
+    {
+        "ParariusProvider",
+        "RotsvastProvider",
+        "KamernetProvider",
+        "HuislijnProvider",
+        "RentfinderProvider",
+        "VbtProvider",
+    }
+)
+_HEAVY_PROVIDERS = frozenset(
+    {
+        "FundaProvider",
+        "NmgProvider",
+        "HuurwoningenProvider",
+        "VestedaProvider",
+    }
+)
+
 _PROVIDER_PHASE: dict[str, int] = {
     "ParariusProvider": 0,
     "FundaProvider": 0,
@@ -19,11 +38,19 @@ _PROVIDER_PHASE: dict[str, int] = {
 }
 
 
+def scan_profile() -> str:
+    return os.getenv("SCAN_PROFILE", "full").strip().lower()
+
+
 def incremental_scan_enabled() -> bool:
+    if scan_profile() == "fast":
+        return True
     return os.getenv("INCREMENTAL_SCAN", "false").strip().lower() in {"1", "true", "yes", "on"}
 
 
 def scan_rotation_modulus() -> int:
+    if scan_profile() == "fast":
+        return 1
     raw = os.getenv("SCAN_ROTATION", "0").strip()
     try:
         return max(0, int(raw))
@@ -32,6 +59,8 @@ def scan_rotation_modulus() -> int:
 
 
 def current_phase() -> int | None:
+    if scan_profile() == "fast":
+        return None
     if not incremental_scan_enabled():
         return None
     mod = scan_rotation_modulus()
@@ -46,10 +75,17 @@ def current_phase() -> int | None:
 
 
 def provider_should_fetch_live(class_name: str) -> bool:
+    if class_name == "JsonFileProvider":
+        return True
+
+    profile = scan_profile()
+    if profile == "fast":
+        if class_name in _HEAVY_PROVIDERS:
+            return False
+        return True
+
     phase = current_phase()
     if phase is None:
-        return True
-    if class_name == "JsonFileProvider":
         return True
     group = _PROVIDER_PHASE.get(class_name, 0)
     return group == (phase % NUM_PROVIDER_GROUPS)

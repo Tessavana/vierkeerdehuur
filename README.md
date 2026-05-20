@@ -42,6 +42,19 @@ python main.py
 
 See `docs/TAG_METRICS.md` for how tags are scored.
 
+### GitHub Actions (free tier friendly)
+
+Two workflows share one cache and cancel overlapping runs:
+
+| Workflow | Schedule | What it does | ~minutes |
+|----------|----------|--------------|----------|
+| **Housing Scan (fast)** | every 12 min | Pararius, Rotsvast API, VB&T XML, Kamernet, etc. | ~2 min |
+| **Housing Scan (full)** | every 2 hours | Funda, NMG, Huurwoningen, Vesteda (Playwright) + Telegram | ~8 min |
+
+**Private repos:** ~2000 Actions minutes/month → this mix uses ~**900–1100 min/month** (headroom left).
+
+**Public repos:** unlimited minutes; fast scans can run even more often (edit cron in `housing-scan-fast.yml`).
+
 ### Funda / NMG (Playwright)
 
 If Funda returns zero listings (bot wall), bootstrap a browser session:

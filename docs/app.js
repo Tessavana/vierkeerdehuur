@@ -18,15 +18,6 @@ function updateCountdown() {
   el.textContent = `${days}d ${hours}u ${mins}m ${secs}s tot 26 juli`;
 }
 
-function groupByProvider(listings) {
-  const out = {};
-  listings.forEach((item) => {
-    if (!out[item.provider]) out[item.provider] = [];
-    out[item.provider].push(item);
-  });
-  return out;
-}
-
 function dash(v) {
   if (v === null || v === undefined || v === "") return "-";
   return v;
@@ -38,6 +29,20 @@ function matchTagClass(tag) {
   if (t === "nice") return "tag tag-nice";
   if (t === "okay") return "tag tag-okay";
   return "tag tag-meh";
+}
+
+function formatSeen(iso) {
+  if (!iso) return "-";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "-";
+  const diff = Date.now() - d.getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m geleden`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 48) return `${hours}u geleden`;
+  const days = Math.floor(hours / 24);
+  if (days < 14) return `${days}d geleden`;
+  return d.toLocaleDateString("nl-NL", { day: "numeric", month: "short" });
 }
 
 const MAP_VISITED_KEY = "housing_map_visited_urls_v1";
@@ -59,7 +64,6 @@ function addVisitedUrl(url) {
   return s;
 }
 
-/** Matches src/map_geocode.py _hash_fallback_coords when Web Crypto is available (HTTPS). */
 async function mapCoordsForListing(listing) {
   const key = `${listing.url}|${listing.location}|${listing.title}`;
   try {
@@ -75,7 +79,7 @@ async function mapCoordsForListing(listing) {
       return { lat: 51.4416 + dlat, lon: 5.4697 + dlon };
     }
   } catch (_e) {
-    /* http://localhost has no subtle crypto */
+    /* no subtle crypto on http:// */
   }
   let h = 2166136261;
   for (let j = 0; j < key.length; j++) h = Math.imul(h ^ key.charCodeAt(j), 16777619);
@@ -85,122 +89,137 @@ async function mapCoordsForListing(listing) {
   return { lat: 51.4416 + dlat, lon: 5.4697 + dlon };
 }
 
-async function loadRun() {
-  const res = await fetch("./data/latest_listings.json", { cache: "no-store" });
-  const data = await res.json();
-
-  const status = data.application_status || {};
-  renderOverviewTables(status);
-  const subtitle = document.getElementById("results-subtitle");
-  if (subtitle) subtitle.textContent = `Alle woningen gevonden op ${new Date(data.generated_at_utc).toLocaleString()}`;
-  const headline = document.getElementById("headline-status");
-  if (headline) headline.innerHTML = `Laatste update: ${new Date(data.generated_at_utc).toLocaleTimeString()}<br/>Nog steeds geen woning🙂`;
-
-  renderProviders(data);
-  await renderMap(data.listings);
-}
-
-function renderOverviewTables(status) {
-  const left = document.getElementById("status-table-left");
-  const right = document.getElementById("status-table-right");
-  if (!left || !right) return;
-  const rejected = (status.rejected_addresses || []).join(", ");
-  const sh = status.sociale_huur || {};
-  left.innerHTML = `
-    <tr><td>Applications sent</td><td><b>${status.applications_sent ?? 5}</b></td></tr>
-    <tr><td>Viewings</td><td><b>${status.viewings ?? 0}</b></td></tr>
-    <tr><td>Rejections</td><td><b>${status.rejections ?? 3}</b></td></tr>
-    <tr><td>No response</td><td><b>${status.no_response ?? 4}</b></td></tr>
-    <tr><td>Afwijzingen tot nu toe</td><td>${rejected || "-"}</td></tr>
-  `;
-  right.innerHTML = `
-    <tr><td>Sociale huur via</td><td>${sh.platform ?? "Wooniezie"}</td></tr>
-    <tr><td>Inschrijfduur</td><td>${sh.inschrijfduur ?? "4 jaar en 3 maanden"}</td></tr>
-    <tr><td>Reacties verstuurd</td><td>${sh.reacties_verstuurd ?? "230+"}</td></tr>
-    <tr><td>Actief gezocht</td><td>${sh.actief_gezocht ?? "2 jaar"}</td></tr>
-    <tr><td>Aantal bezichtigingen</td><td>${sh.bezichtigingen ?? 0}</td></tr>
-  `;
-}
-
-function renderProviders(data) {
-  const providersEl = document.getElementById("providers");
-  if (!providersEl) return;
-  providersEl.innerHTML = "";
-  const suitableByProvider = groupByProvider(data.listings);
-  const excludedByProvider = groupByProvider(data.excluded_listings || []);
-
-  data.provider_results.forEach((p) => {
-    const block = document.createElement("div");
-    block.className = "provider-block";
-    const suitable = suitableByProvider[p.provider] || [];
-    const excluded = excludedByProvider[p.provider] || [];
-    const sectionId = `excluded-${p.provider}`;
-    const displayName = p.provider_name || p.provider.replace("Provider", "");
-    const errLine = p.error ? `<div class="muted"><span class="status-error">error:</span> ${p.error}</div>` : "";
-    const statusLine =
-      p.status === "error"
-        ? `<div class="muted"><span class="status-error">mislukt</span></div>`
-        : "";
-    block.innerHTML = `
-      <div><b>${displayName}</b></div>
-      ${statusLine}
-      <div class="muted">parsed=${p.parsed} | suitable=${p.suitable} | excluded=${p.excluded ?? 0}</div>
-      ${errLine}
-      <div class="listing-header">
-        <div>Woning</div>
-        <div>Wijk</div>
-        <div>Huur</div>
-        <div>m²</div>
-        <div>Huur vanaf</div>
-        <div>Tag / link</div>
-      </div>
-      <div id="suitable-${p.provider}"></div>
-      <button class="toggle-btn" data-target="${sectionId}">Show excluded (${excluded.length})</button>
-      <div id="${sectionId}" class="hidden"></div>
-    `;
-    providersEl.appendChild(block);
-
-    const suitableEl = block.querySelector(`#suitable-${CSS.escape(p.provider)}`);
-    suitable.slice(0, 25).forEach((l) => {
-      suitableEl.innerHTML += listingRow(l, false);
-    });
-    if (!suitable.length) suitableEl.innerHTML = `<div class="muted">No suitable listings from this provider right now.</div>`;
-
-    const excludedEl = block.querySelector(`#${CSS.escape(sectionId)}`);
-    excluded.slice(0, 50).forEach((l) => {
-      excludedEl.innerHTML += listingRow(l, true);
-    });
-    if (!excluded.length) excludedEl.innerHTML = `<div class="muted">No excluded listings stored.</div>`;
-  });
-
-  providersEl.querySelectorAll(".toggle-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const target = document.getElementById(btn.dataset.target);
-      if (!target) return;
-      target.classList.toggle("hidden");
-      btn.textContent = target.classList.contains("hidden") ? "Show excluded" : "Hide excluded";
-    });
-  });
-}
-
-function listingRow(l, excluded) {
+function listingRow(l) {
   const wijk = dash(l.neighborhood);
-  const avail = dash(l.available_from);
-  const newClass = !excluded && l.is_new_today ? " is-new-today" : "";
-  const reason = excluded
-    ? `<span class="muted">${l.reason ?? "excluded"}</span>`
-    : `<span class="${matchTagClass(l.match_tag || "okay")}">${l.match_tag ?? "okay"}</span>`;
-  const newBadge = !excluded && l.is_new_today ? ' <span class="tag tag-new">Nieuw vandaag</span>' : "";
+  const platform = dash(l.platform || l.provider_name || l.source);
+  const newClass = l.is_new_today ? " is-new-today" : "";
+  const tag = `<span class="${matchTagClass(l.match_tag || "okay")}">${l.match_tag ?? "okay"}</span>`;
+  const newBadge = l.is_new_today ? ' <span class="tag tag-new">Nieuw vandaag</span>' : "";
   return `
     <div class="listing-row${newClass}">
+      <div class="platform-cell"><b>${platform}</b></div>
       <div><b>${l.title}</b><div class="muted">${l.location}</div></div>
       <div>${wijk}</div>
       <div>EUR ${l.rent_eur ?? "?"}</div>
-      <div>${l.size_m2 ?? "?"} m2</div>
-      <div>${avail}</div>
-      <div>${reason}${newBadge}<br/><a href="${l.url}" target="_blank" rel="noopener noreferrer">open</a></div>
+      <div>${l.size_m2 ?? "?"} m²</div>
+      <div>${formatSeen(l.first_seen_utc)}</div>
+      <div>${tag}${newBadge}<br/><a href="${l.url}" target="_blank" rel="noopener noreferrer">open</a></div>
     </div>
   `;
+}
+
+function renderListingsTable(listings) {
+  const el = document.getElementById("listings-table");
+  if (!el) return;
+  if (!listings.length) {
+    el.innerHTML = `<div class="muted">Geen matches binnen budget op dit moment.</div>`;
+    return;
+  }
+  el.innerHTML = listings.map(listingRow).join("");
+}
+
+function renderStats(stats, maxRent) {
+  if (!stats) return;
+  const cards = document.getElementById("stats-cards");
+  const fun = document.getElementById("fun-stats");
+  const subtitle = document.getElementById("stats-subtitle");
+  if (subtitle) {
+    subtitle.textContent = `${stats.total_tracked ?? 0} woningen gevolgd in de markt · max huur €${maxRent}`;
+  }
+  if (cards) {
+    const items = [
+      ["Nieuw deze week", stats.new_this_week ?? 0],
+      ["Nieuw vandaag (budget)", stats.new_today ?? 0],
+      ["Gem. huur (alles)", stats.avg_rent_all != null ? `€${stats.avg_rent_all}` : "-"],
+      ["Mediaan huur", stats.median_rent_all != null ? `€${stats.median_rent_all}` : "-"],
+      ["Gem. huur (budget)", stats.avg_rent_in_budget != null ? `€${stats.avg_rent_in_budget}` : "-"],
+      ["Goedkoopste match", stats.cheapest_in_budget != null ? `€${stats.cheapest_in_budget}` : "-"],
+      ["Gem. m²", stats.avg_size_m2 != null ? `${stats.avg_size_m2} m²` : "-"],
+      ["€/m² gemiddeld", stats.avg_eur_per_m2 != null ? `€${stats.avg_eur_per_m2}` : "-"],
+      ["Boven budget", `${stats.pct_above_budget ?? 0}%`],
+      ["Strijp (budget)", stats.strijp_in_budget ?? 0],
+      ["Met buitenruimte", `${stats.outdoor_pct ?? 0}%`],
+    ];
+    cards.innerHTML = items
+      .map(([label, val]) => `<div class="stat-card"><div class="stat-label">${label}</div><div class="stat-value">${val}</div></div>`)
+      .join("");
+  }
+  drawPriceChart(stats.price_distribution || []);
+  renderPlatformBreakdown(stats.by_platform || {});
+  if (fun) {
+    const reasons = stats.excluded_by_reason || {};
+    const reasonLine = Object.entries(reasons)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(" · ");
+    fun.innerHTML = `
+      <p><b>Leuk om te weten:</b> er staan nu <b>${stats.active_in_budget ?? 0}</b> woningen binnen budget live,
+      terwijl de scanners <b>${stats.total_tracked ?? 0}</b> unieke adressen zagen (inclusief dure parels).
+      ${stats.priciest_in_budget != null ? `Duurste match binnen budget: <b>€${stats.priciest_in_budget}</b>.` : ""}
+      ${reasonLine ? `<br/><span class="muted">Waarom buiten budget: ${reasonLine}</span>` : ""}
+      </p>
+    `;
+  }
+}
+
+function drawPriceChart(buckets) {
+  const canvas = document.getElementById("price-chart");
+  if (!canvas || !buckets.length) return;
+  const ctx = canvas.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth || 560;
+  const h = 220;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+
+  const max = Math.max(...buckets.map((b) => b.count), 1);
+  const pad = { l: 36, r: 12, t: 16, b: 48 };
+  const chartW = w - pad.l - pad.r;
+  const chartH = h - pad.t - pad.b;
+  const barW = chartW / buckets.length - 8;
+
+  ctx.fillStyle = "#171717";
+  ctx.font = "12px Segoe UI, Arial, sans-serif";
+  buckets.forEach((b, i) => {
+    const bh = (b.count / max) * chartH;
+    const x = pad.l + i * (chartW / buckets.length) + 4;
+    const y = pad.t + chartH - bh;
+    ctx.fillStyle = "#0b4ea2";
+    ctx.fillRect(x, y, barW, bh);
+    ctx.fillStyle = "#171717";
+    ctx.textAlign = "center";
+    ctx.fillText(String(b.count), x + barW / 2, y - 4);
+    ctx.save();
+    ctx.translate(x + barW / 2, h - 8);
+    ctx.rotate(-0.35);
+    ctx.fillStyle = "#5f5f5f";
+    ctx.font = "11px Segoe UI, Arial, sans-serif";
+    ctx.fillText(b.label, 0, 0);
+    ctx.restore();
+  });
+}
+
+function renderPlatformBreakdown(byPlatform) {
+  const el = document.getElementById("platform-breakdown");
+  if (!el) return;
+  const entries = Object.entries(byPlatform);
+  if (!entries.length) {
+    el.innerHTML = `<div class="muted">Nog geen data.</div>`;
+    return;
+  }
+  const max = Math.max(...entries.map(([, c]) => c));
+  el.innerHTML = entries
+    .map(([name, count]) => {
+      const pct = max ? Math.round((count / max) * 100) : 0;
+      return `
+        <div class="platform-row">
+          <span class="platform-name">${name}</span>
+          <div class="platform-bar"><div class="platform-bar-fill" style="width:${pct}%"></div></div>
+          <span class="platform-count">${count}</span>
+        </div>`;
+    })
+    .join("");
 }
 
 async function renderMap(listings) {
@@ -248,9 +267,10 @@ async function renderMap(listings) {
       fillOpacity: 1,
     });
     const wijk = dash(listing.neighborhood);
+    const platform = dash(listing.platform || listing.source);
     const newLine = isNewToday ? "<b>Nieuw vandaag</b><br/>" : "";
     marker.bindPopup(
-      `${newLine}<b>${listing.title}</b><br/>${wijk !== "-" ? `${wijk} · ` : ""}EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²<br/>${listing.available_from ? `Vanaf ${listing.available_from}<br/>` : ""}`
+      `${newLine}<b>${listing.title}</b><br/>${platform}${wijk !== "-" ? ` · ${wijk}` : ""}<br/>EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²`
     );
     marker.on("click", () => {
       addVisitedUrl(listing.url);
@@ -267,23 +287,66 @@ async function renderMap(listings) {
       map.setView([51.4416, 5.4697], 12);
     }
   }
-  setTimeout(() => {
-    map.invalidateSize();
-  }, 200);
+  setTimeout(() => map.invalidateSize(), 200);
 }
 
 function showSelectedMatch(listing) {
   const el = document.getElementById("selected-match");
   if (!el) return;
   const wijk = dash(listing.neighborhood);
+  const platform = dash(listing.platform || listing.source);
   el.innerHTML = `
     <b>${listing.title}</b><br/>
+    <span class="muted">${platform}</span><br/>
     ${listing.location}${wijk !== "-" ? ` · ${wijk}` : ""}<br/>
-    EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m2<br/>
-    Huur vanaf: ${dash(listing.available_from)}<br/>
+    EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²<br/>
+    Gezien: ${formatSeen(listing.first_seen_utc)}<br/>
     <span class="${matchTagClass(listing.match_tag || "okay")}">${listing.match_tag ?? "okay"}</span>${listing.is_new_today ? ' <span class="tag tag-new">Nieuw vandaag</span>' : ""}<br/>
     <a href="${listing.url}" target="_blank" rel="noopener noreferrer">open listing</a>
   `;
+}
+
+function renderOverviewTables(status) {
+  const left = document.getElementById("status-table-left");
+  const right = document.getElementById("status-table-right");
+  if (!left || !right) return;
+  const rejected = (status.rejected_addresses || []).join(", ");
+  const sh = status.sociale_huur || {};
+  left.innerHTML = `
+    <tr><td>Applications sent</td><td><b>${status.applications_sent ?? 5}</b></td></tr>
+    <tr><td>Viewings</td><td><b>${status.viewings ?? 0}</b></td></tr>
+    <tr><td>Rejections</td><td><b>${status.rejections ?? 3}</b></td></tr>
+    <tr><td>No response</td><td><b>${status.no_response ?? 4}</b></td></tr>
+    <tr><td>Afwijzingen tot nu toe</td><td>${rejected || "-"}</td></tr>
+  `;
+  right.innerHTML = `
+    <tr><td>Sociale huur via</td><td>${sh.platform ?? "Wooniezie"}</td></tr>
+    <tr><td>Inschrijfduur</td><td>${sh.inschrijfduur ?? "4 jaar en 3 maanden"}</td></tr>
+    <tr><td>Reacties verstuurd</td><td>${sh.reacties_verstuurd ?? "230+"}</td></tr>
+    <tr><td>Actief gezocht</td><td>${sh.actief_gezocht ?? "2 jaar"}</td></tr>
+    <tr><td>Aantal bezichtigingen</td><td>${sh.bezichtigingen ?? 0}</td></tr>
+  `;
+}
+
+async function loadRun() {
+  const res = await fetch("./data/latest_listings.json", { cache: "no-store" });
+  const data = await res.json();
+
+  renderOverviewTables(data.application_status || {});
+  const subtitle = document.getElementById("results-subtitle");
+  if (subtitle) {
+    const n = (data.listings || []).length;
+    subtitle.textContent = `${n} match${n === 1 ? "" : "es"} · nieuwste eerst · update ${new Date(data.generated_at_utc).toLocaleString("nl-NL")}`;
+  }
+  const headline = document.getElementById("headline-status");
+  if (headline) {
+    headline.innerHTML = `Laatste update: ${new Date(data.generated_at_utc).toLocaleTimeString("nl-NL")}<br/>Nog steeds geen woning🙂`;
+  }
+
+  renderListingsTable(data.listings || []);
+  window.__lastMarketStats = data.market_stats;
+  renderStats(data.market_stats, data.max_rent);
+  await renderMap(data.listings || []);
 }
 
 updateClock();
@@ -292,7 +355,10 @@ setInterval(updateClock, 1000);
 setInterval(updateCountdown, 1000);
 loadRun().catch((err) => {
   const headline = document.getElementById("headline-status");
-  if (headline) {
-    headline.textContent = `Nog steeds geen woning. Ook de website had issues: ${err}`;
-  }
+  if (headline) headline.textContent = `Nog steeds geen woning. Ook de website had issues: ${err}`;
+});
+
+window.addEventListener("resize", () => {
+  const stats = window.__lastMarketStats;
+  if (stats) drawPriceChart(stats.price_distribution || []);
 });
