@@ -188,55 +188,53 @@ h3 { margin: 0 0 8px; font-size: 18px; }
 
 .stats-dashboard {
   display: grid;
-  grid-template-columns: 1.1fr 1fr 0.9fr;
+  grid-template-columns: 1fr 1fr;
   gap: 14px;
   margin-bottom: 18px;
   align-items: start;
 }
-.market-hero-card {
+.market-summary-card {
+  grid-column: 1 / -1;
   border: 1px solid #171717;
   border-radius: 12px;
-  padding: 16px;
+  padding: 18px 20px;
   background: #fff;
 }
-.market-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-.market-pill {
-  font-size: 11px;
-  border: 1px solid #171717;
-  border-radius: 999px;
-  padding: 2px 8px;
-  text-transform: lowercase;
+.market-summary-line {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.55;
+  color: #333;
+  font-weight: 400;
 }
-.market-card-title { font-size: 22px; font-weight: 800; }
-.market-card-divider { border: none; border-top: 1px solid #e0e0e0; margin: 12px 0; }
-.market-card-lead { margin: 0 0 8px; font-size: 15px; color: #444; }
-.market-card-hint { margin: 0 0 12px; font-size: 12px; line-height: 1.4; }
-.metric-mini-val-text { font-size: 15px; line-height: 1.3; font-weight: 700; }
-.market-card-metric { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.market-big { font-size: 48px; font-weight: 800; line-height: 1; }
-.market-trend {
-  font-size: 13px;
-  border: 1px solid #171717;
-  padding: 4px 8px;
-  border-radius: 4px;
+.market-summary-num {
+  font-size: 28px;
+  font-weight: 800;
+  color: #171717;
 }
-.market-segments {
+.market-metrics-grid {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.outdoor-stat {
   display: flex;
-  gap: 3px;
-  margin-top: 14px;
+  align-items: baseline;
+  gap: 8px;
   flex-wrap: wrap;
 }
-.market-segments .seg {
-  width: 8px;
-  height: 22px;
-  background: #e5e5e5;
-  border-radius: 2px;
+.outdoor-stat-num {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  color: #171717;
 }
-.market-segments .seg-on { background: #171717; }
-.market-metrics-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+.outdoor-stat-text {
+  font-size: 15px;
+  font-weight: 400;
+  color: #444;
+  line-height: 1.35;
 }
 .metric-mini {
   border: 1px solid #ececec;
@@ -311,6 +309,7 @@ h3 { margin: 0 0 8px; font-size: 18px; }
 
 @media (max-width: 899px) {
   .stats-dashboard { grid-template-columns: 1fr; }
+  .market-metrics-grid { grid-template-columns: 1fr 1fr; }
   .map-with-detail { grid-template-columns: 1fr; }
   #map { height: 300px; }
   .listings-table-header { display: none; }

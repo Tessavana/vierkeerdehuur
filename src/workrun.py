@@ -5,7 +5,7 @@ from pathlib import Path
 
 from src.config import load_config
 from src.filters import evaluate_rental, score_rental
-from src.listing_detail import enrich_listing, is_new_on_platform_today
+from src.listing_detail import enrich_listing, is_new_on_platform_today, normalize_available_from
 from src.listing_registry import apply_listing_lifecycle
 from src.market_registry import build_market_stats, record_market_listings
 from src.eindhoven_geo import attach_map_coordinates
@@ -102,7 +102,7 @@ def run_workrun() -> dict:
                     "url": l.url,
                     "match_tag": _match_tag(score_rental(l, config)),
                     "neighborhood": _extract_neighborhood(l.title, l.location),
-                    "available_from": l.available_from,
+                    "available_from": normalize_available_from(l.available_from),
                     "platform_listed_date": l.platform_listed_date,
                     "is_new_today": is_new_on_platform_today(l),
                     "notes": l.notes,

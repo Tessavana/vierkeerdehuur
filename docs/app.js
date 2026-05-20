@@ -1,8 +1,8 @@
 const MOVE_OUT_DEADLINE = new Date("2026-07-26T23:59:59+02:00");
 const MAP_VISITED_KEY = "housing_map_visited_urls_v1";
 const SUPPORT_CLICKED_KEY = "housing_support_clicked_v1";
-const COUNTAPI_NS = "vierkeerdehuur";
-const COUNTAPI_KEY = "tessa-support";
+const COUNTAPI_BASE = "https://countapi.mileshilliard.com/api/v1";
+const COUNTAPI_KEY = "vierkeerdehuur-tessa-support";
 
 let __allListings = [];
 let __mapLayerGroup = null;
@@ -33,15 +33,19 @@ function formatRentFrom(v) {
   const s = String(v).trim();
   if (/geleden/i.test(s)) return "-";
   if (/^\d{4}-\d{2}-\d{2}T/.test(s)) return "-";
-  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
-    const d = new Date(`${s}T12:00:00`);
+  const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (iso) {
+    const d = new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]));
     if (!Number.isNaN(d.getTime())) {
       return d.toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
     }
   }
-  const d = new Date(s);
-  if (!Number.isNaN(d.getTime()) && s.includes("-")) {
-    return d.toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
+  const eu = s.match(/(?:per\s+)?(\d{1,2})[-/](\d{1,2})[-/](\d{4})/i);
+  if (eu) {
+    const d = new Date(Number(eu[3]), Number(eu[2]) - 1, Number(eu[1]));
+    if (!Number.isNaN(d.getTime())) {
+      return d.toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
+    }
   }
   if (s.length > 48) return "-";
   return s;
@@ -160,48 +164,28 @@ function renderStats(stats, maxRent, listingsCount) {
     .join("");
 
   const outdoorYes = stats.outdoor_yes_count ?? 0;
-  const outdoorText =
-    outdoorYes === 0
-      ? "Geen met buitenruimte"
-      : `${outdoorYes} woning${outdoorYes === 1 ? "" : "en"} gevonden met buitenruimte`;
-
   const inBudget = listingsCount ?? stats.active_in_budget ?? 0;
-  const tracked = stats.total_tracked ?? 0;
-  const segTotal = 24;
-  const filled = tracked ? Math.min(segTotal, Math.round((inBudget / tracked) * segTotal)) : 0;
+  const foundWeek = stats.new_this_week ?? stats.total_tracked ?? 0;
 
   if (dashEl) {
     dashEl.innerHTML = `
-      <div class="market-hero-card">
-        <div class="market-card-tags">
-          <span class="market-pill">live</span>
-          <span class="market-pill">eindhoven</span>
-          <span class="market-pill">≤ €${maxRent}</span>
-        </div>
-        <div class="market-card-title">Matches binnen budget</div>
-        <hr class="market-card-divider" />
-        <p class="market-card-lead">${inBudget} woning${inBudget === 1 ? "" : "en"} passen nu in je filters (≤ €${maxRent}).</p>
-        <div class="market-card-metric">
-          <span class="market-big">${inBudget}</span>
-          <span class="market-trend">binnen budget · ${tracked} uniek gezien door scanners</span>
-        </div>
-        <p class="market-card-hint muted">“Gezien” = alle woningen die we vinden op Funda, Pararius, enz., ook boven je max huur.</p>
-        <div class="market-segments" aria-hidden="true">
-          ${Array.from({ length: segTotal }, (_, i) => `<span class="seg${i < filled ? " seg-on" : ""}"></span>`).join("")}
-        </div>
+      <div class="market-summary-card">
+        <p class="market-summary-line">
+          <span class="market-summary-num">${inBudget}</span> matches binnen budget.
+          van de <span class="market-summary-num">${foundWeek}</span> woningen gevonden deze week.
+        </p>
       </div>
       <div class="market-metrics-grid">
-        <div class="metric-mini"><span class="metric-mini-label">Nieuw deze week</span><span class="metric-mini-val">${stats.new_this_week ?? 0}</span></div>
         <div class="metric-mini"><span class="metric-mini-label">Nieuw vandaag</span><span class="metric-mini-val">${stats.new_on_platform_today ?? 0}</span></div>
-        <div class="metric-mini"><span class="metric-mini-label">Gem. huur</span><span class="metric-mini-val">${stats.avg_rent_in_budget != null ? `€${stats.avg_rent_in_budget}` : "—"}</span></div>
-        <div class="metric-mini"><span class="metric-mini-label">Mediaan</span><span class="metric-mini-val">${stats.median_rent_all != null ? `€${stats.median_rent_all}` : "—"}</span></div>
-        <div class="metric-mini"><span class="metric-mini-label">Goedkoopste</span><span class="metric-mini-val">${stats.cheapest_in_budget != null ? `€${stats.cheapest_in_budget}` : "—"}</span></div>
-        <div class="metric-mini"><span class="metric-mini-label">€/m²</span><span class="metric-mini-val">${stats.avg_eur_per_m2 != null ? `€${stats.avg_eur_per_m2}` : "—"}</span></div>
-        <div class="metric-mini metric-mini-wide">
-          <span class="metric-mini-label">Buitenruimte</span>
-          <span class="metric-mini-val metric-mini-val-text">${outdoorText}</span>
+        <div class="metric-mini"><span class="metric-mini-label">Gem. huur (markt)</span><span class="metric-mini-val">${stats.avg_rent_all != null ? `€${stats.avg_rent_all}` : "—"}</span></div>
+        <div class="metric-mini"><span class="metric-mini-label">Mediaan (markt)</span><span class="metric-mini-val">${stats.median_rent_all != null ? `€${stats.median_rent_all}` : "—"}</span></div>
+        <div class="metric-mini"><span class="metric-mini-label">Gem. m²</span><span class="metric-mini-val">${stats.avg_size_m2 != null ? `${stats.avg_size_m2} m²` : "—"}</span></div>
+        <div class="metric-mini"><span class="metric-mini-label">€/m² (markt)</span><span class="metric-mini-val">${stats.avg_eur_per_m2 != null ? `€${stats.avg_eur_per_m2}` : "—"}</span></div>
+        <div class="metric-mini"><span class="metric-mini-label">Goedkoopste match</span><span class="metric-mini-val">${stats.cheapest_in_budget != null ? `€${stats.cheapest_in_budget}` : "—"}</span></div>
+        <div class="metric-mini metric-mini-wide outdoor-stat">
+          <span class="outdoor-stat-num">${outdoorYes}</span>
+          <span class="outdoor-stat-text">woningen gevonden met buitenruimte</span>
         </div>
-        <div class="metric-mini"><span class="metric-mini-label">Strijp</span><span class="metric-mini-val">${stats.strijp_in_budget ?? 0}</span></div>
       </div>
       <div class="market-stack-card">
         <h3 class="market-stack-title">Tags (matches)</h3>
@@ -310,15 +294,8 @@ function refreshMapMarkers() {
 
     const isVisited = visitedUrls.has(listing.url);
     const isNewToday = isListedToday(listing);
-    const tag = (listing.match_tag || "okay").toLowerCase();
-    const tagColors = {
-      "super nice": "#145a2a",
-      nice: "#084298",
-      okay: "#444",
-      meh: "#888",
-    };
-    const fillColor = isNewToday ? "#e67e22" : isVisited ? "#9ca3af" : tagColors[tag] || "#171717";
-    const pinColor = isNewToday ? "#c0392b" : isVisited ? "#4b5563" : "#171717";
+    const fillColor = isNewToday ? "#e67e22" : isVisited ? "#9ca3af" : "#171717";
+    const pinColor = isNewToday ? "#c0392b" : isVisited ? "#6b7280" : "#171717";
 
     const marker = L.circleMarker([latAdj, lonAdj], {
       radius: isNewToday ? 9 : 8,
@@ -402,11 +379,14 @@ function renderOverviewTable(status) {
   `;
 }
 
-async function ensureCountApi() {
+async function fetchSupportCount() {
   try {
-    await fetch(`https://api.countapi.xyz/create?namespace=${COUNTAPI_NS}&key=${COUNTAPI_KEY}&value=0`);
+    const res = await fetch(`${COUNTAPI_BASE}/get/${COUNTAPI_KEY}`, { cache: "no-store" });
+    if (res.status === 404) return 0;
+    const data = await res.json();
+    return parseInt(String(data.value ?? 0), 10) || 0;
   } catch {
-    /* already exists */
+    return null;
   }
 }
 
@@ -415,47 +395,32 @@ async function initSupportButton() {
   const countEl = document.getElementById("support-count");
   if (!btn || !countEl) return;
 
-  await ensureCountApi();
-
-  async function showCount() {
-    try {
-      const res = await fetch(`https://api.countapi.xyz/get/${COUNTAPI_NS}/${COUNTAPI_KEY}`);
-      const data = await res.json();
-      countEl.textContent = String(data.value ?? 0);
-    } catch {
-      countEl.textContent = "0";
-    }
-  }
-
   function lockButton() {
     btn.classList.add("support-done");
     btn.disabled = true;
     btn.setAttribute("aria-disabled", "true");
   }
 
-  await showCount();
+  const globalCount = await fetchSupportCount();
+  countEl.textContent = globalCount === null ? "—" : String(globalCount);
+
   if (localStorage.getItem(SUPPORT_CLICKED_KEY)) {
     lockButton();
   }
 
-  btn.addEventListener(
-    "click",
-    async () => {
-      if (btn.disabled || localStorage.getItem(SUPPORT_CLICKED_KEY)) return;
-      lockButton();
-      localStorage.setItem(SUPPORT_CLICKED_KEY, "1");
-      const prev = parseInt(countEl.textContent, 10) || 0;
-      countEl.textContent = String(prev + 1);
-      try {
-        const res = await fetch(`https://api.countapi.xyz/hit/${COUNTAPI_NS}/${COUNTAPI_KEY}`);
-        const data = await res.json();
-        if (data.value != null) countEl.textContent = String(data.value);
-      } catch {
-        /* keep optimistic count */
-      }
-    },
-    { once: false }
-  );
+  btn.addEventListener("click", async () => {
+    if (btn.disabled || localStorage.getItem(SUPPORT_CLICKED_KEY)) return;
+    localStorage.setItem(SUPPORT_CLICKED_KEY, "1");
+    lockButton();
+    try {
+      const res = await fetch(`${COUNTAPI_BASE}/hit/${COUNTAPI_KEY}`, { cache: "no-store" });
+      const data = await res.json();
+      countEl.textContent = String(parseInt(String(data.value ?? 0), 10) || 0);
+    } catch {
+      const c = await fetchSupportCount();
+      if (c !== null) countEl.textContent = String(c);
+    }
+  });
 }
 
 async function loadRun() {

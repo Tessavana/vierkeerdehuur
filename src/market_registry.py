@@ -56,6 +56,9 @@ def record_market_listings(items: list[dict]) -> None:
         entry["size_m2"] = item.get("size_m2")
         entry["in_budget"] = item.get("in_budget", True)
         entry["exclude_reason"] = item.get("reason") or item.get("exclude_reason")
+        if item.get("outdoor_known"):
+            entry["outdoor_known"] = True
+            entry["outdoor_space"] = bool(item.get("outdoor_space"))
         registry[url] = entry
 
     cutoff = datetime.now(timezone.utc) - timedelta(days=_STALE_DAYS)
@@ -115,8 +118,8 @@ def build_market_stats(
             reason = entry.get("exclude_reason") or "other"
             by_reason[reason] = by_reason.get(reason, 0) + 1
 
-    outdoor_known = [l for l in suitable if l.get("outdoor_known")]
-    outdoor_yes = sum(1 for l in outdoor_known if l.get("outdoor_space") is True)
+    outdoor_known = [e for e in registry.values() if e.get("outdoor_known")]
+    outdoor_yes = sum(1 for e in outdoor_known if e.get("outdoor_space") is True)
     strijp = sum(
         1
         for l in suitable

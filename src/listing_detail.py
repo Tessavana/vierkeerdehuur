@@ -71,6 +71,27 @@ def _parse_iso_date(raw: str) -> date | None:
     return None
 
 
+def normalize_available_from(raw: str | None) -> str | None:
+    """Normalize to YYYY-MM-DD (European day-month-year input)."""
+    if not raw:
+        return None
+    text = str(raw).strip()
+    if re.match(r"\d{4}-\d{2}-\d{2}", text):
+        return text[:10]
+    m = re.search(r"(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})", text, re.I)
+    if m:
+        d, mo, y = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        if y < 100:
+            y += 2000
+        if 1 <= mo <= 12 and 1 <= d <= 31:
+            return f"{y:04d}-{mo:02d}-{d:02d}"
+    parsed = _parse_available_from(text)
+    if parsed and re.match(r"\d{2}-\d{2}-\d{4}", parsed):
+        parts = parsed.split("-")
+        return f"{parts[2]}-{parts[1]}-{parts[0]}"
+    return parsed
+
+
 def _parse_available_from(text: str) -> str | None:
     """Rent start date only — avoid matching unrelated numbers."""
     patterns = (
