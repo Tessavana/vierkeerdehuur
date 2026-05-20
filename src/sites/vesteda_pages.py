@@ -7,6 +7,7 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 
+from src.filters import INACTIVE_LISTING_MARKERS
 from src.models import Listing
 from src.web_fetch import fetch_html_with_fallback
 
@@ -76,7 +77,7 @@ def _project_links(list_url: str) -> list[tuple[str, str]]:
 
 def fetch_vesteda_eindhoven_listings(list_url: str, max_detail_pages: int | None = None) -> list[Listing]:
     if max_detail_pages is None:
-        max_detail_pages = int(os.getenv("VESTEDA_MAX_DETAIL_PAGES", "18"))
+        max_detail_pages = int(os.getenv("VESTEDA_MAX_DETAIL_PAGES", "40"))
     links = _project_links(list_url)[:max_detail_pages]
     listings: list[Listing] = []
     for url, label in links:
@@ -85,24 +86,34 @@ def fetch_vesteda_eindhoven_listings(list_url: str, max_detail_pages: int | None
         h1 = soup.select_one("h1")
         title = h1.get_text(" ", strip=True) if h1 else label
         text = soup.get_text(" ", strip=True)
+        lowered = text.lower()
+        if any(m in lowered for m in INACTIVE_LISTING_MARKERS):
+            continue
         amounts = _parse_euro_amounts(text)
         rent = min(amounts) if amounts else None
         size = _parse_size_m2(text)
         avail = _parse_available(text)
         slug = url.rstrip("/").rsplit("/", 1)[-1]
+        addr_el = soup.select_one("[class*='address'], address, .location")
+        location = addr_el.get_text(" ", strip=True) if addr_el else "Eindhoven"
+        if "eindhoven" not in location.lower():
+            location = f"{location}, Eindhoven".strip(", ")
+        note_bits = []
+        if avail:
+            note_bits.append(f"Beschikbaar: {avail}")
         listings.append(
             Listing(
                 source="vesteda",
                 source_id=f"vesteda-{slug}",
                 title=title,
                 url=url,
-                location="Eindhoven",
+                location=location,
                 rent_eur=rent,
                 size_m2=size,
                 outdoor_space=_outdoor_from_text(text),
                 contract_months=None,
                 available_from=avail,
-                notes=text[:1800] if text else None,
+                notes="; ".join(note_bits) if note_bits else None,
             )
         )
     return listings

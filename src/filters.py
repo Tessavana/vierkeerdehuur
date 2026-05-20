@@ -77,7 +77,8 @@ NEWCOMER_RESTRICTION_MARKERS = (
 def _search_blob(listing: Listing) -> str:
     parts = [listing.title, listing.location]
     if listing.notes:
-        parts.append(listing.notes)
+        # Avoid full-page dumps triggering false positives (e.g. nav "tijdelijk").
+        parts.append(listing.notes[:500])
     return " ".join(parts).lower()
 
 
@@ -112,6 +113,21 @@ def evaluate_rental(listing: Listing, config: AppConfig) -> tuple[bool, str]:
     return True, "ok"
 
 
+def _size_score(size_m2: int | None, min_size: int) -> int:
+    """Reward larger flats above the hard minimum (m²)."""
+    if size_m2 is None:
+        return 0
+    if size_m2 >= min_size + 25:
+        return 20
+    if size_m2 >= min_size + 15:
+        return 15
+    if size_m2 >= min_size + 8:
+        return 10
+    if size_m2 >= min_size:
+        return 5
+    return 0
+
+
 def score_rental(listing: Listing, config: AppConfig) -> int:
     score = 0
     searchable = _search_blob(listing)
@@ -121,6 +137,7 @@ def score_rental(listing: Listing, config: AppConfig) -> int:
         score += 20
     if listing.rent_eur is not None and listing.rent_eur <= config.max_rent:
         score += 15
+    score += _size_score(listing.size_m2, config.min_size)
     if listing.outdoor_space:
         score += 15
     if "noord" in searchable:

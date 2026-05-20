@@ -36,11 +36,19 @@ python main.py
 
 ## Current scope
 
-- Rental flow only
-- File provider (for local verification) and Pararius provider
-- Console notifications only
+- Rental flow for Eindhoven (direct sources: Pararius, Funda huur, VB&T, Vesteda, Rotsvast, NMG, Huurwoningen, Kamernet, Huislijn, Rentfinder)
+- GitHub Pages dashboard (`docs/`) with map, countdown to 26 July 2026, and match tags (`meh` → `super nice`)
+- Listing lifecycle: removed when no longer on source sites; orange highlight for listings first seen today
 
-This is intentional for MVP stability. Next features can be added one by one (FastAPI dashboard, Funda buy flow, richer scoring).
+See `docs/TAG_METRICS.md` for how tags are scored.
+
+### Funda / NMG (Playwright)
+
+If Funda returns zero listings (bot wall), bootstrap a browser session:
+
+```bash
+python -m src.session_bootstrap --url "https://www.funda.nl/zoeken/huur?selected_area=%5B%22eindhoven%22%5D" --wait-seconds 120
+```
 
 ## Real source mode (optional now)
 

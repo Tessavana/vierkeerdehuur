@@ -4,6 +4,7 @@ from pathlib import Path
 
 from src.config import load_config
 from src.filters import evaluate_rental, score_rental
+from src.listing_registry import apply_listing_lifecycle
 from src.map_geocode import attach_map_coordinates
 from src.scan_bundle import load_scan_bundle, save_scan_bundle
 from src.scan_schedule import provider_should_fetch_live
@@ -14,8 +15,10 @@ from src.providers import (
     JsonFileProvider,
     KamernetProvider,
     ListingProvider,
+    NmgProvider,
     ParariusProvider,
     RentfinderProvider,
+    RotsvastProvider,
     VbtProvider,
     VestedaProvider,
 )
@@ -139,7 +142,15 @@ def run_workrun() -> dict:
     save_scan_bundle(bundle)
 
     deduped = _dedupe_by_url(all_matches)
-    deduped.sort(key=lambda x: (x["rent_eur"] is None, -(x["rent_eur"] or 10**9)), reverse=False)
+    apply_listing_lifecycle(deduped)
+    deduped.sort(
+        key=lambda x: (
+            not x.get("is_new_today", False),
+            x["rent_eur"] is None,
+            -(x["rent_eur"] or 10**9),
+        ),
+        reverse=False,
+    )
     attach_map_coordinates(deduped)
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -188,6 +199,10 @@ def _build_providers(urls: list[str]) -> list[ListingProvider]:
             providers.append(VbtProvider(url))
         elif "vesteda.com" in lower:
             providers.append(VestedaProvider(url))
+        elif "rotsvast.nl" in lower:
+            providers.append(RotsvastProvider(url))
+        elif "nmgwonen.nl" in lower or "nmg.nl" in lower:
+            providers.append(NmgProvider(url))
         elif "huislijn.nl" in lower:
             providers.append(HuislijnProvider(url))
         elif "huurwoningen.nl" in lower or "huurwoningen.com" in lower:
@@ -224,11 +239,13 @@ def _clean_provider_name(name: str) -> str:
 
 
 def _match_tag(score: int) -> str:
-    if score >= 45:
-        return "Instant reageren"
-    if score >= 20:
-        return "Kansrijk"
-    return "Twijfelgeval"
+    if score >= 50:
+        return "super nice"
+    if score >= 30:
+        return "nice"
+    if score >= 12:
+        return "okay"
+    return "meh"
 
 
 def _extract_neighborhood(title: str, location: str) -> str:

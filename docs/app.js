@@ -1,6 +1,21 @@
+const MOVE_OUT_DEADLINE = new Date("2026-07-26T23:59:59+02:00");
+
 function updateClock() {
   const el = document.getElementById("clock");
   if (el) el.textContent = new Date().toLocaleTimeString();
+}
+
+function updateCountdown() {
+  const el = document.getElementById("countdown");
+  if (!el) return;
+  const now = Date.now();
+  const end = MOVE_OUT_DEADLINE.getTime();
+  const diff = Math.max(0, end - now);
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+  el.textContent = `${days}d ${hours}u ${mins}m ${secs}s tot 26 juli`;
 }
 
 function groupByProvider(listings) {
@@ -18,9 +33,11 @@ function dash(v) {
 }
 
 function matchTagClass(tag) {
-  if (tag === "Twijfelgeval") return "tag tag-twijfel";
-  if (tag === "Instant reageren") return "tag tag-instant";
-  return "tag tag-kans";
+  const t = (tag || "").toLowerCase();
+  if (t === "super nice") return "tag tag-super";
+  if (t === "nice") return "tag tag-nice";
+  if (t === "okay") return "tag tag-okay";
+  return "tag tag-meh";
 }
 
 const MAP_VISITED_KEY = "housing_map_visited_urls_v1";
@@ -169,17 +186,19 @@ function renderProviders(data) {
 function listingRow(l, excluded) {
   const wijk = dash(l.neighborhood);
   const avail = dash(l.available_from);
+  const newClass = !excluded && l.is_new_today ? " is-new-today" : "";
   const reason = excluded
     ? `<span class="muted">${l.reason ?? "excluded"}</span>`
-    : `<span class="${matchTagClass(l.match_tag || "Kansrijk")}">${l.match_tag ?? "Kansrijk"}</span>`;
+    : `<span class="${matchTagClass(l.match_tag || "okay")}">${l.match_tag ?? "okay"}</span>`;
+  const newBadge = !excluded && l.is_new_today ? ' <span class="tag tag-new">Nieuw vandaag</span>' : "";
   return `
-    <div class="listing-row">
+    <div class="listing-row${newClass}">
       <div><b>${l.title}</b><div class="muted">${l.location}</div></div>
       <div>${wijk}</div>
       <div>EUR ${l.rent_eur ?? "?"}</div>
       <div>${l.size_m2 ?? "?"} m2</div>
       <div>${avail}</div>
-      <div>${reason}<br/><a href="${l.url}" target="_blank" rel="noopener noreferrer">open</a></div>
+      <div>${reason}${newBadge}<br/><a href="${l.url}" target="_blank" rel="noopener noreferrer">open</a></div>
     </div>
   `;
 }
@@ -218,16 +237,20 @@ async function renderMap(listings) {
     const lonAdj = lon + offset * 0.00025;
 
     const isVisited = visitedUrls.has(listing.url);
+    const isNewToday = Boolean(listing.is_new_today);
+    const pinColor = isNewToday ? "#e67e22" : isVisited ? "#4b5563" : "#000";
+    const fillColor = isNewToday ? "#f39c12" : isVisited ? "#9ca3af" : "#000";
     const marker = L.circleMarker([latAdj, lonAdj], {
-      radius: 8,
-      color: isVisited ? "#4b5563" : "#000",
+      radius: isNewToday ? 9 : 8,
+      color: pinColor,
       weight: 2,
-      fillColor: isVisited ? "#9ca3af" : "#000",
+      fillColor,
       fillOpacity: 1,
     });
     const wijk = dash(listing.neighborhood);
+    const newLine = isNewToday ? "<b>Nieuw vandaag</b><br/>" : "";
     marker.bindPopup(
-      `<b>${listing.title}</b><br/>${wijk !== "-" ? `${wijk} · ` : ""}EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²<br/>${listing.available_from ? `Vanaf ${listing.available_from}<br/>` : ""}`
+      `${newLine}<b>${listing.title}</b><br/>${wijk !== "-" ? `${wijk} · ` : ""}EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²<br/>${listing.available_from ? `Vanaf ${listing.available_from}<br/>` : ""}`
     );
     marker.on("click", () => {
       addVisitedUrl(listing.url);
@@ -258,13 +281,15 @@ function showSelectedMatch(listing) {
     ${listing.location}${wijk !== "-" ? ` · ${wijk}` : ""}<br/>
     EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m2<br/>
     Huur vanaf: ${dash(listing.available_from)}<br/>
-    <span class="${matchTagClass(listing.match_tag || "Kansrijk")}">${listing.match_tag ?? "Kansrijk"}</span><br/>
+    <span class="${matchTagClass(listing.match_tag || "okay")}">${listing.match_tag ?? "okay"}</span>${listing.is_new_today ? ' <span class="tag tag-new">Nieuw vandaag</span>' : ""}<br/>
     <a href="${listing.url}" target="_blank" rel="noopener noreferrer">open listing</a>
   `;
 }
 
 updateClock();
+updateCountdown();
 setInterval(updateClock, 1000);
+setInterval(updateCountdown, 1000);
 loadRun().catch((err) => {
   const headline = document.getElementById("headline-status");
   if (headline) {

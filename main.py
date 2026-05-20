@@ -9,8 +9,10 @@ from src.providers import (
     JsonFileProvider,
     KamernetProvider,
     ListingProvider,
+    NmgProvider,
     ParariusProvider,
     RentfinderProvider,
+    RotsvastProvider,
     VbtProvider,
     VestedaProvider,
 )
@@ -42,6 +44,10 @@ def build_providers(urls: list[str]) -> list[ListingProvider]:
             providers.append(VbtProvider(url))
         elif "vesteda.com" in url_lower:
             providers.append(VestedaProvider(url))
+        elif "rotsvast.nl" in url_lower:
+            providers.append(RotsvastProvider(url))
+        elif "nmgwonen.nl" in url_lower or "nmg.nl" in url_lower:
+            providers.append(NmgProvider(url))
         elif "huislijn.nl" in url_lower:
             providers.append(HuislijnProvider(url))
         elif "huurwoningen.nl" in url_lower or "huurwoningen.com" in url_lower:

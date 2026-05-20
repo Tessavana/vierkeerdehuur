@@ -9,7 +9,10 @@ from bs4 import BeautifulSoup
 from src.models import Listing
 from src.sites.huurwoningen_listings import fetch_huurwoningen_eindhoven_listings
 from src.sites.rentfinder_inertia import fetch_rentfinder_eindhoven_listings
-from src.sites.vbt_feed import fetch_vbt_eindhoven_listings
+from src.sites.funda_huur import fetch_funda_eindhoven_huur_listings
+from src.sites.nmg_listings import fetch_nmg_eindhoven_listings
+from src.sites.rotsvast_index import fetch_rotsvast_eindhoven_listings
+from src.sites.vbt_woningen import fetch_vbt_eindhoven_listings
 from src.sites.vesteda_pages import fetch_vesteda_eindhoven_listings
 from src.web_fetch import fetch_html_with_fallback
 
@@ -102,39 +105,7 @@ class FundaProvider(ListingProvider):
         self.url = url
 
     def fetch(self) -> list[Listing]:
-        fetched = fetch_html_with_fallback(self.url)
-        soup = BeautifulSoup(fetched.html, "html.parser")
-        listings: list[Listing] = []
-        for script in soup.select('script[type="application/ld+json"]'):
-            text = script.string or script.get_text(strip=True)
-            if not text:
-                continue
-            try:
-                payload = json.loads(text)
-            except json.JSONDecodeError:
-                continue
-            objects = payload if isinstance(payload, list) else [payload]
-            for obj in objects:
-                if obj.get("@type") != "Product":
-                    continue
-                name = str(obj.get("name", "Funda listing"))
-                item_url = str(obj.get("url", self.url))
-                offers = obj.get("offers", {}) if isinstance(obj.get("offers"), dict) else {}
-                listings.append(
-                    Listing(
-                        source="funda",
-                        source_id=item_url.rstrip("/").split("/")[-1],
-                        title=name,
-                        url=item_url if item_url.startswith("http") else f"https://www.funda.nl{item_url}",
-                        location="Eindhoven",
-                        rent_eur=_extract_int(str(offers.get("price", ""))),
-                        size_m2=_extract_int(name),
-                        outdoor_space=_has_outdoor_keywords(name),
-                        contract_months=None,
-                        available_from=None,
-                    )
-                )
-        return listings
+        return fetch_funda_eindhoven_huur_listings(self.url)
 
 
 class VbtProvider(ListingProvider):
@@ -143,6 +114,22 @@ class VbtProvider(ListingProvider):
 
     def fetch(self) -> list[Listing]:
         return fetch_vbt_eindhoven_listings()
+
+
+class RotsvastProvider(ListingProvider):
+    def __init__(self, url: str) -> None:
+        self.url = url
+
+    def fetch(self) -> list[Listing]:
+        return fetch_rotsvast_eindhoven_listings(self.url)
+
+
+class NmgProvider(ListingProvider):
+    def __init__(self, url: str) -> None:
+        self.url = url
+
+    def fetch(self) -> list[Listing]:
+        return fetch_nmg_eindhoven_listings(self.url)
 
 
 class VestedaProvider(ListingProvider):

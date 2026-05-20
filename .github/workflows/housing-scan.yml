@@ -33,6 +33,7 @@ jobs:
             data/telegram_offset.txt
             data/scan_bundle.json
             data/geocode_cache.json
+            data/listing_registry.json
             data/cache
           key: housing-state-${{ github.run_id }}
           restore-keys: |
@@ -49,7 +50,7 @@ jobs:
 
       - name: Run one scan
         env:
-          SEARCH_URLS: ${{ vars.SEARCH_URLS || 'https://kamernet.nl/en/for-rent/apartment-eindhoven,https://www.pararius.com/apartments/eindhoven,https://www.funda.nl/zoeken/huur?selected_area=%5B%22eindhoven%22%5D,https://www.vesteda.com/nl/huurwoningen-eindhoven,https://www.vbtverhuurmakelaars.nl/huurwoningen-eindhoven,https://www.huurwoningen.nl/in/eindhoven/,https://www.huislijn.nl/huurwoningen/nederland/noord-brabant/eindhoven,https://rentfinder.nl' }}
+          SEARCH_URLS: ${{ vars.SEARCH_URLS || 'https://kamernet.nl/en/for-rent/apartment-eindhoven,https://www.pararius.com/apartments/eindhoven,https://www.funda.nl/zoeken/huur?selected_area=%5B%22eindhoven%22%5D,https://www.vesteda.com/nl/huurwoningen-eindhoven,https://www.vbtverhuurmakelaars.nl/huurwoningen-eindhoven,https://www.rotsvast.nl/woningaanbod/huur/eindhoven/,https://nmgwonen.nl/huurwoningen/eindhoven/,https://www.huurwoningen.nl/in/eindhoven/,https://www.huislijn.nl/huurwoningen/nederland/noord-brabant/eindhoven,https://rentfinder.nl' }}
           MAX_RENT: ${{ vars.MAX_RENT || '1150' }}
           MIN_SIZE: ${{ vars.MIN_SIZE || '20' }}
           POLL_INTERVAL_SECONDS: "300"
@@ -61,8 +62,13 @@ jobs:
           HUURWONINGEN_MAX_PAGES: "4"
           HUURWONINGEN_MAX_DETAILS: "90"
           RENTFINDER_MAX_PAGES: "12"
-          VESTEDA_MAX_DETAIL_PAGES: "8"
-          VBT_FEED_CACHE_TTL_SECONDS: "2700"
+          VESTEDA_MAX_DETAIL_PAGES: "20"
+          FUNDA_MAX_PAGES: "12"
+          FUNDA_MAX_DETAIL_PAGES: "40"
+          VBT_WONINGEN_CACHE_TTL_SECONDS: "2700"
+          NMG_MAX_PAGES: "6"
+          NMG_MAX_DETAIL_PAGES: "40"
+          GEOCODE_USE_PDOK: "true"
           TELEGRAM_ENABLED: ${{ secrets.TELEGRAM_BOT_TOKEN != '' && secrets.TELEGRAM_CHAT_ID != '' }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -85,6 +91,7 @@ jobs:
             data/telegram_offset.txt
             data/scan_bundle.json
             data/geocode_cache.json
+            data/listing_registry.json
             data/cache
           key: ${{ steps.restore-state.outputs.cache-primary-key }}
 

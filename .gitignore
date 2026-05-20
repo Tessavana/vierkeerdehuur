@@ -8,3 +8,6 @@ data/playwright_state.json
 data/latest_listings.json
 data/telegram_offset.txt
 data/geocode_cache.json
+data/cache/
+data/scan_bundle.json
+data/listing_registry.json

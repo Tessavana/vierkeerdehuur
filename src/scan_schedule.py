@@ -10,6 +10,8 @@ _PROVIDER_PHASE: dict[str, int] = {
     "FundaProvider": 0,
     "KamernetProvider": 0,
     "HuislijnProvider": 0,
+    "RotsvastProvider": 0,
+    "NmgProvider": 0,
     "VbtProvider": 1,
     "RentfinderProvider": 1,
     "VestedaProvider": 2,
