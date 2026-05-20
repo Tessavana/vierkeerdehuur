@@ -95,6 +95,8 @@ def _parse_woningen_xml(content: bytes) -> list[Listing]:
         source_id = f"vbt-woning-{_slug(street_line or url)}"
         title = f"{street_line} — {elem.findtext('SoortObject') or 'woning'}".strip(" —")
         avail = (elem.findtext("AanvaardingDatum") or "").strip() or None
+        invoer = (elem.findtext("InvoerDatum") or "").strip()
+        platform_date = invoer[:10] if invoer and len(invoer) >= 10 else None
         blob = f"{title} {location}"
         listings.append(
             Listing(
@@ -107,9 +109,10 @@ def _parse_woningen_xml(content: bytes) -> list[Listing]:
                 size_m2=size,
                 outdoor_space=_outdoor(blob),
                 contract_months=None,
-                available_from=avail,
-                notes=(elem.findtext("Status") or "").strip() or None,
-            )
+                    available_from=avail,
+                    platform_listed_date=platform_date,
+                    notes=(elem.findtext("Status") or "").strip() or None,
+                )
         )
         elem.clear()
 

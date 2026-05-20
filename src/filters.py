@@ -51,6 +51,12 @@ STUDENT_ONLY_MARKERS = (
     "kamer voor studenten",
     "huurder moet student",
     "inschrijving alleen student",
+    "studentenhuis",
+    "studenten huis",
+    "huisvesting voor studenten",
+    "geschikt voor studenten",
+    "alleen geschikt voor student",
+    "niet geschikt voor werkenden",
 )
 
 # “Max X years in NL” / newcomer-only schemes.
@@ -77,8 +83,7 @@ NEWCOMER_RESTRICTION_MARKERS = (
 def _search_blob(listing: Listing) -> str:
     parts = [listing.title, listing.location]
     if listing.notes:
-        # Avoid full-page dumps triggering false positives (e.g. nav "tijdelijk").
-        parts.append(listing.notes[:500])
+        parts.append(listing.notes[:4000])
     return " ".join(parts).lower()
 
 
@@ -88,6 +93,12 @@ def is_rental_match(listing: Listing, config: AppConfig) -> bool:
 
 
 def evaluate_rental(listing: Listing, config: AppConfig) -> tuple[bool, str]:
+    from src.listing_detail import restriction_reason_from_listing
+
+    extra = restriction_reason_from_listing(listing)
+    if extra:
+        return False, extra
+
     searchable = _search_blob(listing)
     # Keep the shortlist actionable: require concrete rent/size data.
     if listing.rent_eur is None or listing.size_m2 is None:

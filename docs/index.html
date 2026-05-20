@@ -10,19 +10,31 @@
   <body>
     <main class="container">
       <section class="hero">
-        <div class="clock" id="clock">--:--:--</div>
-        <div class="countdown" id="countdown">-- dagen tot 26 juli</div>
+        <div class="hero-top-right">
+          <button type="button" class="support-btn" id="support-btn" title="Eén keer per browser">
+            <span class="support-heart">❤️</span> Gun Tessa een woning
+            <span class="support-count" id="support-count">…</span>
+          </button>
+          <div class="last-updated" id="last-updated">Laatste update: —</div>
+          <div class="hero-status" id="headline-status">Status: nog steeds geen woning🙂</div>
+        </div>
         <h1>Vier Keer de Huur</h1>
-        <p>Vier keer de huur. Vast contract. Geen bezichtigingen.<br />Dit is mijn live zoektocht naar een woning in Eindhoven.<br />Een realistisch beeld van huren in 2026.</p>
-        <p><b>Deadline:</b> woning vóór vertrek uit huidige woning — <span id="deadline-date">26 juli 2026</span></p>
-        <p class="sarcastic" id="headline-status">
-          Laatste update: 21:41<br />
-          Nog steeds geen woning🙂
+        <p class="hero-lead">
+          Vier keer de huur. Vast contract. Geen bezichtigingen.<br />
+          Dit is mijn live zoektocht naar een woning in Eindhoven.<br />
+          Een realistisch beeld van huren in 2026.
         </p>
       </section>
 
       <section class="panel map-section">
         <h2>Matches op de kaart</h2>
+        <div class="map-filters" id="map-filters">
+          <span class="map-filters-label">Toon tags:</span>
+          <label><input type="checkbox" class="tag-filter" data-tag="super nice" checked /> super nice</label>
+          <label><input type="checkbox" class="tag-filter" data-tag="nice" checked /> nice</label>
+          <label><input type="checkbox" class="tag-filter" data-tag="okay" checked /> okay</label>
+          <label><input type="checkbox" class="tag-filter" data-tag="meh" checked /> meh</label>
+        </div>
         <div class="map-with-detail">
           <div id="map"></div>
           <aside class="map-detail">
@@ -34,10 +46,7 @@
 
       <section class="panel overview-section">
         <h2>Overzicht</h2>
-        <div class="overview-columns">
-          <table id="status-table-left" class="overview-table"></table>
-          <table id="status-table-right" class="overview-table"></table>
-        </div>
+        <table id="status-table" class="overview-table overview-table-single"></table>
       </section>
 
       <section class="panel">
@@ -49,7 +58,7 @@
           <div>Wijk</div>
           <div>Huur</div>
           <div>m²</div>
-          <div>Binnen</div>
+          <div>Huur vanaf</div>
           <div>Tag / link</div>
         </div>
         <div id="listings-table"></div>

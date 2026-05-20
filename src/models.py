@@ -15,3 +15,4 @@ class Listing:
     contract_months: Optional[int] = None
     available_from: Optional[str] = None
     notes: Optional[str] = None
+    platform_listed_date: Optional[str] = None  # YYYY-MM-DD on source site

@@ -12,6 +12,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from src.filters import INACTIVE_LISTING_MARKERS
+from src.listing_detail import parse_detail_html
 from src.models import Listing
 from playwright.sync_api import sync_playwright
 
@@ -174,6 +175,7 @@ def _parse_detail(html: str, url: str) -> Listing | None:
     if any(m in lowered for m in INACTIVE_LISTING_MARKERS):
         return None
 
+    fields = parse_detail_html(html, url)
     name = "Funda listing"
     rent: int | None = None
     size: int | None = None
@@ -227,8 +229,9 @@ def _parse_detail(html: str, url: str) -> Listing | None:
         size_m2=size,
         outdoor_space=_outdoor(text),
         contract_months=None,
-        available_from=None,
-        notes=None,
+        available_from=fields.get("available_from"),
+        notes=(fields.get("description") or "")[:4000] or None,
+        platform_listed_date=fields.get("platform_listed_date"),
     )
 
 

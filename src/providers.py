@@ -13,6 +13,7 @@ from src.sites.funda_huur import fetch_funda_eindhoven_huur_listings
 from src.sites.nmg_listings import fetch_nmg_eindhoven_listings
 from src.sites.rotsvast_index import fetch_rotsvast_eindhoven_listings
 from src.sites.vbt_woningen import fetch_vbt_eindhoven_listings
+from src.sites.pararius_listings import fetch_pararius_eindhoven_listings
 from src.sites.vesteda_pages import fetch_vesteda_eindhoven_listings
 from src.web_fetch import fetch_html_with_fallback
 
@@ -28,38 +29,7 @@ class ParariusProvider(ListingProvider):
         self.url = url
 
     def fetch(self) -> list[Listing]:
-        fetched = fetch_html_with_fallback(self.url)
-        soup = BeautifulSoup(fetched.html, "html.parser")
-        cards = soup.select("section.listing-search-item")
-        listings: list[Listing] = []
-        for card in cards:
-            link = card.select_one("a.listing-search-item__link--title")
-            if not link or not link.get("href"):
-                continue
-            url = "https://www.pararius.com" + link["href"]
-            source_id = link["href"].strip("/")
-            title = link.get_text(" ", strip=True)
-            location_el = card.select_one("div.listing-search-item__location")
-            location = location_el.get_text(" ", strip=True) if location_el else ""
-            price_el = card.select_one("div.listing-search-item__price")
-            area_el = card.select_one("li.illustrated-features__item--surface-area")
-            rent_eur = _extract_int(price_el.get_text(" ", strip=True)) if price_el else None
-            size_m2 = _extract_int(area_el.get_text(" ", strip=True)) if area_el else None
-            listings.append(
-                Listing(
-                    source="pararius",
-                    source_id=source_id,
-                    title=title,
-                    url=url,
-                    location=location,
-                    rent_eur=rent_eur,
-                    size_m2=size_m2,
-                    outdoor_space=_has_outdoor_keywords(title + " " + location),
-                    contract_months=None,
-                    available_from=None,
-                )
-            )
-        return listings
+        return fetch_pararius_eindhoven_listings(self.url)
 
 
 class KamernetProvider(ListingProvider):

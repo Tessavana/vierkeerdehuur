@@ -1,14 +1,12 @@
-"""Track first-seen dates and drop listings no longer returned by scrapers."""
+"""Track first-seen for sorting; platform-new flag is set separately."""
 
 from __future__ import annotations
 
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from zoneinfo import ZoneInfo
 
 _REGISTRY_PATH = Path("data/listing_registry.json")
-_AMSTERDAM = ZoneInfo("Europe/Amsterdam")
 
 
 def _load() -> dict[str, dict[str, str]]:
@@ -26,14 +24,9 @@ def _save(registry: dict[str, dict[str, str]]) -> None:
     _REGISTRY_PATH.write_text(json.dumps(registry, indent=2, ensure_ascii=True), encoding="utf-8")
 
 
-def _today_amsterdam() -> str:
-    return datetime.now(_AMSTERDAM).date().isoformat()
-
-
 def apply_listing_lifecycle(items: list[dict]) -> None:
-    """Set first_seen_utc / is_new_today; prune URLs absent from this run."""
+    """Set first_seen_utc for sorting; prune URLs absent from this run."""
     now = datetime.now(timezone.utc).isoformat()
-    today = _today_amsterdam()
     active_urls = {str(i.get("url", "")).strip().lower() for i in items if i.get("url")}
     registry = _load()
 
@@ -51,12 +44,6 @@ def apply_listing_lifecycle(items: list[dict]) -> None:
             registry[url] = entry
         else:
             entry["last_seen_utc"] = now
-        first = entry.get("first_seen_utc", now)
-        item["first_seen_utc"] = first
-        try:
-            first_day = datetime.fromisoformat(first.replace("Z", "+00:00")).astimezone(_AMSTERDAM).date().isoformat()
-        except ValueError:
-            first_day = today
-        item["is_new_today"] = first_day == today
+        item["first_seen_utc"] = entry.get("first_seen_utc", now)
 
     _save(registry)

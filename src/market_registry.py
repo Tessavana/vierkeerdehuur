@@ -137,6 +137,7 @@ def build_market_stats(
         "active_excluded": len(excluded),
         "new_this_week": new_this_week,
         "new_today": sum(1 for l in suitable if l.get("is_new_today")),
+        "new_on_platform_today": sum(1 for l in suitable if l.get("is_new_today")),
         "avg_rent_all": round(sum(rents_all) / len(rents_all)) if rents_all else None,
         "median_rent_all": _median(rents_all),
         "avg_rent_in_budget": round(sum(rents_budget) / len(rents_budget)) if rents_budget else None,

@@ -5,6 +5,7 @@ from pathlib import Path
 
 from src.config import load_config
 from src.filters import evaluate_rental, score_rental
+from src.listing_detail import enrich_listing, is_new_on_platform_today
 from src.listing_registry import apply_listing_lifecycle
 from src.market_registry import build_market_stats, record_market_listings
 from src.map_geocode import attach_map_coordinates
@@ -61,6 +62,7 @@ def run_workrun() -> dict:
             suitable: list = []
             excluded_count = 0
             for listing in listings:
+                listing = _maybe_enrich(listing)
                 ok, reason = evaluate_rental(listing, config)
                 if ok:
                     suitable.append(listing)
@@ -100,6 +102,8 @@ def run_workrun() -> dict:
                     "match_tag": _match_tag(score_rental(l, config)),
                     "neighborhood": _extract_neighborhood(l.title, l.location),
                     "available_from": l.available_from,
+                    "platform_listed_date": l.platform_listed_date,
+                    "is_new_today": is_new_on_platform_today(l),
                     "notes": l.notes,
                 }
                 for l in suitable
@@ -185,13 +189,22 @@ def _write_outputs(payload: dict) -> None:
     (Path("data") / "latest_listings.json").write_text(json.dumps(payload, indent=2, ensure_ascii=True), encoding="utf-8")
 
 
+def _maybe_enrich(listing):
+    if listing.notes and len(listing.notes) > 250 and listing.platform_listed_date:
+        return listing
+    if listing.notes and len(listing.notes) > 800:
+        return listing
+    return enrich_listing(listing)
+
+
 def _sort_newest_first(item: dict) -> tuple:
     raw = item.get("first_seen_utc") or ""
     try:
         ts = datetime.fromisoformat(raw.replace("Z", "+00:00")).timestamp()
     except ValueError:
         ts = 0.0
-    return (-ts, not item.get("is_new_today", False))
+    listed = item.get("platform_listed_date") or ""
+    return (-ts, listed, not item.get("is_new_today", False))
 
 
 def _dedupe_by_url(items: list[dict]) -> list[dict]:
@@ -239,8 +252,9 @@ def _load_application_status() -> dict:
     path = Path("data/application_status.json")
     if not path.exists():
         return {
-            "applications_sent": 5,
-            "viewings": 0,
+            "reacties_verstuurd": 46,
+            "bezichtigingen": 0,
+            "kijkavonden": 2,
             "rejections": 3,
             "no_response": 4,
             "rejected_addresses": ["PSV-laan 233", "Schootsestraat 94 A"],

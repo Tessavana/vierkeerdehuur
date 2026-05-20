@@ -1,13 +1,13 @@
 const MOVE_OUT_DEADLINE = new Date("2026-07-26T23:59:59+02:00");
+const MAP_VISITED_KEY = "housing_map_visited_urls_v1";
+const SUPPORT_CLICKED_KEY = "housing_support_clicked_v1";
+const COUNTAPI_NS = "vierkeerdehuur";
+const COUNTAPI_KEY = "tessa-support";
 
-function updateClock() {
-  const el = document.getElementById("clock");
-  if (el) el.textContent = new Date().toLocaleTimeString();
-}
+let __allListings = [];
+let __mapLayerGroup = null;
 
-function updateCountdown() {
-  const el = document.getElementById("countdown");
-  if (!el) return;
+function updateCountdownHtml() {
   const now = Date.now();
   const end = MOVE_OUT_DEADLINE.getTime();
   const diff = Math.max(0, end - now);
@@ -15,7 +15,12 @@ function updateCountdown() {
   const hours = Math.floor((diff % 86400000) / 3600000);
   const mins = Math.floor((diff % 3600000) / 60000);
   const secs = Math.floor((diff % 60000) / 1000);
-  el.textContent = `${days}d ${hours}u ${mins}m ${secs}s tot 26 juli`;
+  return `${days}d ${hours}u ${mins}m ${secs}s`;
+}
+
+function updateDeadlineRow() {
+  const el = document.getElementById("deadline-countdown");
+  if (el) el.textContent = updateCountdownHtml();
 }
 
 function dash(v) {
@@ -45,8 +50,6 @@ function formatSeen(iso) {
   return d.toLocaleDateString("nl-NL", { day: "numeric", month: "short" });
 }
 
-const MAP_VISITED_KEY = "housing_map_visited_urls_v1";
-
 function loadVisitedUrls() {
   try {
     const raw = localStorage.getItem(MAP_VISITED_KEY);
@@ -64,29 +67,11 @@ function addVisitedUrl(url) {
   return s;
 }
 
-async function mapCoordsForListing(listing) {
-  const key = `${listing.url}|${listing.location}|${listing.title}`;
-  try {
-    if (globalThis.crypto?.subtle) {
-      const buf = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(key));
-      const hex = Array.from(new Uint8Array(buf))
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("")
-        .slice(0, 12);
-      const h = parseInt(hex, 16);
-      const dlat = (h % 2000) / 2000 * 0.035 - 0.0175;
-      const dlon = (Math.floor(h / 2000) % 2000) / 2000 * 0.05 - 0.025;
-      return { lat: 51.4416 + dlat, lon: 5.4697 + dlon };
-    }
-  } catch (_e) {
-    /* no subtle crypto on http:// */
-  }
-  let h = 2166136261;
-  for (let j = 0; j < key.length; j++) h = Math.imul(h ^ key.charCodeAt(j), 16777619);
-  h = Math.abs(h) >>> 0;
-  const dlat = (h % 2000) / 2000 * 0.035 - 0.0175;
-  const dlon = (Math.floor(h / 2000) % 2000) / 2000 * 0.05 - 0.025;
-  return { lat: 51.4416 + dlat, lon: 5.4697 + dlon };
+function tagPassesFilter(listing) {
+  const active = window.__activeTagFilters;
+  if (!active || active.size === 0) return true;
+  const t = (listing.match_tag || "okay").toLowerCase();
+  return active.has(t);
 }
 
 function listingRow(l) {
@@ -102,7 +87,7 @@ function listingRow(l) {
       <div>${wijk}</div>
       <div>EUR ${l.rent_eur ?? "?"}</div>
       <div>${l.size_m2 ?? "?"} m²</div>
-      <div>${formatSeen(l.first_seen_utc)}</div>
+      <div>${dash(l.available_from)}</div>
       <div>${tag}${newBadge}<br/><a href="${l.url}" target="_blank" rel="noopener noreferrer">open</a></div>
     </div>
   `;
@@ -129,7 +114,7 @@ function renderStats(stats, maxRent) {
   if (cards) {
     const items = [
       ["Nieuw deze week", stats.new_this_week ?? 0],
-      ["Nieuw vandaag (budget)", stats.new_today ?? 0],
+      ["Nieuw op platform vandaag", stats.new_on_platform_today ?? stats.new_today ?? 0],
       ["Gem. huur (alles)", stats.avg_rent_all != null ? `€${stats.avg_rent_all}` : "-"],
       ["Mediaan huur", stats.median_rent_all != null ? `€${stats.median_rent_all}` : "-"],
       ["Gem. huur (budget)", stats.avg_rent_in_budget != null ? `€${stats.avg_rent_in_budget}` : "-"],
@@ -222,33 +207,26 @@ function renderPlatformBreakdown(byPlatform) {
     .join("");
 }
 
-async function renderMap(listings) {
-  const mapEl = document.getElementById("map");
-  if (!mapEl) return;
-  if (window.__housingMap) {
-    window.__housingMap.remove();
-    window.__housingMap = null;
-  }
-  const map = L.map("map").setView([51.4416, 5.4697], 12);
-  window.__housingMap = map;
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-    attribution: "&copy; OpenStreetMap &copy; CARTO",
-    subdomains: "abcd",
-    maxZoom: 20,
-  }).addTo(map);
+function getActiveTagFilters() {
+  const set = new Set();
+  document.querySelectorAll(".tag-filter:checked").forEach((el) => {
+    set.add((el.dataset.tag || "").toLowerCase());
+  });
+  return set;
+}
 
-  const usedCoords = new Map();
-  const layerGroup = L.layerGroup().addTo(map);
+function refreshMapMarkers() {
+  if (!window.__housingMap || !__mapLayerGroup) return;
+  __mapLayerGroup.clearLayers();
+  window.__activeTagFilters = getActiveTagFilters();
   const visitedUrls = loadVisitedUrls();
+  const filtered = __allListings.filter(tagPassesFilter);
+  const usedCoords = new Map();
 
-  for (const listing of listings) {
-    let lat = listing.map_lat != null ? Number(listing.map_lat) : null;
-    let lon = listing.map_lon != null ? Number(listing.map_lon) : null;
-    if (lat == null || lon == null || Number.isNaN(lat) || Number.isNaN(lon)) {
-      const c = await mapCoordsForListing(listing);
-      lat = c.lat;
-      lon = c.lon;
-    }
+  for (const listing of filtered) {
+    let lat = Number(listing.map_lat);
+    let lon = Number(listing.map_lon);
+    if (Number.isNaN(lat) || Number.isNaN(lon)) continue;
     const key = `${lat.toFixed(5)},${lon.toFixed(5)}`;
     const offset = usedCoords.get(key) || 0;
     usedCoords.set(key, offset + 1);
@@ -268,7 +246,7 @@ async function renderMap(listings) {
     });
     const wijk = dash(listing.neighborhood);
     const platform = dash(listing.platform || listing.source);
-    const newLine = isNewToday ? "<b>Nieuw vandaag</b><br/>" : "";
+    const newLine = isNewToday ? "<b>Nieuw op platform vandaag</b><br/>" : "";
     marker.bindPopup(
       `${newLine}<b>${listing.title}</b><br/>${platform}${wijk !== "-" ? ` · ${wijk}` : ""}<br/>EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²`
     );
@@ -277,16 +255,36 @@ async function renderMap(listings) {
       marker.setStyle({ color: "#4b5563", weight: 2, fillColor: "#9ca3af", fillOpacity: 1 });
       showSelectedMatch(listing);
     });
-    layerGroup.addLayer(marker);
+    __mapLayerGroup.addLayer(marker);
   }
 
-  if (listings.length > 0) {
+  if (filtered.length > 0) {
     try {
-      map.fitBounds(layerGroup.getBounds().pad(0.12));
+      window.__housingMap.fitBounds(__mapLayerGroup.getBounds().pad(0.12));
     } catch (_e) {
-      map.setView([51.4416, 5.4697], 12);
+      window.__housingMap.setView([51.4416, 5.4697], 12);
     }
   }
+}
+
+async function renderMap(listings) {
+  __allListings = listings;
+  const mapEl = document.getElementById("map");
+  if (!mapEl) return;
+  if (window.__housingMap) {
+    window.__housingMap.remove();
+    window.__housingMap = null;
+  }
+  const map = L.map("map").setView([51.4416, 5.4697], 12);
+  window.__housingMap = map;
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+    attribution: "&copy; OpenStreetMap &copy; CARTO",
+    subdomains: "abcd",
+    maxZoom: 20,
+  }).addTo(map);
+  __mapLayerGroup = L.layerGroup().addTo(map);
+  window.__activeTagFilters = getActiveTagFilters();
+  refreshMapMarkers();
   setTimeout(() => map.invalidateSize(), 200);
 }
 
@@ -300,47 +298,74 @@ function showSelectedMatch(listing) {
     <span class="muted">${platform}</span><br/>
     ${listing.location}${wijk !== "-" ? ` · ${wijk}` : ""}<br/>
     EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²<br/>
-    Gezien: ${formatSeen(listing.first_seen_utc)}<br/>
+    Huur vanaf: ${dash(listing.available_from)}<br/>
     <span class="${matchTagClass(listing.match_tag || "okay")}">${listing.match_tag ?? "okay"}</span>${listing.is_new_today ? ' <span class="tag tag-new">Nieuw vandaag</span>' : ""}<br/>
     <a href="${listing.url}" target="_blank" rel="noopener noreferrer">open listing</a>
   `;
 }
 
-function renderOverviewTables(status) {
-  const left = document.getElementById("status-table-left");
-  const right = document.getElementById("status-table-right");
-  if (!left || !right) return;
+function renderOverviewTable(status) {
+  const table = document.getElementById("status-table");
+  if (!table) return;
   const rejected = (status.rejected_addresses || []).join(", ");
-  const sh = status.sociale_huur || {};
-  left.innerHTML = `
-    <tr><td>Applications sent</td><td><b>${status.applications_sent ?? 5}</b></td></tr>
-    <tr><td>Viewings</td><td><b>${status.viewings ?? 0}</b></td></tr>
-    <tr><td>Rejections</td><td><b>${status.rejections ?? 3}</b></td></tr>
-    <tr><td>No response</td><td><b>${status.no_response ?? 4}</b></td></tr>
+  table.innerHTML = `
+    <tr><td>Reacties verstuurd</td><td><b>${status.reacties_verstuurd ?? status.applications_sent ?? 46}</b></td></tr>
+    <tr><td>Bezichtigingen</td><td><b>${status.bezichtigingen ?? status.viewings ?? 0}</b></td></tr>
+    <tr><td>Kijkavonden</td><td><b>${status.kijkavonden ?? 0}</b></td></tr>
+    <tr><td>Deadline 26 juli</td><td><b id="deadline-countdown">${updateCountdownHtml()}</b></td></tr>
     <tr><td>Afwijzingen tot nu toe</td><td>${rejected || "-"}</td></tr>
   `;
-  right.innerHTML = `
-    <tr><td>Sociale huur via</td><td>${sh.platform ?? "Wooniezie"}</td></tr>
-    <tr><td>Inschrijfduur</td><td>${sh.inschrijfduur ?? "4 jaar en 3 maanden"}</td></tr>
-    <tr><td>Reacties verstuurd</td><td>${sh.reacties_verstuurd ?? "230+"}</td></tr>
-    <tr><td>Actief gezocht</td><td>${sh.actief_gezocht ?? "2 jaar"}</td></tr>
-    <tr><td>Aantal bezichtigingen</td><td>${sh.bezichtigingen ?? 0}</td></tr>
-  `;
+}
+
+async function initSupportButton() {
+  const btn = document.getElementById("support-btn");
+  const countEl = document.getElementById("support-count");
+  if (!btn || !countEl) return;
+
+  async function showCount() {
+    try {
+      const res = await fetch(`https://api.countapi.xyz/get/${COUNTAPI_NS}/${COUNTAPI_KEY}`);
+      const data = await res.json();
+      countEl.textContent = String(data.value ?? 0);
+    } catch {
+      countEl.textContent = "—";
+    }
+  }
+
+  await showCount();
+  if (localStorage.getItem(SUPPORT_CLICKED_KEY)) {
+    btn.classList.add("support-done");
+    btn.disabled = true;
+  }
+
+  btn.addEventListener("click", async () => {
+    if (localStorage.getItem(SUPPORT_CLICKED_KEY)) return;
+    try {
+      const res = await fetch(`https://api.countapi.xyz/hit/${COUNTAPI_NS}/${COUNTAPI_KEY}`);
+      const data = await res.json();
+      countEl.textContent = String(data.value ?? 0);
+      localStorage.setItem(SUPPORT_CLICKED_KEY, "1");
+      btn.classList.add("support-done");
+      btn.disabled = true;
+    } catch {
+      countEl.textContent = "?";
+    }
+  });
 }
 
 async function loadRun() {
   const res = await fetch("./data/latest_listings.json", { cache: "no-store" });
   const data = await res.json();
 
-  renderOverviewTables(data.application_status || {});
+  renderOverviewTable(data.application_status || {});
+  const updated = document.getElementById("last-updated");
+  if (updated) {
+    updated.textContent = `Laatste update: ${new Date(data.generated_at_utc).toLocaleString("nl-NL")}`;
+  }
   const subtitle = document.getElementById("results-subtitle");
   if (subtitle) {
     const n = (data.listings || []).length;
-    subtitle.textContent = `${n} match${n === 1 ? "" : "es"} · nieuwste eerst · update ${new Date(data.generated_at_utc).toLocaleString("nl-NL")}`;
-  }
-  const headline = document.getElementById("headline-status");
-  if (headline) {
-    headline.innerHTML = `Laatste update: ${new Date(data.generated_at_utc).toLocaleTimeString("nl-NL")}<br/>Nog steeds geen woning🙂`;
+    subtitle.textContent = `${n} match${n === 1 ? "" : "es"} · nieuwste eerst · oranje = vandaag op het platform geplaatst`;
   }
 
   renderListingsTable(data.listings || []);
@@ -349,13 +374,15 @@ async function loadRun() {
   await renderMap(data.listings || []);
 }
 
-updateClock();
-updateCountdown();
-setInterval(updateClock, 1000);
-setInterval(updateCountdown, 1000);
+document.querySelectorAll(".tag-filter").forEach((el) => {
+  el.addEventListener("change", () => refreshMapMarkers());
+});
+
+setInterval(updateDeadlineRow, 1000);
+initSupportButton();
 loadRun().catch((err) => {
   const headline = document.getElementById("headline-status");
-  if (headline) headline.textContent = `Nog steeds geen woning. Ook de website had issues: ${err}`;
+  if (headline) headline.textContent = `Status: nog steeds geen woning — site error: ${err}`;
 });
 
 window.addEventListener("resize", () => {

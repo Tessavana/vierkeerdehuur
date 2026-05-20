@@ -12,3 +12,4 @@ data/cache/
 data/scan_bundle.json
 data/listing_registry.json
 data/market_registry.json
+data/detail_cache.json
