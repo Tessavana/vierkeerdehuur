@@ -12,6 +12,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from src.filters import INACTIVE_LISTING_MARKERS
+from src.filters import detect_outdoor
 from src.listing_detail import parse_detail_html
 from src.models import Listing
 from playwright.sync_api import sync_playwright
@@ -28,11 +29,6 @@ def _extract_int(text: str) -> int | None:
         return None
     normalized = re.sub(r"[^\d]", "", match.group(1))
     return int(normalized) if normalized else None
-
-
-def _outdoor(text: str) -> bool:
-    lowered = text.lower()
-    return any(k in lowered for k in ("balkon", "tuin", "terras", "dakterras", "buitenruimte"))
 
 
 def _search_urls(max_pages: int) -> list[str]:
@@ -144,6 +140,71 @@ def _collect_search_urls_playwright(max_pages: int) -> list[str]:
     return ordered
 
 
+def _fetch_funda_api_listings(max_results: int) -> list[Listing]:
+    """Use Funda's app API (via pyfunda) when HTML/Playwright is blocked."""
+    if os.getenv("FUNDA_USE_API", "true").strip().lower() in {"0", "false", "no", "off"}:
+        return []
+    try:
+        from funda import Funda
+    except ImportError:
+        return []
+
+    max_price = int(os.getenv("FUNDA_API_MAX_PRICE", "2500"))
+    listings: list[Listing] = []
+    seen: set[str] = set()
+
+    with Funda() as client:
+        for item in client.search("eindhoven", category="rent", max_price=max_price):
+            if len(listings) >= max_results:
+                break
+            url = (item.url or "").split("?")[0]
+            if not url or url in seen:
+                continue
+            rent = item.price.amount if item.price else None
+            size = item.living_area
+            if rent is None or size is None:
+                continue
+            seen.add(url)
+            addr = item.address
+            parts = []
+            if addr:
+                street = " ".join(
+                    p
+                    for p in (addr.street_name, addr.house_number, addr.house_number_suffix)
+                    if p
+                ).strip()
+                if street:
+                    parts.append(street)
+                if addr.postcode:
+                    parts.append(addr.postcode)
+                if addr.city:
+                    parts.append(addr.city)
+            location = ", ".join(parts) or "Eindhoven"
+            desc = (item.description or "")[:4000]
+            outdoor_known, outdoor_space = detect_outdoor(desc)
+            listed = None
+            if item.publication_date:
+                listed = str(item.publication_date)[:10]
+            listings.append(
+                Listing(
+                    source="funda",
+                    source_id=str(item.global_id or item.tiny_id or url.rstrip("/").split("/")[-1]),
+                    title=item.title or "Funda listing",
+                    url=url,
+                    location=location,
+                    rent_eur=int(rent),
+                    size_m2=int(size),
+                    outdoor_space=outdoor_space,
+                    outdoor_known=outdoor_known,
+                    contract_months=None,
+                    available_from=None,
+                    notes=desc or None,
+                    platform_listed_date=listed,
+                )
+            )
+    return listings
+
+
 def _collect_search_urls(max_pages: int) -> list[str]:
     urls = _collect_search_urls_playwright(max_pages)
     if urls:
@@ -219,6 +280,8 @@ def _parse_detail(html: str, url: str) -> Listing | None:
 
     location = ", ".join(p for p in (street, postcode, locality) if p) or "Eindhoven"
     source_id = url.rstrip("/").split("/")[-1]
+    desc = fields.get("description") or ""
+    outdoor_known, outdoor_space = detect_outdoor(f"{desc} {text}")
     return Listing(
         source="funda",
         source_id=source_id,
@@ -227,17 +290,22 @@ def _parse_detail(html: str, url: str) -> Listing | None:
         location=location,
         rent_eur=rent,
         size_m2=size,
-        outdoor_space=_outdoor(text),
+        outdoor_space=outdoor_space,
+        outdoor_known=outdoor_known,
         contract_months=None,
         available_from=fields.get("available_from"),
-        notes=(fields.get("description") or "")[:4000] or None,
+        notes=desc[:4000] or None,
         platform_listed_date=fields.get("platform_listed_date"),
     )
 
 
 def fetch_funda_eindhoven_huur_listings(search_url: str | None = None) -> list[Listing]:
-    max_pages = int(os.getenv("FUNDA_MAX_PAGES", "25"))
     max_details = int(os.getenv("FUNDA_MAX_DETAIL_PAGES", "120"))
+    api_listings = _fetch_funda_api_listings(max_details)
+    if api_listings:
+        return api_listings
+
+    max_pages = int(os.getenv("FUNDA_MAX_PAGES", "25"))
     detail_urls = _collect_search_urls(max_pages)[:max_details]
 
     listings: list[Listing] = []

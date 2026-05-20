@@ -63,6 +63,9 @@ jobs:
           SQLITE_PATH: data/listings.db
           VBT_WONINGEN_CACHE_TTL_SECONDS: "3600"
           GEOCODE_USE_PDOK: "true"
+          FUNDA_USE_API: "true"
+          FUNDA_API_MAX_PRICE: "2500"
+          FUNDA_MAX_DETAIL_PAGES: "40"
         run: python -m src.workrun
 
       - uses: actions/upload-pages-artifact@v3

@@ -28,26 +28,31 @@ function dash(v) {
   return v;
 }
 
+function formatRentFrom(v) {
+  if (!v) return "-";
+  const s = String(v).trim();
+  if (/geleden/i.test(s)) return "-";
+  if (/^\d{4}-\d{2}-\d{2}T/.test(s)) return "-";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    const d = new Date(`${s}T12:00:00`);
+    if (!Number.isNaN(d.getTime())) {
+      return d.toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
+    }
+  }
+  const d = new Date(s);
+  if (!Number.isNaN(d.getTime()) && s.includes("-")) {
+    return d.toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
+  }
+  if (s.length > 48) return "-";
+  return s;
+}
+
 function matchTagClass(tag) {
   const t = (tag || "").toLowerCase();
   if (t === "super nice") return "tag tag-super";
   if (t === "nice") return "tag tag-nice";
   if (t === "okay") return "tag tag-okay";
   return "tag tag-meh";
-}
-
-function formatSeen(iso) {
-  if (!iso) return "-";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "-";
-  const diff = Date.now() - d.getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `${mins}m geleden`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 48) return `${hours}u geleden`;
-  const days = Math.floor(hours / 24);
-  if (days < 14) return `${days}d geleden`;
-  return d.toLocaleDateString("nl-NL", { day: "numeric", month: "short" });
 }
 
 function loadVisitedUrls() {
@@ -67,9 +72,17 @@ function addVisitedUrl(url) {
   return s;
 }
 
+function getActiveTagFilters() {
+  const set = new Set();
+  document.querySelectorAll(".map-tag-toggle.active").forEach((el) => {
+    set.add((el.dataset.tag || "").toLowerCase());
+  });
+  return set;
+}
+
 function tagPassesFilter(listing) {
   const active = window.__activeTagFilters;
-  if (!active || active.size === 0) return true;
+  if (!active || active.size === 0) return false;
   const t = (listing.match_tag || "okay").toLowerCase();
   return active.has(t);
 }
@@ -87,7 +100,7 @@ function listingRow(l) {
       <div>${wijk}</div>
       <div>EUR ${l.rent_eur ?? "?"}</div>
       <div>${l.size_m2 ?? "?"} m²</div>
-      <div>${dash(l.available_from)}</div>
+      <div>${formatRentFrom(l.available_from)}</div>
       <div>${tag}${newBadge}<br/><a href="${l.url}" target="_blank" rel="noopener noreferrer">open</a></div>
     </div>
   `;
@@ -97,53 +110,97 @@ function renderListingsTable(listings) {
   const el = document.getElementById("listings-table");
   if (!el) return;
   if (!listings.length) {
-    el.innerHTML = `<div class="muted">Geen matches binnen budget op dit moment.</div>`;
+    el.innerHTML = `<div class="muted listings-empty">Geen matches binnen budget op dit moment.</div>`;
     return;
   }
   el.innerHTML = listings.map(listingRow).join("");
 }
 
-function renderStats(stats, maxRent) {
+function renderStats(stats, maxRent, listingsCount) {
   if (!stats) return;
-  const cards = document.getElementById("stats-cards");
-  const fun = document.getElementById("fun-stats");
+  const dashEl = document.getElementById("stats-dashboard");
   const subtitle = document.getElementById("stats-subtitle");
   if (subtitle) {
-    subtitle.textContent = `${stats.total_tracked ?? 0} woningen gevolgd in de markt · max huur €${maxRent}`;
+    subtitle.textContent = `${stats.total_tracked ?? 0} woningen gevolgd · max huur €${maxRent}`;
   }
-  if (cards) {
-    const items = [
-      ["Nieuw deze week", stats.new_this_week ?? 0],
-      ["Nieuw op platform vandaag", stats.new_on_platform_today ?? stats.new_today ?? 0],
-      ["Gem. huur (alles)", stats.avg_rent_all != null ? `€${stats.avg_rent_all}` : "-"],
-      ["Mediaan huur", stats.median_rent_all != null ? `€${stats.median_rent_all}` : "-"],
-      ["Gem. huur (budget)", stats.avg_rent_in_budget != null ? `€${stats.avg_rent_in_budget}` : "-"],
-      ["Goedkoopste match", stats.cheapest_in_budget != null ? `€${stats.cheapest_in_budget}` : "-"],
-      ["Gem. m²", stats.avg_size_m2 != null ? `${stats.avg_size_m2} m²` : "-"],
-      ["€/m² gemiddeld", stats.avg_eur_per_m2 != null ? `€${stats.avg_eur_per_m2}` : "-"],
-      ["Boven budget", `${stats.pct_above_budget ?? 0}%`],
-      ["Strijp (budget)", stats.strijp_in_budget ?? 0],
-      ["Met buitenruimte", `${stats.outdoor_pct ?? 0}%`],
-    ];
-    cards.innerHTML = items
-      .map(([label, val]) => `<div class="stat-card"><div class="stat-label">${label}</div><div class="stat-value">${val}</div></div>`)
-      .join("");
-  }
-  drawPriceChart(stats.price_distribution || []);
-  renderPlatformBreakdown(stats.by_platform || {});
-  if (fun) {
-    const reasons = stats.excluded_by_reason || {};
-    const reasonLine = Object.entries(reasons)
-      .map(([k, v]) => `${k}: ${v}`)
-      .join(" · ");
-    fun.innerHTML = `
-      <p><b>Leuk om te weten:</b> er staan nu <b>${stats.active_in_budget ?? 0}</b> woningen binnen budget live,
-      terwijl de scanners <b>${stats.total_tracked ?? 0}</b> unieke adressen zagen (inclusief dure parels).
-      ${stats.priciest_in_budget != null ? `Duurste match binnen budget: <b>€${stats.priciest_in_budget}</b>.` : ""}
-      ${reasonLine ? `<br/><span class="muted">Waarom buiten budget: ${reasonLine}</span>` : ""}
-      </p>
+
+  const tags = stats.tag_counts || {};
+  const tagTotal = Object.values(tags).reduce((a, b) => a + b, 0) || 1;
+  const tagOrder = ["super nice", "nice", "okay", "meh"];
+  const tagBars = tagOrder
+    .map((name) => {
+      const n = tags[name] || 0;
+      const pct = Math.round((100 * n) / tagTotal);
+      return `
+        <div class="stack-bar-row">
+          <div class="stack-bar-label">${name}</div>
+          <div class="stack-bar-track">
+            <div class="stack-bar-fill" style="width:${pct}%"></div>
+            <span class="stack-bar-pct">${n}</span>
+          </div>
+        </div>`;
+    })
+    .join("");
+
+  const outdoorPct =
+    stats.outdoor_pct != null
+      ? `${stats.outdoor_pct}%`
+      : stats.outdoor_known_count
+        ? "—"
+        : "n.v.t.";
+  const outdoorNote =
+    stats.outdoor_known_count != null
+      ? `${stats.outdoor_yes_count ?? 0} van ${stats.outdoor_known_count} bekend`
+      : "";
+
+  const inBudget = listingsCount ?? stats.active_in_budget ?? 0;
+  const tracked = stats.total_tracked ?? 0;
+  const matchPct = tracked ? Math.round((100 * inBudget) / tracked) : 0;
+  const segTotal = 24;
+  const filled = Math.round((matchPct / 100) * segTotal);
+
+  if (dashEl) {
+    dashEl.innerHTML = `
+      <div class="market-hero-card">
+        <div class="market-card-tags">
+          <span class="market-pill">live</span>
+          <span class="market-pill">eindhoven</span>
+          <span class="market-pill">≤ €${maxRent}</span>
+        </div>
+        <div class="market-card-title">Matches binnen budget</div>
+        <hr class="market-card-divider" />
+        <p class="market-card-lead">${inBudget} woning${inBudget === 1 ? "" : "en"} passen nu in je filters.</p>
+        <div class="market-card-metric">
+          <span class="market-big">${matchPct}%</span>
+          <span class="market-trend">van ${tracked} gevolgd</span>
+        </div>
+        <div class="market-segments" aria-hidden="true">
+          ${Array.from({ length: segTotal }, (_, i) => `<span class="seg${i < filled ? " seg-on" : ""}"></span>`).join("")}
+        </div>
+      </div>
+      <div class="market-metrics-grid">
+        <div class="metric-mini"><span class="metric-mini-label">Nieuw deze week</span><span class="metric-mini-val">${stats.new_this_week ?? 0}</span></div>
+        <div class="metric-mini"><span class="metric-mini-label">Nieuw vandaag</span><span class="metric-mini-val">${stats.new_on_platform_today ?? 0}</span></div>
+        <div class="metric-mini"><span class="metric-mini-label">Gem. huur</span><span class="metric-mini-val">${stats.avg_rent_in_budget != null ? `€${stats.avg_rent_in_budget}` : "—"}</span></div>
+        <div class="metric-mini"><span class="metric-mini-label">Mediaan</span><span class="metric-mini-val">${stats.median_rent_all != null ? `€${stats.median_rent_all}` : "—"}</span></div>
+        <div class="metric-mini"><span class="metric-mini-label">Goedkoopste</span><span class="metric-mini-val">${stats.cheapest_in_budget != null ? `€${stats.cheapest_in_budget}` : "—"}</span></div>
+        <div class="metric-mini"><span class="metric-mini-label">€/m²</span><span class="metric-mini-val">${stats.avg_eur_per_m2 != null ? `€${stats.avg_eur_per_m2}` : "—"}</span></div>
+        <div class="metric-mini metric-mini-wide">
+          <span class="metric-mini-label">Met buitenruimte (bekend)</span>
+          <span class="metric-mini-val">${outdoorPct}</span>
+          <span class="metric-mini-sub">${outdoorNote}</span>
+        </div>
+        <div class="metric-mini"><span class="metric-mini-label">Strijp</span><span class="metric-mini-val">${stats.strijp_in_budget ?? 0}</span></div>
+      </div>
+      <div class="market-stack-card">
+        <h3 class="market-stack-title">Tags (matches)</h3>
+        ${tagBars}
+      </div>
     `;
   }
+
+  drawPriceChart(stats.price_distribution || []);
+  renderPlatformBreakdown(stats.by_platform || {});
 }
 
 function drawPriceChart(buckets) {
@@ -164,14 +221,16 @@ function drawPriceChart(buckets) {
   const chartH = h - pad.t - pad.b;
   const barW = chartW / buckets.length - 8;
 
-  ctx.fillStyle = "#171717";
-  ctx.font = "12px Segoe UI, Arial, sans-serif";
+  ctx.font = "12px system-ui, Segoe UI, Arial, sans-serif";
   buckets.forEach((b, i) => {
     const bh = (b.count / max) * chartH;
     const x = pad.l + i * (chartW / buckets.length) + 4;
     const y = pad.t + chartH - bh;
-    ctx.fillStyle = "#0b4ea2";
+    ctx.fillStyle = i % 2 === 0 ? "#171717" : "#fff";
+    ctx.strokeStyle = "#171717";
+    ctx.lineWidth = 1;
     ctx.fillRect(x, y, barW, bh);
+    if (i % 2 !== 0) ctx.strokeRect(x, y, barW, bh);
     ctx.fillStyle = "#171717";
     ctx.textAlign = "center";
     ctx.fillText(String(b.count), x + barW / 2, y - 4);
@@ -179,7 +238,7 @@ function drawPriceChart(buckets) {
     ctx.translate(x + barW / 2, h - 8);
     ctx.rotate(-0.35);
     ctx.fillStyle = "#5f5f5f";
-    ctx.font = "11px Segoe UI, Arial, sans-serif";
+    ctx.font = "11px system-ui, Segoe UI, Arial, sans-serif";
     ctx.fillText(b.label, 0, 0);
     ctx.restore();
   });
@@ -207,12 +266,17 @@ function renderPlatformBreakdown(byPlatform) {
     .join("");
 }
 
-function getActiveTagFilters() {
-  const set = new Set();
-  document.querySelectorAll(".tag-filter:checked").forEach((el) => {
-    set.add((el.dataset.tag || "").toLowerCase());
+function initMapTagFilters() {
+  const wrap = document.getElementById("map-tag-filters");
+  if (!wrap || wrap.dataset.bound) return;
+  wrap.dataset.bound = "1";
+  wrap.addEventListener("click", (e) => {
+    const btn = e.target.closest(".map-tag-toggle");
+    if (!btn) return;
+    btn.classList.toggle("active");
+    window.__activeTagFilters = getActiveTagFilters();
+    refreshMapMarkers();
   });
-  return set;
 }
 
 function refreshMapMarkers() {
@@ -235,8 +299,16 @@ function refreshMapMarkers() {
 
     const isVisited = visitedUrls.has(listing.url);
     const isNewToday = Boolean(listing.is_new_today);
-    const pinColor = isNewToday ? "#e67e22" : isVisited ? "#4b5563" : "#000";
-    const fillColor = isNewToday ? "#f39c12" : isVisited ? "#9ca3af" : "#000";
+    const tag = (listing.match_tag || "okay").toLowerCase();
+    const tagColors = {
+      "super nice": "#145a2a",
+      nice: "#084298",
+      okay: "#444",
+      meh: "#888",
+    };
+    const fillColor = isNewToday ? "#e67e22" : isVisited ? "#9ca3af" : tagColors[tag] || "#171717";
+    const pinColor = isNewToday ? "#c0392b" : isVisited ? "#4b5563" : "#171717";
+
     const marker = L.circleMarker([latAdj, lonAdj], {
       radius: isNewToday ? 9 : 8,
       color: pinColor,
@@ -246,9 +318,10 @@ function refreshMapMarkers() {
     });
     const wijk = dash(listing.neighborhood);
     const platform = dash(listing.platform || listing.source);
+    const tagHtml = `<span class="${matchTagClass(listing.match_tag || "okay")}">${listing.match_tag ?? "okay"}</span>`;
     const newLine = isNewToday ? "<b>Nieuw op platform vandaag</b><br/>" : "";
     marker.bindPopup(
-      `${newLine}<b>${listing.title}</b><br/>${platform}${wijk !== "-" ? ` · ${wijk}` : ""}<br/>EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²`
+      `${newLine}${tagHtml}<br/><b>${listing.title}</b><br/>${platform}${wijk !== "-" ? ` · ${wijk}` : ""}<br/>EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²`
     );
     marker.on("click", () => {
       addVisitedUrl(listing.url);
@@ -271,21 +344,19 @@ async function renderMap(listings) {
   __allListings = listings;
   const mapEl = document.getElementById("map");
   if (!mapEl) return;
-  if (window.__housingMap) {
-    window.__housingMap.remove();
-    window.__housingMap = null;
+  if (!window.__housingMap) {
+    const map = L.map("map").setView([51.4416, 5.4697], 12);
+    window.__housingMap = map;
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+      attribution: "&copy; OpenStreetMap &copy; CARTO",
+      subdomains: "abcd",
+      maxZoom: 20,
+    }).addTo(map);
+    __mapLayerGroup = L.layerGroup().addTo(map);
+    setTimeout(() => map.invalidateSize(), 200);
   }
-  const map = L.map("map").setView([51.4416, 5.4697], 12);
-  window.__housingMap = map;
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-    attribution: "&copy; OpenStreetMap &copy; CARTO",
-    subdomains: "abcd",
-    maxZoom: 20,
-  }).addTo(map);
-  __mapLayerGroup = L.layerGroup().addTo(map);
   window.__activeTagFilters = getActiveTagFilters();
   refreshMapMarkers();
-  setTimeout(() => map.invalidateSize(), 200);
 }
 
 function showSelectedMatch(listing) {
@@ -294,12 +365,12 @@ function showSelectedMatch(listing) {
   const wijk = dash(listing.neighborhood);
   const platform = dash(listing.platform || listing.source);
   el.innerHTML = `
+    <span class="${matchTagClass(listing.match_tag || "okay")}">${listing.match_tag ?? "okay"}</span>${listing.is_new_today ? ' <span class="tag tag-new">Nieuw vandaag</span>' : ""}<br/>
     <b>${listing.title}</b><br/>
     <span class="muted">${platform}</span><br/>
     ${listing.location}${wijk !== "-" ? ` · ${wijk}` : ""}<br/>
     EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²<br/>
-    Huur vanaf: ${dash(listing.available_from)}<br/>
-    <span class="${matchTagClass(listing.match_tag || "okay")}">${listing.match_tag ?? "okay"}</span>${listing.is_new_today ? ' <span class="tag tag-new">Nieuw vandaag</span>' : ""}<br/>
+    Huur vanaf: ${formatRentFrom(listing.available_from)}<br/>
     <a href="${listing.url}" target="_blank" rel="noopener noreferrer">open listing</a>
   `;
 }
@@ -307,14 +378,25 @@ function showSelectedMatch(listing) {
 function renderOverviewTable(status) {
   const table = document.getElementById("status-table");
   if (!table) return;
-  const rejected = (status.rejected_addresses || []).join(", ");
+  const sh = status.sociale_huur || {};
   table.innerHTML = `
     <tr><td>Reacties verstuurd</td><td><b>${status.reacties_verstuurd ?? status.applications_sent ?? 46}</b></td></tr>
     <tr><td>Bezichtigingen</td><td><b>${status.bezichtigingen ?? status.viewings ?? 0}</b></td></tr>
     <tr><td>Kijkavonden</td><td><b>${status.kijkavonden ?? 0}</b></td></tr>
-    <tr><td>Deadline 26 juli</td><td><b id="deadline-countdown">${updateCountdownHtml()}</b></td></tr>
-    <tr><td>Afwijzingen tot nu toe</td><td>${rejected || "-"}</td></tr>
+    <tr class="overview-section-head"><td colspan="2"><b>Sociale huur (${sh.platform || "Wooniezie"})</b></td></tr>
+    <tr><td>Inschrijfduur</td><td>${dash(sh.inschrijfduur)}</td></tr>
+    <tr><td>Reacties verstuurd</td><td>${dash(sh.reacties_verstuurd)}</td></tr>
+    <tr><td>Actief gezocht</td><td>${dash(sh.actief_gezocht)}</td></tr>
+    <tr><td>Bezichtigingen</td><td><b>${sh.bezichtigingen ?? 0}</b></td></tr>
   `;
+}
+
+async function ensureCountApi() {
+  try {
+    await fetch(`https://api.countapi.xyz/create?namespace=${COUNTAPI_NS}&key=${COUNTAPI_KEY}&value=0`);
+  } catch {
+    /* already exists */
+  }
 }
 
 async function initSupportButton() {
@@ -322,13 +404,15 @@ async function initSupportButton() {
   const countEl = document.getElementById("support-count");
   if (!btn || !countEl) return;
 
+  await ensureCountApi();
+
   async function showCount() {
     try {
       const res = await fetch(`https://api.countapi.xyz/get/${COUNTAPI_NS}/${COUNTAPI_KEY}`);
       const data = await res.json();
       countEl.textContent = String(data.value ?? 0);
     } catch {
-      countEl.textContent = "—";
+      countEl.textContent = "0";
     }
   }
 
@@ -340,15 +424,17 @@ async function initSupportButton() {
 
   btn.addEventListener("click", async () => {
     if (localStorage.getItem(SUPPORT_CLICKED_KEY)) return;
+    const prev = parseInt(countEl.textContent, 10) || 0;
+    countEl.textContent = String(prev + 1);
     try {
       const res = await fetch(`https://api.countapi.xyz/hit/${COUNTAPI_NS}/${COUNTAPI_KEY}`);
       const data = await res.json();
-      countEl.textContent = String(data.value ?? 0);
+      if (data.value != null) countEl.textContent = String(data.value);
       localStorage.setItem(SUPPORT_CLICKED_KEY, "1");
       btn.classList.add("support-done");
       btn.disabled = true;
     } catch {
-      countEl.textContent = "?";
+      countEl.textContent = String(prev + 1);
     }
   });
 }
@@ -363,22 +449,20 @@ async function loadRun() {
     updated.textContent = `Laatste update: ${new Date(data.generated_at_utc).toLocaleString("nl-NL")}`;
   }
   const subtitle = document.getElementById("results-subtitle");
+  const listings = data.listings || [];
   if (subtitle) {
-    const n = (data.listings || []).length;
-    subtitle.textContent = `${n} match${n === 1 ? "" : "es"} · nieuwste eerst · oranje = vandaag op het platform geplaatst`;
+    subtitle.textContent = `${listings.length} match${listings.length === 1 ? "" : "es"} · nieuwste eerst · oranje pin = vandaag op platform`;
   }
 
-  renderListingsTable(data.listings || []);
+  renderListingsTable(listings);
   window.__lastMarketStats = data.market_stats;
-  renderStats(data.market_stats, data.max_rent);
-  await renderMap(data.listings || []);
+  renderStats(data.market_stats, data.max_rent, listings.length);
+  initMapTagFilters();
+  await renderMap(listings);
 }
 
-document.querySelectorAll(".tag-filter").forEach((el) => {
-  el.addEventListener("change", () => refreshMapMarkers());
-});
-
 setInterval(updateDeadlineRow, 1000);
+updateDeadlineRow();
 initSupportButton();
 loadRun().catch((err) => {
   const headline = document.getElementById("headline-status");
@@ -388,4 +472,5 @@ loadRun().catch((err) => {
 window.addEventListener("resize", () => {
   const stats = window.__lastMarketStats;
   if (stats) drawPriceChart(stats.price_distribution || []);
+  if (window.__housingMap) window.__housingMap.invalidateSize();
 });

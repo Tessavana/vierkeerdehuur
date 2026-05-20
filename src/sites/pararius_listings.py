@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 
+from src.filters import detect_outdoor
 from src.listing_detail import parse_detail_html
 from src.models import Listing
 from src.web_fetch import HEADERS, fetch_html_with_fallback
@@ -24,11 +25,6 @@ def _extract_int(text: str) -> int | None:
         return None
     normalized = re.sub(r"[^\d]", "", match.group(1))
     return int(normalized) if normalized else None
-
-
-def _outdoor(text: str) -> bool:
-    lowered = text.lower()
-    return any(k in lowered for k in ("balkon", "tuin", "terras", "dakterras", "balkon"))
 
 
 def _card_is_new_today(card) -> bool:
@@ -135,6 +131,8 @@ def fetch_pararius_eindhoven_listings(list_url: str | None = None) -> list[Listi
             listed = fields.get("platform_listed_date")
             if card_new and not listed:
                 listed = today
+            desc = fields.get("description") or ""
+            outdoor_known, outdoor_space = detect_outdoor(f"{desc} {text}")
             listings.append(
                 Listing(
                     source="pararius",
@@ -144,10 +142,11 @@ def fetch_pararius_eindhoven_listings(list_url: str | None = None) -> list[Listi
                     location=location if "eindhoven" in location.lower() else f"{location}, Eindhoven",
                     rent_eur=rent,
                     size_m2=size,
-                    outdoor_space=_outdoor(text),
+                    outdoor_space=outdoor_space,
+                    outdoor_known=outdoor_known,
                     contract_months=None,
                     available_from=fields.get("available_from"),
-                    notes=(fields.get("description") or "")[:4000] or None,
+                    notes=desc[:4000] or None,
                     platform_listed_date=listed,
                 )
             )

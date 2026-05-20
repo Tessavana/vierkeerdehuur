@@ -11,8 +11,17 @@
     <main class="container">
       <section class="hero">
         <div class="hero-top-right">
+          <div class="deadline-pill">
+            Verhuizen 26 jul · <span id="deadline-countdown">—</span>
+          </div>
           <button type="button" class="support-btn" id="support-btn" title="Eén keer per browser">
-            <span class="support-heart">❤️</span> Gun Tessa een woning
+            <svg class="support-heart" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+              />
+            </svg>
+            Gun Tessa een woning
             <span class="support-count" id="support-count">…</span>
           </button>
           <div class="last-updated" id="last-updated">Laatste update: —</div>
@@ -28,12 +37,12 @@
 
       <section class="panel map-section">
         <h2>Matches op de kaart</h2>
-        <div class="map-filters" id="map-filters">
-          <span class="map-filters-label">Toon tags:</span>
-          <label><input type="checkbox" class="tag-filter" data-tag="super nice" checked /> super nice</label>
-          <label><input type="checkbox" class="tag-filter" data-tag="nice" checked /> nice</label>
-          <label><input type="checkbox" class="tag-filter" data-tag="okay" checked /> okay</label>
-          <label><input type="checkbox" class="tag-filter" data-tag="meh" checked /> meh</label>
+        <div class="map-tag-filters" id="map-tag-filters" role="group" aria-label="Filter op tag">
+          <span class="map-filters-label">Toon:</span>
+          <button type="button" class="map-tag-toggle tag tag-super active" data-tag="super nice">super nice</button>
+          <button type="button" class="map-tag-toggle tag tag-nice active" data-tag="nice">nice</button>
+          <button type="button" class="map-tag-toggle tag tag-okay active" data-tag="okay">okay</button>
+          <button type="button" class="map-tag-toggle tag tag-meh active" data-tag="meh">meh</button>
         </div>
         <div class="map-with-detail">
           <div id="map"></div>
@@ -49,28 +58,30 @@
         <table id="status-table" class="overview-table overview-table-single"></table>
       </section>
 
-      <section class="panel">
+      <section class="panel listings-panel">
         <h2>Matches binnen budget</h2>
         <p class="muted" id="results-subtitle">Nieuwste eerst · alleen woningen binnen je filters</p>
-        <div class="listing-header listings-table-header">
-          <div>Platform</div>
-          <div>Woning</div>
-          <div>Wijk</div>
-          <div>Huur</div>
-          <div>m²</div>
-          <div>Huur vanaf</div>
-          <div>Tag / link</div>
+        <div class="listings-table-wrap">
+          <div class="listing-header listings-table-header">
+            <div>Platform</div>
+            <div>Woning</div>
+            <div>Wijk</div>
+            <div>Huur</div>
+            <div>m²</div>
+            <div>Huur vanaf</div>
+            <div>Tag / link</div>
+          </div>
+          <div id="listings-table" class="listings-scroll"></div>
         </div>
-        <div id="listings-table"></div>
       </section>
 
       <section class="panel stats-section">
-        <h2>Markt in Eindhoven</h2>
-        <p class="muted" id="stats-subtitle">Op basis van alles wat de scanners vinden (inclusief boven budget)</p>
-        <div id="stats-cards" class="stats-cards"></div>
+        <h2>Woningmarkt in eindhoven</h2>
+        <p class="muted" id="stats-subtitle">Op basis van alles wat de scanners vinden</p>
+        <div id="stats-dashboard" class="stats-dashboard"></div>
         <div class="stats-charts">
           <div class="chart-block">
-            <h3>Huurverdeling (alle gevonden woningen)</h3>
+            <h3>Huurverdeling</h3>
             <canvas id="price-chart" width="560" height="220" aria-label="Huurverdeling"></canvas>
           </div>
           <div class="chart-block">
@@ -78,7 +89,6 @@
             <div id="platform-breakdown" class="platform-breakdown"></div>
           </div>
         </div>
-        <div id="fun-stats" class="fun-stats"></div>
       </section>
     </main>
 

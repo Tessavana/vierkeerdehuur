@@ -73,6 +73,8 @@ jobs:
           HUURWONINGEN_MAX_DETAILS: "90"
           RENTFINDER_MAX_PAGES: "12"
           VESTEDA_MAX_DETAIL_PAGES: "20"
+          FUNDA_USE_API: "true"
+          FUNDA_API_MAX_PRICE: "2500"
           FUNDA_MAX_PAGES: "12"
           FUNDA_MAX_DETAIL_PAGES: "40"
           VBT_WONINGEN_CACHE_TTL_SECONDS: "2700"

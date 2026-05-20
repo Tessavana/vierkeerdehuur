@@ -8,7 +8,7 @@ from src.filters import evaluate_rental, score_rental
 from src.listing_detail import enrich_listing, is_new_on_platform_today
 from src.listing_registry import apply_listing_lifecycle
 from src.market_registry import build_market_stats, record_market_listings
-from src.map_geocode import attach_map_coordinates
+from src.eindhoven_geo import attach_map_coordinates
 from src.scan_bundle import load_scan_bundle, save_scan_bundle
 from src.scan_schedule import provider_should_fetch_live
 from src.providers import (
@@ -98,6 +98,7 @@ def run_workrun() -> dict:
                     "rent_eur": l.rent_eur,
                     "size_m2": l.size_m2,
                     "outdoor_space": l.outdoor_space,
+                    "outdoor_known": l.outdoor_known,
                     "url": l.url,
                     "match_tag": _match_tag(score_rental(l, config)),
                     "neighborhood": _extract_neighborhood(l.title, l.location),

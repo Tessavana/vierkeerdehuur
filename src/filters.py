@@ -80,6 +80,30 @@ NEWCOMER_RESTRICTION_MARKERS = (
 )
 
 
+_OUTDOOR_YES = ("balkon", "tuin", "terras", "dakterras", "buitenruimte")
+_OUTDOOR_NO = (
+    "geen balkon",
+    "geen tuin",
+    "geen terras",
+    "zonder buitenruimte",
+    "geen buitenruimte",
+    "no balcony",
+    "no garden",
+)
+
+
+def detect_outdoor(text: str) -> tuple[bool, bool]:
+    """Return (known, has_outdoor) from listing text."""
+    blob = (text or "").lower()
+    if not blob.strip():
+        return False, False
+    if any(p in blob for p in _OUTDOOR_NO):
+        return True, False
+    if any(k in blob for k in _OUTDOOR_YES):
+        return True, True
+    return False, False
+
+
 def _search_blob(listing: Listing) -> str:
     parts = [listing.title, listing.location]
     if listing.notes:
@@ -121,6 +145,8 @@ def evaluate_rental(listing: Listing, config: AppConfig) -> tuple[bool, str]:
         return False, "outside_city"
     if "noord" in searchable:
         return False, "north_eindhoven"
+    if "blauwe loper" in searchable:
+        return False, "student_area"
     return True, "ok"
 
 

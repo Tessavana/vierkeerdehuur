@@ -115,7 +115,8 @@ def build_market_stats(
             reason = entry.get("exclude_reason") or "other"
             by_reason[reason] = by_reason.get(reason, 0) + 1
 
-    outdoor = sum(1 for l in suitable if l.get("outdoor_space"))
+    outdoor_known = [l for l in suitable if l.get("outdoor_known")]
+    outdoor_yes = sum(1 for l in outdoor_known if l.get("outdoor_space") is True)
     strijp = sum(
         1
         for l in suitable
@@ -151,12 +152,28 @@ def build_market_stats(
         )
         if registry
         else 0,
-        "outdoor_pct": round(100 * outdoor / len(suitable), 1) if suitable else 0,
+        "outdoor_pct": round(100 * outdoor_yes / len(outdoor_known), 1) if outdoor_known else None,
+        "outdoor_known_count": len(outdoor_known),
+        "outdoor_yes_count": outdoor_yes,
+        "tag_counts": _tag_counts(suitable),
+        "excluded_by_reason_chart": [
+            {"label": k.replace("_", " "), "count": v}
+            for k, v in sorted(by_reason.items(), key=lambda x: -x[1])[:6]
+        ],
         "strijp_in_budget": strijp,
         "price_distribution": distribution,
         "by_platform": dict(sorted(by_platform.items(), key=lambda x: -x[1])),
         "excluded_by_reason": dict(sorted(by_reason.items(), key=lambda x: -x[1])),
     }
+
+
+def _tag_counts(suitable: list[dict]) -> dict[str, int]:
+    counts = {"super nice": 0, "nice": 0, "okay": 0, "meh": 0}
+    for l in suitable:
+        tag = (l.get("match_tag") or "meh").lower()
+        if tag in counts:
+            counts[tag] += 1
+    return counts
 
 
 def _median(values: list[int]) -> int | None:

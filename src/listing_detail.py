@@ -72,17 +72,27 @@ def _parse_iso_date(raw: str) -> date | None:
 
 
 def _parse_available_from(text: str) -> str | None:
+    """Rent start date only — avoid matching unrelated numbers."""
     patterns = (
-        r"(?:Beschikbaar|Huur)\s+(?:per|vanaf)\s+(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})",
-        r"Ingangsdatum\s*[:\s]+(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})",
-        r"(\d{1,2}[-/]\d{1,2}[-/]\d{4})\s*\(beschikbaar",
-        r"Aanvaarding(?:datum)?\s*[:\s]+(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})",
-        r"Per\s+(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})",
+        r"(?:Beschikbaar|Huur)\s+(?:per|vanaf)\s+(\d{1,2}[-/]\d{1,2}[-/](?:\d{2}|\d{4}))",
+        r"Ingangsdatum\s*[:\s]+(\d{1,2}[-/]\d{1,2}[-/](?:\d{2}|\d{4}))",
+        r"Aanvaarding(?:datum)?\s*[:\s]+(\d{1,2}[-/]\d{1,2}[-/](?:\d{2}|\d{4}))",
+        r"(\d{4}-\d{2}-\d{2})",
     )
     for pat in patterns:
         m = re.search(pat, text, re.I)
-        if m:
-            return m.group(1).replace("/", "-")
+        if not m:
+            continue
+        raw = m.group(1).replace("/", "-")
+        if re.match(r"\d{4}-\d{2}-\d{2}", raw):
+            return raw
+        parts = raw.split("-")
+        if len(parts) == 3:
+            d, mo, y = int(parts[0]), int(parts[1]), int(parts[2])
+            if y < 100:
+                y += 2000
+            if 1 <= mo <= 12 and 1 <= d <= 31:
+                return f"{d:02d}-{mo:02d}-{y}"
     return None
 
 
@@ -182,13 +192,43 @@ def enrich_listing(listing: Listing, use_cache: bool = True) -> Listing:
     notes = notes[:4000] if notes else None
 
     avail = listing.available_from or fields.get("available_from")
+    if avail and ("T" in avail or re.match(r"\d{4}-\d{2}-\d{2}T", avail)):
+        avail = avail[:10] if re.match(r"\d{4}-\d{2}-\d{2}", avail) else None
     listed_date = fields.get("platform_listed_date")
+
+    blob = f"{desc or ''} {notes or ''}".lower()
+    outdoor_known = False
+    outdoor_space = listing.outdoor_space
+    if desc:
+        no_outdoor = any(
+            p in blob
+            for p in (
+                "geen balkon",
+                "geen tuin",
+                "geen terras",
+                "zonder buitenruimte",
+                "geen buitenruimte",
+                "no balcony",
+                "no garden",
+            )
+        )
+        yes_outdoor = any(
+            k in blob for k in ("balkon", "tuin", "terras", "dakterras", "buitenruimte")
+        )
+        if no_outdoor:
+            outdoor_known = True
+            outdoor_space = False
+        elif yes_outdoor:
+            outdoor_known = True
+            outdoor_space = True
 
     return replace(
         listing,
         notes=notes,
         available_from=avail,
         platform_listed_date=listed_date,
+        outdoor_space=outdoor_space,
+        outdoor_known=outdoor_known,
     )
 
 
@@ -221,4 +261,6 @@ def restriction_reason_from_listing(listing: Listing) -> str | None:
         w in blob for w in ("alleen", "uitsluitend", "only", "verplicht", "must be")
     ):
         return "student_only"
+    if "blauwe loper" in blob:
+        return "student_area"
     return None
