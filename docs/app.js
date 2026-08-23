@@ -382,6 +382,7 @@ function renderOverviewTable(status) {
     <tr><td>Reacties verstuurd</td><td><b>${status.reacties_verstuurd ?? status.applications_sent ?? "180+"}</b></td></tr>
     <tr><td>Bezichtigingen</td><td><b>${status.bezichtigingen ?? status.viewings ?? 2}</b></td></tr>
     <tr><td>Kijkavonden</td><td><b>${status.kijkavonden ?? 0}</b></td></tr>
+    <tr><td>Afwijzingen</td><td><b>${status.rejections ?? status.afwijzingen ?? 86}</b></td></tr>
     <tr class="overview-section-head"><td colspan="2"><b>Sociale huur (${sh.platform || "Wooniezie"})</b></td></tr>
     <tr><td>Inschrijfduur</td><td>${dash(sh.inschrijfduur)}</td></tr>
     <tr><td>Reacties verstuurd</td><td>${dash(sh.reacties_verstuurd)}</td></tr>

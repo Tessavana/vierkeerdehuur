@@ -14,7 +14,7 @@ from src.listing_registry import apply_listing_lifecycle
 from src.market_registry import build_market_stats, record_market_listings
 from src.eindhoven_geo import attach_map_coordinates
 from src.scan_bundle import load_scan_bundle, save_scan_bundle
-from src.scan_schedule import provider_should_fetch_live
+from src.scan_schedule import provider_should_fetch_live, scan_profile
 from src.seekers.build_feed import build_seekers_feed
 from src.provider_registry import build_providers
 
@@ -57,7 +57,8 @@ def run_workrun() -> dict:
                 listing = _maybe_enrich(listing)
                 ok, reason = evaluate_rental(listing, config)
                 if ok:
-                    listing = attach_application_count(listing, force_refresh=True)
+                    refresh_apps = scan_profile() != "fast"
+                    listing = attach_application_count(listing, force_refresh=refresh_apps)
                     listing = attach_income_requirement(listing)
                     suitable.append(listing)
                 else:
@@ -210,6 +211,9 @@ def _ensure_income_fields(item: dict) -> dict:
 
 
 def _maybe_enrich(listing):
+    if scan_profile() == "fast":
+        if listing.rent_eur is not None and listing.size_m2 is not None:
+            return attach_income_requirement(listing)
     needs_fields = listing.rent_eur is None or listing.size_m2 is None
     if (
         not needs_fields
@@ -243,7 +247,7 @@ def _load_application_status() -> dict:
             "reacties_verstuurd": "180+",
             "bezichtigingen": 2,
             "kijkavonden": 2,
-            "rejections": 3,
+            "rejections": 86,
             "no_response": 4,
             "rejected_addresses": ["PSV-laan 233", "Schootsestraat 94 A"],
             "sociale_huur": {

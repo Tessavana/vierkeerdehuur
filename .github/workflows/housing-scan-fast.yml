@@ -1,12 +1,10 @@
-# Light scan (~2 min): API/HTML sources only. Runs often to stay within free minutes.
+# Light scan (~1–2 min): HTTP/API sources; Playwright providers rotate on cache.
 name: Housing Scan (fast)
 
 on:
-  push:
-    branches: ["main"]
   workflow_dispatch:
   schedule:
-    # Free tier: ~every 10 min keeps the site fresh without burning minutes.
+    # Every 10 min — data refresh. Docs deploy separately on push (pages-deploy.yml).
     - cron: "*/10 * * * *"
 
 concurrency:
@@ -65,10 +63,11 @@ jobs:
       - name: Fast workrun
         env:
           SCAN_PROFILE: fast
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          SEEKERS_LLM_MODE: borderline
-          LISTING_LLM_MODE: missing_fields
-          SEARCH_URLS: ${{ vars.SEARCH_URLS || 'https://kamernet.nl/en/for-rent/apartment-eindhoven,https://www.pararius.com/apartments/eindhoven,https://www.funda.nl/zoeken/huur?selected_area=%5B%22eindhoven%22%5D,https://www.vesteda.com/nl/huurwoningen-eindhoven,https://www.vbtverhuurmakelaars.nl/huurwoningen-eindhoven,https://www.rotsvast.nl/woningaanbod/huur/eindhoven/,https://nmgwonen.nl/huurwoningen/eindhoven/,https://www.huurwoningen.nl/in/eindhoven/,https://www.huurwoningen.nl/in/veldhoven/,https://www.huislijn.nl/huurwoningen/nederland/noord-brabant/eindhoven,https://rentfinder.nl,https://directwonen.nl/huurwoningen-huren/eindhoven' }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+          OPENAI_API_KEY: ""
+          SEEKERS_LLM_MODE: "off"
+          LISTING_LLM_MODE: "off"
+          SEARCH_URLS: ${{ vars.SEARCH_URLS || 'https://kamernet.nl/en/for-rent/apartment-eindhoven,https://www.pararius.com/apartments/eindhoven,https://www.funda.nl/zoeken/huur?selected_area=%5B%22eindhoven%22%5D,https://www.vesteda.com/nl/huurwoningen-eindhoven,https://www.vbtverhuurmakelaars.nl/huurwoningen-eindhoven,https://www.rotsvast.nl/woningaanbod/huur/eindhoven/,https://nmgwonen.nl/huurwoningen/eindhoven/,https://www.huurwoningen.nl/in/eindhoven/,https://www.huislijn.nl/huurwoningen/nederland/noord-brabant/eindhoven,https://rentfinder.nl,https://directwonen.nl/huurwoningen-huren/eindhoven' }}
           MAX_RENT: ${{ vars.MAX_RENT || '1150' }}
           MIN_SIZE: ${{ vars.MIN_SIZE || '20' }}
           SQLITE_PATH: data/listings.db
@@ -76,9 +75,10 @@ jobs:
           GEOCODE_USE_PDOK: "true"
           FUNDA_USE_API: "true"
           FUNDA_API_MAX_PRICE: "2500"
-          FUNDA_MAX_DETAIL_PAGES: "40"
-          HUURWONINGEN_MAX_PAGES: "8"
-          HUURWONINGEN_MAX_DETAILS: "120"
+          PARARIUS_MAX_DETAILS: "20"
+          HUURWONINGEN_MAX_PAGES: "3"
+          HUURWONINGEN_MAX_DETAILS: "40"
+          DIRECTWONEN_MAX_PAGES: "2"
           REDDIT_SEEKER_RSS: "https://www.reddit.com/r/eindhoven/new.rss,https://www.reddit.com/r/NetherlandsHousing/new.rss"
         run: python -m src.workrun
 
@@ -106,6 +106,9 @@ jobs:
   deploy:
     needs: scan
     runs-on: ubuntu-latest
+    concurrency:
+      group: github-pages-deploy
+      cancel-in-progress: true
     permissions:
       pages: write
       id-token: write

@@ -17,6 +17,12 @@ _FAST_PROVIDERS = frozenset(
         "HuurwoningenProvider",
     }
 )
+# Playwright-heavy: use cached bundle on most fast runs (see _fast_rotate_live).
+_FAST_ROTATE_PROVIDERS: dict[str, int] = {
+    "HuurwoningenProvider": 6,
+    "ParariusProvider": 3,
+    "DirectWonenProvider": 3,
+}
 _HEAVY_PROVIDERS = frozenset(
     {
         "FundaProvider",
@@ -60,6 +66,21 @@ def scan_rotation_modulus() -> int:
         return 0
 
 
+def _github_run_number() -> int:
+    raw = os.getenv("GITHUB_RUN_NUMBER", "0").strip()
+    try:
+        return int(raw)
+    except ValueError:
+        return 0
+
+
+def _fast_rotate_live(class_name: str) -> bool:
+    period = _FAST_ROTATE_PROVIDERS.get(class_name)
+    if period is None:
+        return True
+    return _github_run_number() % period == 0
+
+
 def current_phase() -> int | None:
     if scan_profile() == "fast":
         return None
@@ -68,12 +89,7 @@ def current_phase() -> int | None:
     mod = scan_rotation_modulus()
     if mod <= 1:
         return None
-    run = os.getenv("GITHUB_RUN_NUMBER", "0").strip()
-    try:
-        rn = int(run)
-    except ValueError:
-        rn = 0
-    return rn % mod
+    return _github_run_number() % mod
 
 
 def provider_should_fetch_live(class_name: str) -> bool:
@@ -84,7 +100,7 @@ def provider_should_fetch_live(class_name: str) -> bool:
     if profile == "fast":
         if class_name in _HEAVY_PROVIDERS:
             return False
-        return True
+        return _fast_rotate_live(class_name)
 
     phase = current_phase()
     if phase is None:
