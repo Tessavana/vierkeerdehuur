@@ -15,6 +15,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from src.application_count import extract_application_count_from_html
+from src.income_requirement import extract_income_requirement_from_html
 from src.extract import extract_location_hint, extract_rent_eur, extract_size_m2, parse_json_ld, parse_posted_date
 from src.filters import NEWCOMER_RESTRICTION_MARKERS, STUDENT_ONLY_MARKERS
 from src.models import Listing
@@ -194,16 +195,22 @@ def parse_detail_html(html: str, url: str) -> dict:
         structured["location"] = extract_location_hint(text)
     if not structured.get("platform_listed_date") and listed:
         structured["platform_listed_date"] = listed.isoformat()
-    app = extract_application_count_from_html(html, source=_source_from_url(url), url=url)
+    source = _source_from_url(url)
+    app = extract_application_count_from_html(html, source=source, url=url)
+    rent = structured.get("rent_eur")
+    income = extract_income_requirement_from_html(html, rent_eur=rent, source=source)
     return {
         "description": _extract_description(soup, text),
         "platform_listed_date": structured.get("platform_listed_date"),
         "available_from": _parse_available_from(text),
-        "rent_eur": structured.get("rent_eur"),
+        "rent_eur": rent,
         "size_m2": structured.get("size_m2"),
         "location": structured.get("location"),
         "application_count": app.get("application_count"),
         "application_count_label": app.get("application_count_label"),
+        "income_multiplier": income.get("income_multiplier"),
+        "income_required_eur": income.get("income_required_eur"),
+        "income_requirement_label": income.get("income_requirement_label"),
     }
 
 
@@ -287,6 +294,17 @@ def enrich_listing(listing: Listing, use_cache: bool = True) -> Listing:
             outdoor_known = True
             outdoor_space = True
 
+    income_multiplier = listing.income_multiplier or fields.get("income_multiplier")
+    income_required_eur = listing.income_required_eur or fields.get("income_required_eur")
+    income_label = listing.income_requirement_label or fields.get("income_requirement_label")
+    if income_multiplier is None and income_required_eur is None and notes:
+        from src.income_requirement import extract_income_requirement
+
+        from_notes = extract_income_requirement(notes, rent_eur=rent)
+        income_multiplier = from_notes.get("income_multiplier")
+        income_required_eur = from_notes.get("income_required_eur")
+        income_label = from_notes.get("income_requirement_label")
+
     return replace(
         listing,
         notes=notes,
@@ -297,6 +315,9 @@ def enrich_listing(listing: Listing, use_cache: bool = True) -> Listing:
         location=location,
         application_count=listing.application_count or fields.get("application_count"),
         application_count_label=listing.application_count_label or fields.get("application_count_label"),
+        income_multiplier=income_multiplier,
+        income_required_eur=income_required_eur,
+        income_requirement_label=income_label,
         outdoor_space=outdoor_space,
         outdoor_known=outdoor_known,
     )

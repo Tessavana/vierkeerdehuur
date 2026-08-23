@@ -136,8 +136,8 @@ def build_seekers_feed() -> dict:
         "reddit_overview": build_reddit_overview(reddit_merged),
         "posts": [p.to_dict() for p in display],
         "notes": (
-            "Automatisch: Reddit + Marktplaats. Facebook alleen lokaal "
-            "(python -m src.seekers.facebook_local)."
+            "Automatisch: Reddit (r/eindhoven, r/NetherlandsHousing) + Marktplaats. "
+            "Facebook alleen lokaal (python -m src.seekers.facebook_local)."
         ),
     }
     _OUTPUT.parent.mkdir(parents=True, exist_ok=True)

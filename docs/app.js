@@ -118,6 +118,22 @@ function applicationsClass(l) {
   return "muted";
 }
 
+function formatIncomeRequirement(l) {
+  if (l.income_requirement_label) return l.income_requirement_label;
+  if (l.income_multiplier != null && l.rent_eur != null) {
+    const mult = Number(l.income_multiplier);
+    const multLabel = Number.isInteger(mult) ? String(mult) : String(mult).replace(".", ",");
+    const req = l.income_required_eur ?? Math.round(l.rent_eur * mult);
+    return `${multLabel}× huur · €${req}`;
+  }
+  if (l.income_required_eur != null) return `€${l.income_required_eur}`;
+  if (l.income_multiplier != null) {
+    const mult = Number(l.income_multiplier);
+    return `${Number.isInteger(mult) ? mult : String(mult).replace(".", ",")}× huur`;
+  }
+  return "—";
+}
+
 function listingRow(l) {
   const wijk = dash(l.neighborhood);
   const platform = dash(l.platform || l.provider_name || l.source);
@@ -131,6 +147,7 @@ function listingRow(l) {
       <div><b>${l.title}</b><div class="muted">${l.location}</div></div>
       <div>${wijk}</div>
       <div>EUR ${l.rent_eur ?? "?"}</div>
+      <div class="listing-income">${formatIncomeRequirement(l)}</div>
       <div>${l.size_m2 ?? "?"} m²</div>
       <div class="${applicationsClass(l)}">${formatApplications(l)}</div>
       <div>${formatRentFrom(l.available_from)}</div>
@@ -370,6 +387,7 @@ function showSelectedMatch(listing) {
     <span class="muted">${platform}</span><br/>
     ${listing.location}${wijk !== "-" ? ` · ${wijk}` : ""}<br/>
     EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²<br/>
+    Inkomens eis: ${formatIncomeRequirement(listing)}<br/>
     Huur vanaf: ${formatRentFrom(listing.available_from)}<br/>
     <a href="${listing.url}" target="_blank" rel="noopener noreferrer">open listing</a>
   `;
@@ -421,19 +439,16 @@ function seekerCardHtml(p, idx, seenSet) {
   const when = formatSeekerTime(p.posted_at);
   const budget = p.budget_eur ? ` · max €${p.budget_eur}` : "";
   const loc = p.location_hint ? ` · ${p.location_hint}` : "";
-  const group = p.group_name || p.source || "";
+  const sourceLabel = p.source === "reddit" && p.group_name ? p.group_name : p.source || "";
   const author = formatSeekerAuthor(p.author);
   const pid = seekerPostId(p);
   const isNew = !seenSet.has(pid);
-  const delay = Math.min(idx, 12) * 70;
-  const sourceIcon =
-    p.source === "reddit" ? "🔴" : p.source === "marktplaats" ? "🟡" : p.source === "facebook" ? "🔵" : "•";
   return `
-    <article class="seeker-card seeker-card-enter${isNew ? " seeker-card-new" : ""}" data-seeker-id="${pid}" style="animation-delay:${delay}ms">
-      <div class="seeker-card-glow" aria-hidden="true"></div>
+    <article class="seeker-card${isNew ? " seeker-card-new" : ""}" data-seeker-id="${pid}">
       <div class="seeker-card-top">
         <span class="${kindClass}">${kindLabel}</span>
-        <span class="seeker-source">${sourceIcon} ${group}${author ? `<span class="seeker-author muted">${author}</span>` : ""}</span>
+        ${isNew ? `<span class="seeker-tag seeker-tag-new">nieuw</span>` : ""}
+        <span class="seeker-source">${sourceLabel}${author ? `<span class="seeker-author muted">${author}</span>` : ""}</span>
         ${when.relative ? `<span class="seeker-time" title="${when.full}">${when.relative}</span>` : ""}
       </div>
       ${when.full ? `<div class="seeker-datetime muted">${when.full}</div>` : ""}
@@ -442,21 +457,6 @@ function seekerCardHtml(p, idx, seenSet) {
       <div class="seeker-meta muted">${budget}${loc}</div>
       <a class="seeker-link" href="${p.url}" target="_blank" rel="noopener noreferrer">open bron →</a>
     </article>`;
-}
-
-function renderSeekersLiveStrip(posts, seenSet) {
-  const strip = document.getElementById("seekers-live-strip");
-  if (!strip || !posts.length) {
-    if (strip) strip.innerHTML = "";
-    return;
-  }
-  const fresh = posts.filter((p) => !seenSet.has(seekerPostId(p))).slice(0, 4);
-  const items = (fresh.length ? fresh : posts.slice(0, 4)).map((p) => {
-    const when = formatSeekerTime(p.posted_at);
-    const isNew = !seenSet.has(seekerPostId(p));
-    return `<a class="seekers-live-chip${isNew ? " seekers-live-chip-new" : ""}" href="${p.url}" target="_blank" rel="noopener noreferrer">${p.title.slice(0, 52)}${p.title.length > 52 ? "…" : ""}<span class="muted">${when.relative ? ` · ${when.relative}` : ""}</span></a>`;
-  });
-  strip.innerHTML = `<div class="seekers-live-label"><span class="live-dot"></span> binnenkomend</div><div class="seekers-live-track">${items.join("")}</div>`;
 }
 
 function formatSeekerTime(iso) {
@@ -500,11 +500,17 @@ function renderRedditOverview(overview) {
   const asks = overview.recent_asks || [];
   const recent = overview.recent_posts || asks;
   const askLines = recent.map(renderLine).join("");
+  const subs = (overview.subreddits && overview.subreddits.length
+    ? overview.subreddits
+    : overview.subreddit
+      ? [overview.subreddit]
+      : []
+  ).join(" · ");
   el.innerHTML = `
     <div class="reddit-overview-card">
       <div class="reddit-overview-head">
-        <strong>${overview.subreddit || "Reddit"}</strong>
-        <span class="muted">wonen in Eindhoven · titels gefilterd op relevantie</span>
+        <strong>Reddit</strong>
+        <span class="muted">${subs || "—"} · wonen in Eindhoven · titels gefilterd op relevantie</span>
       </div>
       <p class="reddit-overview-stats">
         <span class="reddit-stat"><b>${overview.seeking ?? 0}</b> zoekt</span>
@@ -529,7 +535,6 @@ function renderSeekersFeed(feed) {
     const newLabel = newCount ? ` · ${newCount} nieuw` : "";
     subtitle.textContent = `${posts.length} zoekers · bronnen: ${src}${newLabel}`;
   }
-  renderSeekersLiveStrip(posts, seenSet);
   if (!posts.length) {
     el.innerHTML = `<div class="muted">Nog geen zoekers gevonden in Eindhoven. Reddit en Marktplaats worden elke scan bijgewerkt.</div>`;
     return;

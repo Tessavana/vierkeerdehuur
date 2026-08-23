@@ -13,8 +13,12 @@ from playwright.sync_api import sync_playwright
 from src.models import Listing
 from src.web_fetch import HEADERS
 
-# Listing URLs look like /huren/eindhoven/{8-char-id}/{slug}/ (hex id).
-LISTING_PATH_RE = re.compile(r"^/huren/eindhoven/(?P<id>[0-9a-f]{8})/(?P<slug>[^/?#]+)/?$", re.I)
+# Listing URLs look like /huren/{city}/{8-char-id}/{slug}/ (hex id).
+LISTING_CITIES = ("eindhoven", "veldhoven")
+LISTING_PATH_RE = re.compile(
+    r"^/huren/(?P<city>eindhoven|veldhoven)/(?P<id>[0-9a-f]{8})/(?P<slug>[^/?#]+)/?$",
+    re.I,
+)
 
 
 def _to_com_base(url: str) -> str:
@@ -38,18 +42,35 @@ def _accept_cookies(page) -> None:
             continue
 
 
-def _collect_listing_hrefs_from_page(page) -> list[str]:
+def _city_from_list_url(list_base_url: str) -> str:
+    m = re.search(r"/in/(eindhoven|veldhoven)/?", list_base_url, re.I)
+    return m.group(1).lower() if m else "eindhoven"
+
+
+def _is_woningruil(path_or_url: str) -> bool:
+    lower = (path_or_url or "").lower()
+    return "woningruil" in lower or "huisruil" in lower or "/ruil/" in lower
+
+
+def _collect_listing_hrefs_from_page(page, city: str) -> list[str]:
     hrefs = page.locator("a[href*='/huren/']").evaluate_all("els => els.map(e => e.getAttribute('href'))")
     out: list[str] = []
     for h in hrefs:
-        if not h or not LISTING_PATH_RE.match(h.split("?")[0]):
+        if not h:
             continue
-        out.append(h.split("?")[0].rstrip("/") + "/")
+        path = h.split("?")[0]
+        if _is_woningruil(path):
+            continue
+        m = LISTING_PATH_RE.match(path)
+        if not m or m.group("city").lower() != city:
+            continue
+        out.append(path.rstrip("/") + "/")
     return out
 
 
 def _listing_urls_playwright(list_base_url: str, max_pages: int = 40) -> list[str]:
-    """Scroll search pages; listing links look like /huren/eindhoven/{id}/{slug}/."""
+    """Scroll search pages; listing links look like /huren/{city}/{id}/{slug}/."""
+    city = _city_from_list_url(list_base_url)
     seen: set[str] = set()
     ordered: list[str] = []
     storage = os.getenv("PLAYWRIGHT_STORAGE_STATE_PATH", "data/playwright_state.json")
@@ -70,11 +91,11 @@ def _listing_urls_playwright(list_base_url: str, max_pages: int = 40) -> list[st
             page.goto(url, wait_until="domcontentloaded", timeout=90000)
             _accept_cookies(page)
             try:
-                page.wait_for_selector("a[href*='/huren/eindhoven/']", timeout=45000)
+                page.wait_for_selector(f"a[href*='/huren/{city}/']", timeout=45000)
             except Exception:
                 pass
             page.wait_for_timeout(2000)
-            for _ in range(16):
+            for _ in range(24):
                 try:
                     page.evaluate("window.scrollTo(0, document.documentElement.scrollHeight)")
                 except Exception:
@@ -84,7 +105,7 @@ def _listing_urls_playwright(list_base_url: str, max_pages: int = 40) -> list[st
                 page.wait_for_load_state("networkidle", timeout=45000)
             except Exception:
                 pass
-            batch = _collect_listing_hrefs_from_page(page)
+            batch = _collect_listing_hrefs_from_page(page, city)
             new = [h for h in batch if h not in seen]
             if not batch and page_num == 1:
                 break
@@ -119,13 +140,27 @@ def _detail_page_inactive(html: str) -> bool:
     return any(m in text for m in markers)
 
 
-def _parse_detail(html: str, page_url: str) -> tuple[str, int | None, int | None, str | None, str | None]:
+def _extract_location(title: str, meta: str, page_text: str, fallback_city: str) -> str:
+    blob = f"{title} {meta} {page_text[:6000]}".lower()
+    for city in ("waalre", "veldhoven", "geldrop", "best", "nuenen", "eindhoven"):
+        if re.search(rf"\b{re.escape(city)}\b", blob):
+            return city.capitalize() if city != "eindhoven" else "Eindhoven"
+    m = re.search(r"\b(\d{4}\s*[A-Z]{2})\b", f"{title} {page_text[:4000]}")
+    if m:
+        return m.group(1).upper()
+    return fallback_city.capitalize() if fallback_city else "Eindhoven"
+
+
+def _parse_detail(
+    html: str, page_url: str, fallback_city: str = "eindhoven"
+) -> tuple[str, int | None, int | None, str | None, str | None, str]:
     soup = BeautifulSoup(html, "html.parser")
     title = ""
     if soup.title and soup.title.string:
         title = soup.title.string.strip()
     meta = soup.find("meta", attrs={"name": "description"})
     meta_content = (meta.get("content", "").strip() if meta else "")[:2000]
+    page_text = soup.get_text(" ", strip=True)
     blob = f"{title} {meta_content}"
     rent = None
     clean = blob.replace("\xa0", " ").replace("\u20ac", "€")
@@ -138,12 +173,14 @@ def _parse_detail(html: str, page_url: str) -> tuple[str, int | None, int | None
             rent = int(digits)
     size = None
     m_sz = re.search(r"(\d{2,3})\s*m\s*[²2]", blob, re.I)
+    if not m_sz:
+        m_sz = re.search(r"(\d{2,3})\s*m\s*[²2]", page_text[:8000], re.I)
     if m_sz:
         size = int(m_sz.group(1))
     avail = None
     m_av = re.search(
         r"(?:beschikbaar|ingangsdatum|vanaf)\s*(?:per\s*)?(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})",
-        soup.get_text(" ", strip=True),
+        page_text,
         re.I,
     )
     if m_av:
@@ -151,8 +188,9 @@ def _parse_detail(html: str, page_url: str) -> tuple[str, int | None, int | None
     if not title:
         og = soup.find("meta", property="og:title")
         title = og.get("content", "").strip() if og else page_url.rstrip("/").rsplit("/", 2)[-2]
+    location = _extract_location(title, meta_content, page_text, fallback_city)
     notes = meta_content[:800].strip() if meta_content else None
-    return title, rent, size, avail, notes
+    return title, rent, size, avail, notes, location
 
 
 def _outdoor(blob: str) -> bool:
@@ -166,22 +204,27 @@ def fetch_huurwoningen_eindhoven_listings(
     max_details: int | None = None,
 ) -> list[Listing]:
     if max_pages is None:
-        max_pages = int(os.getenv("HUURWONINGEN_MAX_PAGES", "12"))
+        max_pages = int(os.getenv("HUURWONINGEN_MAX_PAGES", "16"))
     if max_details is None:
-        max_details = int(os.getenv("HUURWONINGEN_MAX_DETAILS", "220"))
+        max_details = int(os.getenv("HUURWONINGEN_MAX_DETAILS", "280"))
     base = _to_com_base(list_url)
+    city = _city_from_list_url(base)
     urls = _listing_urls_playwright(base, max_pages=max_pages)[: max(1, max_details)]
     session = requests.Session()
     session.headers.update(HEADERS)
     listings: list[Listing] = []
     for rel in urls:
         try:
+            if _is_woningruil(rel):
+                continue
             r = session.get(rel, timeout=25)
             if r.status_code >= 400:
                 continue
             if _detail_page_inactive(r.text):
                 continue
-            title, rent, size, avail, notes = _parse_detail(r.text, rel)
+            title, rent, size, avail, notes, location = _parse_detail(r.text, rel, fallback_city=city)
+            if _is_woningruil(f"{title} {notes or ''} {r.text[:4000]}"):
+                continue
             path = urlparse(rel).path.strip("/")
             source_id = path.replace("/", "_") if path else rel
             listings.append(
@@ -190,7 +233,7 @@ def fetch_huurwoningen_eindhoven_listings(
                     source_id=source_id,
                     title=title or rel,
                     url=rel,
-                    location="Eindhoven",
+                    location=location,
                     rent_eur=rent,
                     size_m2=size,
                     outdoor_space=_outdoor(title + " " + (r.text[:8000] or "")),

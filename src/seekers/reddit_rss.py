@@ -86,7 +86,7 @@ def _subreddit_from_url(rss_url: str) -> str:
 def fetch_reddit_seekers() -> list[SeekerPost]:
     feeds = os.getenv(
         "REDDIT_SEEKER_RSS",
-        "https://www.reddit.com/r/eindhoven/new.rss",
+        "https://www.reddit.com/r/eindhoven/new.rss,https://www.reddit.com/r/NetherlandsHousing/new.rss",
     ).split(",")
     out: list[SeekerPost] = []
     seen: set[str] = set()
@@ -126,8 +126,11 @@ def build_reddit_overview(posts: list[SeekerPost]) -> dict:
             "group_name": p.group_name,
         }
 
+    subreddits = sorted({p.group_name for p in reddit if p.group_name})
+
     return {
-        "subreddit": "r/eindhoven",
+        "subreddits": subreddits,
+        "subreddit": " · ".join(subreddits) if subreddits else "Reddit",
         "total_relevant": len(reddit),
         "seeking": len(seeking),
         "offering": len(offering),

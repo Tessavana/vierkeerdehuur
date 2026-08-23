@@ -14,13 +14,13 @@ _FAST_PROVIDERS = frozenset(
         "RentfinderProvider",
         "VbtProvider",
         "DirectWonenProvider",
+        "HuurwoningenProvider",
     }
 )
 _HEAVY_PROVIDERS = frozenset(
     {
         "FundaProvider",
         "NmgProvider",
-        "HuurwoningenProvider",
         "VestedaProvider",
     }
 )

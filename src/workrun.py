@@ -7,6 +7,7 @@ from src.config import load_config
 from src.filters import evaluate_rental, score_rental
 from src.listing_detail import enrich_listing, is_new_on_platform_today, normalize_available_from
 from src.application_count import attach_application_count
+from src.income_requirement import attach_income_requirement, extract_income_requirement
 from src.listing_dedupe import dedupe_listings
 from src.listing_llm_extract import maybe_llm_fill_listing
 from src.listing_registry import apply_listing_lifecycle
@@ -57,6 +58,7 @@ def run_workrun() -> dict:
                 ok, reason = evaluate_rental(listing, config)
                 if ok:
                     listing = attach_application_count(listing, force_refresh=True)
+                    listing = attach_income_requirement(listing)
                     suitable.append(listing)
                 else:
                     excluded_count += 1
@@ -98,6 +100,9 @@ def run_workrun() -> dict:
                     "platform_listed_date": l.platform_listed_date,
                     "application_count": l.application_count,
                     "application_count_label": l.application_count_label,
+                    "income_multiplier": l.income_multiplier,
+                    "income_required_eur": l.income_required_eur,
+                    "income_requirement_label": l.income_requirement_label,
                     "is_new_today": is_new_on_platform_today(l),
                     "notes": l.notes,
                     "map_lat": l.map_lat,
@@ -151,6 +156,7 @@ def run_workrun() -> dict:
     deduped, dupe_count = dedupe_listings(all_matches)
     if dupe_count:
         print(f"deduped {dupe_count} duplicate listing(s)")
+    deduped = [_ensure_income_fields(item) for item in deduped]
     apply_listing_lifecycle(deduped)
     deduped.sort(key=_sort_newest_first)
 
@@ -189,6 +195,18 @@ def _write_outputs(payload: dict) -> None:
     Path("data").mkdir(exist_ok=True)
     (docs_data / "latest_listings.json").write_text(json.dumps(payload, indent=2, ensure_ascii=True), encoding="utf-8")
     (Path("data") / "latest_listings.json").write_text(json.dumps(payload, indent=2, ensure_ascii=True), encoding="utf-8")
+
+
+def _ensure_income_fields(item: dict) -> dict:
+    if item.get("income_multiplier") is not None or item.get("income_required_eur") is not None:
+        return item
+    blob = " ".join(
+        p for p in (item.get("title"), item.get("location"), item.get("notes")) if p
+    )
+    fields = extract_income_requirement(blob, rent_eur=item.get("rent_eur"))
+    if not fields:
+        return item
+    return {**item, **fields}
 
 
 def _maybe_enrich(listing):

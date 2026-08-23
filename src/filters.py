@@ -12,6 +12,45 @@ PREFERRED_NEIGHBORHOODS = {
 
 BLOCKED_KEYWORDS = {"student", "anti-kraak", "antikraak", "temporary", "tijdelijk"}
 
+# Home-swap / trade listings — almost never useful when searching for a normal rental.
+WONINGRUIL_MARKERS = (
+    "woningruil",
+    "woning ruil",
+    "huisruil",
+    "huis ruil",
+    "ruilwoning",
+    "te ruil",
+    "ruil woning",
+    "home swap",
+    "homeswap",
+    "house swap",
+    "apartment swap",
+)
+
+_ALLOWED_CITIES = ("eindhoven", "veldhoven")
+_REJECTED_MUNICIPALITIES = (
+    "waalre",
+    "geldrop",
+    "geldrop-mierlo",
+    "best",
+    "helmond",
+    "nuenen",
+    "son en breugel",
+    "valkenswaard",
+    "hertogenbosch",
+    "'s-hertogenbosch",
+    "den bosch",
+    "tilburg",
+    "boxtel",
+    "oisterwijk",
+    "roermond",
+    "asten",
+    "deurne",
+    "someren",
+    "laarbeek",
+    "heeze-leende",
+)
+
 # No longer on the market / closed intake (Dutch + English fragments).
 INACTIVE_LISTING_MARKERS = (
     "niet meer beschikbaar",
@@ -105,10 +144,32 @@ def detect_outdoor(text: str) -> tuple[bool, bool]:
 
 
 def _search_blob(listing: Listing) -> str:
-    parts = [listing.title, listing.location]
+    parts = [listing.title, listing.location, listing.url]
     if listing.notes:
         parts.append(listing.notes[:4000])
     return " ".join(parts).lower()
+
+
+def _in_allowed_city(searchable: str) -> tuple[bool, str]:
+    if any(city in searchable for city in _REJECTED_MUNICIPALITIES):
+        return False, "outside_city"
+    if "eindhoven" in searchable or "veldhoven" in searchable:
+        return True, "ok"
+    return False, "outside_city"
+
+
+def _is_north_eindhoven(searchable: str) -> bool:
+    if "noord-brabant" in searchable:
+        return False
+    north_markers = (
+        "eindhoven-noord",
+        "eindhoven noord",
+        "woensel-noord",
+        "woensel noord",
+        " noord,",
+        " noord ",
+    )
+    return any(m in searchable for m in north_markers)
 
 
 def is_rental_match(listing: Listing, config: AppConfig) -> bool:
@@ -131,6 +192,8 @@ def evaluate_rental(listing: Listing, config: AppConfig) -> tuple[bool, str]:
         return False, "invalid_price"
     if any(marker in searchable for marker in INACTIVE_LISTING_MARKERS):
         return False, "inactive_listing"
+    if any(marker in searchable for marker in WONINGRUIL_MARKERS):
+        return False, "woningruil"
     if any(marker in searchable for marker in STUDENT_ONLY_MARKERS):
         return False, "student_only"
     if any(marker in searchable for marker in NEWCOMER_RESTRICTION_MARKERS):
@@ -141,9 +204,10 @@ def evaluate_rental(listing: Listing, config: AppConfig) -> tuple[bool, str]:
         return False, "above_budget"
     if listing.size_m2 < config.min_size:
         return False, "too_small"
-    if "eindhoven" not in searchable:
-        return False, "outside_city"
-    if "noord" in searchable:
+    ok_city, city_reason = _in_allowed_city(searchable)
+    if not ok_city:
+        return False, city_reason
+    if _is_north_eindhoven(searchable):
         return False, "north_eindhoven"
     if "blauwe loper" in searchable:
         return False, "student_area"
@@ -177,6 +241,6 @@ def score_rental(listing: Listing, config: AppConfig) -> int:
     score += _size_score(listing.size_m2, config.min_size)
     if listing.outdoor_space:
         score += 15
-    if "noord" in searchable:
+    if _is_north_eindhoven(searchable):
         score -= 40
     return score

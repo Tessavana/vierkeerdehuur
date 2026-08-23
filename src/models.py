@@ -19,5 +19,8 @@ class Listing:
     platform_listed_date: Optional[str] = None  # YYYY-MM-DD on source site
     application_count: Optional[int] = None
     application_count_label: Optional[str] = None  # e.g. "6+"
+    income_multiplier: Optional[float] = None  # e.g. 3.0, 3.5, 4.0 × rent
+    income_required_eur: Optional[int] = None  # bruto per month
+    income_requirement_label: Optional[str] = None  # e.g. "3,5× huur · €4.025"
     map_lat: Optional[float] = None
     map_lon: Optional[float] = None

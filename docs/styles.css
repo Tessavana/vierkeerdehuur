@@ -97,7 +97,7 @@ h3 { margin: 0 0 8px; font-size: 18px; }
 .listings-table-header,
 .listing-header {
   display: grid;
-  grid-template-columns: 0.85fr 2fr 0.8fr 0.7fr 0.55fr 0.55fr 0.85fr minmax(88px, auto);
+  grid-template-columns: 0.85fr 2fr 0.8fr 0.7fr 0.85fr 0.55fr 0.55fr 0.85fr minmax(88px, auto);
   gap: 10px;
   font-size: 11px;
   font-weight: 700;
@@ -107,7 +107,7 @@ h3 { margin: 0 0 8px; font-size: 18px; }
   padding: 4px 0 8px;
   border-bottom: 1px solid #171717;
 }
-.listings-scroll {
+.listing-income { font-size: 13px; line-height: 1.35; }
   max-height: 560px;
   overflow-y: auto;
   overflow-x: auto;
@@ -115,7 +115,7 @@ h3 { margin: 0 0 8px; font-size: 18px; }
 }
 .listing-row {
   display: grid;
-  grid-template-columns: 0.85fr 2fr 0.8fr 0.7fr 0.55fr 0.55fr 0.85fr minmax(88px, auto);
+  grid-template-columns: 0.85fr 2fr 0.8fr 0.7fr 0.85fr 0.55fr 0.55fr 0.85fr minmax(88px, auto);
   gap: 10px;
   border-bottom: 1px dashed #e7e7e7;
   padding: 10px 0;
@@ -266,69 +266,6 @@ h3 { margin: 0 0 8px; font-size: 18px; }
 .platform-bar-fill { height: 100%; background: #171717; }
 
 .seekers-section { margin-bottom: 14px; }
-.seekers-live-strip {
-  margin-bottom: 12px;
-  border: 1px solid #171717;
-  border-radius: 10px;
-  padding: 10px 12px;
-  background: linear-gradient(135deg, #fff 0%, #f7f7f7 100%);
-  overflow: hidden;
-}
-.seekers-live-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #444;
-  margin-bottom: 8px;
-}
-.live-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #e67e22;
-  animation: livePulse 1.4s ease-in-out infinite;
-}
-@keyframes livePulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.45; transform: scale(0.85); }
-}
-.seekers-live-track {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 2px;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-}
-.seekers-live-chip {
-  flex: 0 0 auto;
-  scroll-snap-align: start;
-  max-width: 280px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 1px solid #ddd;
-  background: #fff;
-  color: #171717;
-  font-size: 13px;
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  animation: chipSlide 0.55s ease both;
-}
-.seekers-live-chip-new {
-  border-color: #e67e22;
-  box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.15);
-}
-@keyframes chipSlide {
-  from { opacity: 0; transform: translateX(24px); }
-  to { opacity: 1; transform: translateX(0); }
-}
 .reddit-overview { margin-bottom: 12px; }
 .reddit-overview-card {
   border: 1px solid #171717;
@@ -364,45 +301,14 @@ h3 { margin: 0 0 8px; font-size: 18px; }
   overflow-y: auto;
 }
 .seeker-card {
-  position: relative;
   border: 1px solid #e5e5e5;
   border-radius: 10px;
   padding: 12px 14px;
   background: #fafafa;
-  overflow: hidden;
-}
-.seeker-card-enter {
-  animation: seekerSlideIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .seeker-card-new {
-  border-color: #e67e22;
-  background: #fffaf5;
-}
-.seeker-card-new .seeker-card-glow {
-  opacity: 1;
-}
-.seeker-card-glow {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  background: linear-gradient(180deg, #e67e22, #171717);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-@keyframes seekerSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(16px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .seeker-card-enter,
-  .seekers-live-chip,
-  .live-dot { animation: none !important; }
+  border-color: #171717;
+  background: #fff;
 }
 .seeker-card-top {
   display: flex;
@@ -424,6 +330,7 @@ h3 { margin: 0 0 8px; font-size: 18px; }
 }
 .seeker-tag-seek { background: #171717; color: #fff; }
 .seeker-tag-offer { background: #fff; color: #171717; }
+.seeker-tag-new { background: #fff; color: #171717; font-size: 10px; }
 .seeker-source { font-weight: 600; color: #444; }
 .seeker-time { margin-left: auto; }
 .seeker-title { margin: 0 0 6px; font-size: 16px; line-height: 1.35; font-weight: 700; }

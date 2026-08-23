@@ -62,7 +62,7 @@ jobs:
       - name: Full scan
         env:
           SCAN_PROFILE: full
-          SEARCH_URLS: ${{ vars.SEARCH_URLS || 'https://kamernet.nl/en/for-rent/apartment-eindhoven,https://www.pararius.com/apartments/eindhoven,https://www.funda.nl/zoeken/huur?selected_area=%5B%22eindhoven%22%5D,https://www.vesteda.com/nl/huurwoningen-eindhoven,https://www.vbtverhuurmakelaars.nl/huurwoningen-eindhoven,https://www.rotsvast.nl/woningaanbod/huur/eindhoven/,https://nmgwonen.nl/huurwoningen/eindhoven/,https://www.huurwoningen.nl/in/eindhoven/,https://www.huislijn.nl/huurwoningen/nederland/noord-brabant/eindhoven,https://rentfinder.nl,https://directwonen.nl/huurwoningen-huren/eindhoven' }}
+          SEARCH_URLS: ${{ vars.SEARCH_URLS || 'https://kamernet.nl/en/for-rent/apartment-eindhoven,https://www.pararius.com/apartments/eindhoven,https://www.funda.nl/zoeken/huur?selected_area=%5B%22eindhoven%22%5D,https://www.vesteda.com/nl/huurwoningen-eindhoven,https://www.vbtverhuurmakelaars.nl/huurwoningen-eindhoven,https://www.rotsvast.nl/woningaanbod/huur/eindhoven/,https://nmgwonen.nl/huurwoningen/eindhoven/,https://www.huurwoningen.nl/in/eindhoven/,https://www.huurwoningen.nl/in/veldhoven/,https://www.huislijn.nl/huurwoningen/nederland/noord-brabant/eindhoven,https://rentfinder.nl,https://directwonen.nl/huurwoningen-huren/eindhoven' }}
           MAX_RENT: ${{ vars.MAX_RENT || '1150' }}
           MIN_SIZE: ${{ vars.MIN_SIZE || '20' }}
           POLL_INTERVAL_SECONDS: "300"
@@ -71,8 +71,9 @@ jobs:
           INCREMENTAL_SCAN: "true"
           SCAN_ROTATION: "3"
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
-          HUURWONINGEN_MAX_PAGES: "4"
-          HUURWONINGEN_MAX_DETAILS: "90"
+          HUURWONINGEN_MAX_PAGES: "16"
+          HUURWONINGEN_MAX_DETAILS: "280"
+          REDDIT_SEEKER_RSS: "https://www.reddit.com/r/eindhoven/new.rss,https://www.reddit.com/r/NetherlandsHousing/new.rss"
           RENTFINDER_MAX_PAGES: "12"
           VESTEDA_MAX_DETAIL_PAGES: "20"
           FUNDA_USE_API: "true"
