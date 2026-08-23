@@ -18,12 +18,16 @@ _CACHE = Path(os.getenv("GEOCODE_CACHE_PATH", "data/geocode_cache.json"))
 _CITY_CENTER = (51.4416, 5.4697)
 
 _POSTCODE_WIJK: dict[str, str] = {
-    "5611": "Woensel",
+    "5611": "Centrum",
     "5612": "Woensel",
     "5613": "Strijp",
     "5614": "Strijp",
     "5615": "Strijp",
     "5616": "Gestel",
+    "5617": "Strijp-S",
+    "5618": "Gestel",
+    "5629": "Meerhoven",
+    "5630": "Meerhoven",
     "5621": "Woensel",
     "5622": "Woensel",
     "5623": "Woensel",
@@ -271,9 +275,15 @@ def resolve_location(item: dict[str, Any]) -> tuple[float, float, str]:
 def attach_map_coordinates(items: list[dict[str, Any]]) -> None:
     if os.getenv("GEOCODE_ENABLED", "true").strip().lower() in {"0", "false", "no", "off"}:
         return
+    from src.neighborhood import resolve_neighborhood
+
     for item in items:
         lat, lon, wijk = resolve_location(item)
         item["map_lat"] = lat
         item["map_lon"] = lon
-        if wijk:
-            item["neighborhood"] = wijk
+        item["neighborhood"] = resolve_neighborhood(
+            item.get("title") or "",
+            item.get("location") or "",
+            item.get("notes") or "",
+            geocode_wijk=wijk or item.get("neighborhood") or "",
+        )

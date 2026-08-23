@@ -201,7 +201,43 @@ def extract_income_requirement_from_html(
     return extract_income_requirement(combined, rent_eur=rent_eur)
 
 
+def apply_platform_income_defaults(
+    *,
+    source: str = "",
+    platform: str = "",
+    rent_eur: int | None = None,
+) -> dict:
+    """Platform-specific inkomenseis (VB&T always 4× bruto maandsalaris)."""
+    s = (source or "").lower()
+    p = (platform or "").replace("&", "").lower()
+    if s == "vbt" or "vbt" in p or "vb&t" in (platform or "").lower():
+        mult = 4.0
+        req = int(round(rent_eur * mult)) if rent_eur and rent_eur >= 300 else None
+        label = "4× huur"
+        if req is not None:
+            label = f"4× huur · €{req:,}".replace(",", ".")
+        return {
+            "income_multiplier": mult,
+            "income_required_eur": req,
+            "income_requirement_label": label,
+        }
+    return {}
+
+
 def attach_income_requirement(listing: Listing) -> Listing:
+    platform_defaults = apply_platform_income_defaults(
+        source=listing.source or "",
+        platform=listing.source or "",
+        rent_eur=listing.rent_eur,
+    )
+    if platform_defaults:
+        return replace(
+            listing,
+            income_multiplier=platform_defaults.get("income_multiplier"),
+            income_required_eur=platform_defaults.get("income_required_eur"),
+            income_requirement_label=platform_defaults.get("income_requirement_label"),
+        )
+
     if listing.income_multiplier is not None or listing.income_required_eur is not None:
         return listing
 

@@ -119,6 +119,12 @@ function applicationsClass(l) {
 }
 
 function formatIncomeRequirement(l) {
+  const platform = `${l.platform || ""} ${l.source || ""}`.toLowerCase();
+  if (platform.includes("vbt") || platform.includes("vb&t")) {
+    const req = l.income_required_eur ?? (l.rent_eur != null ? Math.round(l.rent_eur * 4) : null);
+    if (req != null) return `4× huur · €${req}`;
+    return "4× huur";
+  }
   if (l.income_requirement_label) return l.income_requirement_label;
   if (l.income_multiplier != null && l.rent_eur != null) {
     const mult = Number(l.income_multiplier);
@@ -135,7 +141,7 @@ function formatIncomeRequirement(l) {
 }
 
 function listingRow(l) {
-  const wijk = dash(l.neighborhood);
+  const wijk = dash(resolveNeighborhood(l));
   const platform = dash(l.platform || l.provider_name || l.source);
   const newToday = isListedToday(l);
   const newClass = newToday ? " is-new-today" : "";
@@ -314,7 +320,7 @@ function refreshMapMarkers() {
       fillColor,
       fillOpacity: 1,
     });
-    const wijk = dash(listing.neighborhood);
+    const wijk = dash(resolveNeighborhood(listing));
     const platform = dash(listing.platform || listing.source);
     const tagHtml = `<span class="${matchTagClass(listing.match_tag || "okay")}">${listing.match_tag ?? "okay"}</span>`;
     const newLine = isNewToday ? "<b>Nieuw op platform vandaag</b><br/>" : "";
@@ -360,7 +366,7 @@ async function renderMap(listings) {
 function showSelectedMatch(listing) {
   const el = document.getElementById("selected-match");
   if (!el) return;
-  const wijk = dash(listing.neighborhood);
+  const wijk = dash(resolveNeighborhood(listing));
   const platform = dash(listing.platform || listing.source);
   el.innerHTML = `
     <span class="${matchTagClass(listing.match_tag || "okay")}">${listing.match_tag ?? "okay"}</span>${isListedToday(listing) ? ' <span class="tag tag-new">Nieuw vandaag</span>' : ""}<br/>

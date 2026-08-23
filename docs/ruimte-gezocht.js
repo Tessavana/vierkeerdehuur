@@ -52,6 +52,12 @@ function formatDist(km) {
 }
 
 function formatIncome(l) {
+  const platform = `${l.platform || ""} ${l.source || ""}`.toLowerCase();
+  if (platform.includes("vbt") || platform.includes("vb&t")) {
+    const req = l.income_required_eur ?? (l.rent_eur != null ? Math.round(l.rent_eur * 4) : null);
+    if (req != null) return `4× · ${formatEur(req)}`;
+    return "4× huur";
+  }
   if (l.income_requirement_label) return l.income_requirement_label;
   if (l.income_multiplier != null && l.rent_eur != null) {
     const m = Number(l.income_multiplier);
@@ -159,7 +165,7 @@ function enrichListing(l) {
 }
 
 function slideHtml(l, idx, total) {
-  const wijk = (l.neighborhood || "Eindhoven").toUpperCase();
+  const wijk = (resolveNeighborhood(l) || "Eindhoven").toUpperCase();
   const platform = l.platform || l.source || "?";
   const tag = l.match_tag || "?";
   const aff = l.aff;

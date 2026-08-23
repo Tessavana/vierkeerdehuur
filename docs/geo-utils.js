@@ -5,12 +5,16 @@ const PDOK_FREE = "https://api.pdok.nl/bzk/locatieserver/search/v3_1/free";
 const CLIENT_CACHE_KEY = "housing_geocode_client_v1";
 
 const POSTCODE_WIJK = {
-  5611: "Woensel",
+  5611: "Centrum",
   5612: "Woensel",
   5613: "Strijp",
   5614: "Strijp",
   5615: "Strijp",
   5616: "Gestel",
+  5617: "Strijp-S",
+  5618: "Gestel",
+  5629: "Meerhoven",
+  5630: "Meerhoven",
   5621: "Woensel",
   5622: "Woensel",
   5623: "Woensel",
@@ -36,6 +40,41 @@ const POSTCODE_WIJK = {
   5657: "Woensel",
   5658: "Woensel",
 };
+
+function wijkFromPostcode(pc) {
+  if (!pc || pc.length < 4) return "";
+  const prefix = parseInt(pc.slice(0, 4), 10);
+  return POSTCODE_WIJK[prefix] || "";
+}
+
+function resolveNeighborhood(l) {
+  if (l.neighborhood) return l.neighborhood;
+  const blob = `${l.title || ""} ${l.location || ""} ${l.notes || ""}`;
+  const pc = blob.match(/\b(\d{4})\s*([A-Za-z]{2})\b/) || blob.match(/\b(\d{4})([A-Za-z]{2})\b/);
+  if (pc) {
+    const w = wijkFromPostcode(`${pc[1]}${pc[2].toUpperCase()}`);
+    if (w) return w;
+  }
+  const lower = blob.toLowerCase();
+  const keys = [
+    ["strijp-s", "Strijp-S"],
+    ["strijp-r", "Strijp-R"],
+    ["blixembosch", "Blixembosch"],
+    ["regentekwartier", "Centrum"],
+    ["oud-strijp", "Oud-Strijp"],
+    ["meerhoven", "Meerhoven"],
+    ["strijp", "Strijp"],
+    ["woensel", "Woensel"],
+    ["tongelre", "Tongelre"],
+    ["gestel", "Gestel"],
+    ["stratum", "Stratum"],
+    ["centrum", "Centrum"],
+  ];
+  for (const [k, v] of keys) {
+    if (lower.includes(k)) return v;
+  }
+  return "Eindhoven";
+}
 
 function emptyVal() {
   return "";
@@ -205,7 +244,7 @@ function attachResolvedCoords(listings, cache) {
   return listings.map((l) => {
     const c = resolveListingCoords(l, cache);
     if (c) {
-      return { ...l, map_lat: c.lat, map_lon: c.lon, neighborhood: l.neighborhood || c.wijk || l.neighborhood };
+      return { ...l, map_lat: c.lat, map_lon: c.lon, neighborhood: resolveNeighborhood({ ...l, neighborhood: l.neighborhood || c.wijk || "" }) };
     }
     return { ...l };
   });
@@ -219,7 +258,7 @@ async function attachResolvedCoordsAsync(listings, cache) {
       ...l,
       map_lat: c.lat,
       map_lon: c.lon,
-      neighborhood: l.neighborhood || c.wijk || l.neighborhood,
+      neighborhood: resolveNeighborhood({ ...l, neighborhood: l.neighborhood || c.wijk || "" }),
     });
   }
   return out;

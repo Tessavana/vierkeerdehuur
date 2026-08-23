@@ -8,12 +8,13 @@ from src.config import load_config
 from src.filters import evaluate_rental, score_rental
 from src.listing_detail import enrich_listing, is_new_on_platform_today, normalize_available_from
 from src.application_count import attach_application_count
-from src.income_requirement import attach_income_requirement, extract_income_requirement
+from src.income_requirement import attach_income_requirement, extract_income_requirement, apply_platform_income_defaults
 from src.listing_dedupe import dedupe_listings
 from src.listing_llm_extract import maybe_llm_fill_listing
 from src.listing_registry import apply_listing_lifecycle
 from src.market_registry import build_market_stats, record_market_listings
 from src.eindhoven_geo import attach_map_coordinates
+from src.neighborhood import resolve_neighborhood
 from src.scan_bundle import load_scan_bundle, save_scan_bundle
 from src.scan_schedule import provider_should_fetch_live, scan_profile
 from src.seekers.build_feed import build_seekers_feed
@@ -78,7 +79,7 @@ def run_workrun() -> dict:
                             "size_m2": listing.size_m2,
                             "url": listing.url,
                             "reason": reason,
-                            "neighborhood": _extract_neighborhood(listing.title, listing.location),
+                            "neighborhood": resolve_neighborhood(listing.title, listing.location, listing.notes or ""),
                             "available_from": listing.available_from,
                             "notes": listing.notes,
                         }
@@ -97,7 +98,7 @@ def run_workrun() -> dict:
                     "outdoor_known": l.outdoor_known,
                     "url": l.url,
                     "match_tag": _match_tag(score_rental(l, config)),
-                    "neighborhood": _extract_neighborhood(l.title, l.location),
+                    "neighborhood": resolve_neighborhood(l.title, l.location, l.notes or ""),
                     "available_from": normalize_available_from(l.available_from),
                     "platform_listed_date": l.platform_listed_date,
                     "application_count": l.application_count,
@@ -162,6 +163,9 @@ def run_workrun() -> dict:
     apply_listing_lifecycle(deduped)
     deduped.sort(key=_sort_newest_first)
 
+    attach_map_coordinates(deduped)
+    deduped = [_ensure_neighborhood(item) for item in deduped]
+
     market_rows = [
         {**item, "in_budget": True}
         for item in deduped
@@ -172,7 +176,6 @@ def run_workrun() -> dict:
     record_market_listings(market_rows)
     market_stats = build_market_stats(deduped, excluded_items, config.max_rent)
 
-    attach_map_coordinates(deduped)
     seekers_feed = build_seekers_feed()
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -206,6 +209,13 @@ def _write_outputs(payload: dict) -> None:
 
 
 def _ensure_income_fields(item: dict) -> dict:
+    platform_defaults = apply_platform_income_defaults(
+        source=item.get("source") or "",
+        platform=item.get("platform") or "",
+        rent_eur=item.get("rent_eur"),
+    )
+    if platform_defaults:
+        return {**item, **platform_defaults}
     if item.get("income_multiplier") is not None or item.get("income_required_eur") is not None:
         return item
     blob = " ".join(
@@ -215,6 +225,20 @@ def _ensure_income_fields(item: dict) -> dict:
     if not fields:
         return item
     return {**item, **fields}
+
+
+def _ensure_neighborhood(item: dict) -> dict:
+    wijk = resolve_neighborhood(
+        item.get("title") or "",
+        item.get("location") or "",
+        item.get("notes") or "",
+        geocode_wijk=item.get("neighborhood") or "",
+    )
+    if wijk and wijk != item.get("neighborhood"):
+        return {**item, "neighborhood": wijk}
+    if not item.get("neighborhood"):
+        return {**item, "neighborhood": wijk}
+    return item
 
 
 def _maybe_enrich(listing):
@@ -297,34 +321,6 @@ def _match_tag(score: int) -> str:
     if score >= 12:
         return "okay"
     return "meh"
-
-
-def _extract_neighborhood(title: str, location: str) -> str:
-    searchable = f"{title} {location}".lower()
-    # Longer phrases first so "strijp-s" wins over "strijp".
-    hits = [
-        ("strijp-s", "Strijp"),
-        ("strijp", "Strijp"),
-        ("meerrijk", "Meerrijk"),
-        ("blixembosch", "Blixembosch"),
-        ("centrum", "Centrum"),
-        ("stratum", "Stratum"),
-        ("woensel", "Woensel"),
-        ("tongelre", "Tongelre"),
-        ("gestel", "Gestel"),
-        ("bergen", "Bergen"),
-        ("vonderkwartier", "Vonderkwartier"),
-        ("engelsbergen", "Engelsbergen"),
-        ("schrijversbuurt", "Schrijversbuurt"),
-        ("genneper", "Genneper"),
-        ("vaartbroek", "Vaartbroek"),
-        ("het regentekwartier", "Centrum"),
-        ("regentekwartier", "Centrum"),
-    ]
-    for needle, label in hits:
-        if needle in searchable:
-            return label
-    return ""
 
 
 if __name__ == "__main__":
