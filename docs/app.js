@@ -423,6 +423,56 @@ async function initSupportButton() {
   });
 }
 
+function renderSeekersFeed(feed) {
+  const el = document.getElementById("seekers-feed");
+  const subtitle = document.getElementById("seekers-subtitle");
+  if (!el) return;
+  const posts = (feed && feed.posts) || [];
+  const sources = (feed && feed.sources_active) || [];
+  if (subtitle) {
+    const src = sources.length ? sources.join(" · ") : "—";
+    subtitle.textContent = `${posts.length} berichten · bronnen: ${src}`;
+  }
+  if (!posts.length) {
+    el.innerHTML = `<div class="muted">Nog geen zoekers gevonden. Reddit en Marktplaats worden elke scan bijgewerkt.</div>`;
+    return;
+  }
+  el.innerHTML = posts
+    .map((p) => {
+      const kind = p.kind || "unknown";
+      const kindLabel = kind === "seeking" ? "zoekt" : kind === "offering" ? "biedt" : "bericht";
+      const kindClass =
+        kind === "seeking" ? "seeker-tag seeker-tag-seek" : kind === "offering" ? "seeker-tag seeker-tag-offer" : "seeker-tag";
+      const when = p.posted_at ? new Date(p.posted_at).toLocaleString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
+      const budget = p.budget_eur ? ` · max €${p.budget_eur}` : "";
+      const loc = p.location_hint ? ` · ${p.location_hint}` : "";
+      const group = p.group_name || p.source || "";
+      return `
+        <article class="seeker-card">
+          <div class="seeker-card-top">
+            <span class="${kindClass}">${kindLabel}</span>
+            <span class="seeker-source">${group}</span>
+            ${when ? `<span class="seeker-time muted">${when}</span>` : ""}
+          </div>
+          <h3 class="seeker-title">${p.title || "—"}</h3>
+          ${p.snippet && p.snippet !== p.title ? `<p class="seeker-snippet muted">${p.snippet.slice(0, 220)}${p.snippet.length > 220 ? "…" : ""}</p>` : ""}
+          <div class="seeker-meta muted">${budget}${loc}</div>
+          <a class="seeker-link" href="${p.url}" target="_blank" rel="noopener noreferrer">open bron</a>
+        </article>`;
+    })
+    .join("");
+}
+
+async function loadSeekersFeed() {
+  try {
+    const res = await fetch("./data/seekers_feed.json", { cache: "no-store" });
+    if (res.ok) return res.json();
+  } catch {
+    /* fallback below */
+  }
+  return null;
+}
+
 async function loadRun() {
   const res = await fetch("./data/latest_listings.json", { cache: "no-store" });
   const data = await res.json();
@@ -441,6 +491,8 @@ async function loadRun() {
   renderListingsTable(listings);
   window.__lastMarketStats = data.market_stats;
   renderStats(data.market_stats, data.max_rent, listings.length);
+  const seekers = (await loadSeekersFeed()) || data.seekers_feed;
+  renderSeekersFeed(seekers);
   initMapTagFilters();
   await renderMap(listings);
 }

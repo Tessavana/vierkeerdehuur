@@ -37,6 +37,8 @@ jobs:
             data/listing_registry.json
             data/market_registry.json
             data/detail_cache.json
+            data/seekers_registry.json
+            data/facebook_seekers_cache.json
             data/cache
             data/playwright_state.json
           key: housing-state-${{ github.run_id }}
@@ -104,6 +106,8 @@ jobs:
             data/listing_registry.json
             data/market_registry.json
             data/detail_cache.json
+            data/seekers_registry.json
+            data/facebook_seekers_cache.json
             data/cache
             data/playwright_state.json
           key: ${{ steps.restore-state.outputs.cache-primary-key }}

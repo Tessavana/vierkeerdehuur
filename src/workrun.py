@@ -11,6 +11,7 @@ from src.market_registry import build_market_stats, record_market_listings
 from src.eindhoven_geo import attach_map_coordinates
 from src.scan_bundle import load_scan_bundle, save_scan_bundle
 from src.scan_schedule import provider_should_fetch_live
+from src.seekers.build_feed import build_seekers_feed
 from src.providers import (
     FundaProvider,
     HuislijnProvider,
@@ -169,6 +170,7 @@ def run_workrun() -> dict:
     market_stats = build_market_stats(deduped, excluded_items, config.max_rent)
 
     attach_map_coordinates(deduped)
+    seekers_feed = build_seekers_feed()
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "city": "Eindhoven",
@@ -179,6 +181,7 @@ def run_workrun() -> dict:
         "excluded_listings": excluded_items,
         "market_stats": market_stats,
         "application_status": _load_application_status(),
+        "seekers_feed": seekers_feed,
     }
     _write_outputs(payload)
     return payload

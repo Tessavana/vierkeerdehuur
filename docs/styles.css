@@ -303,6 +303,47 @@ h3 { margin: 0 0 8px; font-size: 18px; }
 }
 .platform-bar-fill { height: 100%; background: #171717; }
 
+.seekers-section { margin-bottom: 14px; }
+.seekers-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 520px;
+  overflow-y: auto;
+}
+.seeker-card {
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: #fafafa;
+}
+.seeker-card-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+.seeker-tag {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #171717;
+  background: #fff;
+}
+.seeker-tag-seek { background: #171717; color: #fff; }
+.seeker-tag-offer { background: #fff; color: #171717; }
+.seeker-source { font-weight: 600; color: #444; }
+.seeker-time { margin-left: auto; }
+.seeker-title { margin: 0 0 6px; font-size: 16px; line-height: 1.35; font-weight: 700; }
+.seeker-snippet { margin: 0 0 6px; font-size: 13px; line-height: 1.45; }
+.seeker-meta { font-size: 12px; margin-bottom: 6px; }
+.seeker-link { font-size: 13px; font-weight: 700; color: #171717; }
+
 @media (min-width: 900px) {
   .hero { padding-right: 200px; }
 }
