@@ -97,7 +97,7 @@ h3 { margin: 0 0 8px; font-size: 18px; }
 .listings-table-header,
 .listing-header {
   display: grid;
-  grid-template-columns: 0.85fr 2fr 0.8fr 0.7fr 0.55fr 0.85fr minmax(88px, auto);
+  grid-template-columns: 0.85fr 2fr 0.8fr 0.7fr 0.55fr 0.55fr 0.85fr minmax(88px, auto);
   gap: 10px;
   font-size: 11px;
   font-weight: 700;
@@ -115,7 +115,7 @@ h3 { margin: 0 0 8px; font-size: 18px; }
 }
 .listing-row {
   display: grid;
-  grid-template-columns: 0.85fr 2fr 0.8fr 0.7fr 0.55fr 0.85fr minmax(88px, auto);
+  grid-template-columns: 0.85fr 2fr 0.8fr 0.7fr 0.55fr 0.55fr 0.85fr minmax(88px, auto);
   gap: 10px;
   border-bottom: 1px dashed #e7e7e7;
   padding: 10px 0;
@@ -123,6 +123,8 @@ h3 { margin: 0 0 8px; font-size: 18px; }
   font-size: 14px;
 }
 .listing-row a { color: #171717; font-weight: 600; }
+.listing-applications { font-weight: 700; }
+.listing-applications.hot { color: #b35900; }
 .listings-empty { padding: 12px 0; }
 .muted { color: #6d6d6d; font-size: 13px; }
 .tag {

@@ -14,6 +14,7 @@ from zoneinfo import ZoneInfo
 import requests
 from bs4 import BeautifulSoup
 
+from src.application_count import extract_application_count_from_html
 from src.extract import extract_location_hint, extract_rent_eur, extract_size_m2, parse_json_ld, parse_posted_date
 from src.filters import NEWCOMER_RESTRICTION_MARKERS, STUDENT_ONLY_MARKERS
 from src.models import Listing
@@ -193,6 +194,7 @@ def parse_detail_html(html: str, url: str) -> dict:
         structured["location"] = extract_location_hint(text)
     if not structured.get("platform_listed_date") and listed:
         structured["platform_listed_date"] = listed.isoformat()
+    app = extract_application_count_from_html(html, source=_source_from_url(url), url=url)
     return {
         "description": _extract_description(soup, text),
         "platform_listed_date": structured.get("platform_listed_date"),
@@ -200,7 +202,26 @@ def parse_detail_html(html: str, url: str) -> dict:
         "rent_eur": structured.get("rent_eur"),
         "size_m2": structured.get("size_m2"),
         "location": structured.get("location"),
+        "application_count": app.get("application_count"),
+        "application_count_label": app.get("application_count_label"),
     }
+
+
+def _source_from_url(url: str) -> str:
+    lower = (url or "").lower()
+    if "vbtverhuurmakelaars" in lower or "vbt" in lower:
+        return "vbt"
+    if "vesteda.com" in lower:
+        return "vesteda"
+    if "pararius.com" in lower:
+        return "pararius"
+    if "funda.nl" in lower:
+        return "funda"
+    if "rotsvast.nl" in lower:
+        return "rotsvast"
+    if "nmgwonen.nl" in lower:
+        return "nmg"
+    return ""
 
 
 def fetch_detail_fields(url: str) -> dict:
@@ -274,6 +295,8 @@ def enrich_listing(listing: Listing, use_cache: bool = True) -> Listing:
         rent_eur=rent,
         size_m2=size,
         location=location,
+        application_count=listing.application_count or fields.get("application_count"),
+        application_count_label=listing.application_count_label or fields.get("application_count_label"),
         outdoor_space=outdoor_space,
         outdoor_known=outdoor_known,
     )

@@ -105,6 +105,19 @@ function tagPassesFilter(listing) {
   return active.has(t);
 }
 
+function formatApplications(l) {
+  if (l.application_count_label) return l.application_count_label;
+  if (l.application_count != null) return String(l.application_count);
+  return "—";
+}
+
+function applicationsClass(l) {
+  const n = l.application_count ?? (l.application_count_label ? parseInt(String(l.application_count_label), 10) : null);
+  if (n != null && n >= 5) return "listing-applications hot";
+  if (l.application_count_label || l.application_count != null) return "listing-applications";
+  return "muted";
+}
+
 function listingRow(l) {
   const wijk = dash(l.neighborhood);
   const platform = dash(l.platform || l.provider_name || l.source);
@@ -119,6 +132,7 @@ function listingRow(l) {
       <div>${wijk}</div>
       <div>EUR ${l.rent_eur ?? "?"}</div>
       <div>${l.size_m2 ?? "?"} m²</div>
+      <div class="${applicationsClass(l)}">${formatApplications(l)}</div>
       <div>${formatRentFrom(l.available_from)}</div>
       <div>${tag}${newBadge}<br/><a href="${l.url}" target="_blank" rel="noopener noreferrer">open</a></div>
     </div>

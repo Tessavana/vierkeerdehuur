@@ -44,6 +44,24 @@ def apply_listing_lifecycle(items: list[dict]) -> None:
             registry[url] = entry
         else:
             entry["last_seen_utc"] = now
+        if item.get("application_count") is not None:
+            entry["application_count"] = item["application_count"]
+            entry["application_count_label"] = item.get("application_count_label")
+            entry["application_count_updated_utc"] = now
+            history = entry.get("application_history") or []
+            last = history[-1] if history else None
+            if not last or last.get("count") != item["application_count"]:
+                history.append(
+                    {
+                        "utc": now,
+                        "count": item["application_count"],
+                        "label": item.get("application_count_label"),
+                    }
+                )
+                entry["application_history"] = history[-30:]
         item["first_seen_utc"] = entry.get("first_seen_utc", now)
+        if entry.get("application_count") is not None and item.get("application_count") is None:
+            item["application_count"] = entry["application_count"]
+            item["application_count_label"] = entry.get("application_count_label")
 
     _save(registry)

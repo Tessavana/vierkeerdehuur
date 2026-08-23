@@ -6,6 +6,7 @@ from pathlib import Path
 from src.config import load_config
 from src.filters import evaluate_rental, score_rental
 from src.listing_detail import enrich_listing, is_new_on_platform_today, normalize_available_from
+from src.application_count import attach_application_count
 from src.listing_dedupe import dedupe_listings
 from src.listing_llm_extract import maybe_llm_fill_listing
 from src.listing_registry import apply_listing_lifecycle
@@ -55,6 +56,7 @@ def run_workrun() -> dict:
                 listing = _maybe_enrich(listing)
                 ok, reason = evaluate_rental(listing, config)
                 if ok:
+                    listing = attach_application_count(listing, force_refresh=True)
                     suitable.append(listing)
                 else:
                     excluded_count += 1
@@ -94,6 +96,8 @@ def run_workrun() -> dict:
                     "neighborhood": _extract_neighborhood(l.title, l.location),
                     "available_from": normalize_available_from(l.available_from),
                     "platform_listed_date": l.platform_listed_date,
+                    "application_count": l.application_count,
+                    "application_count_label": l.application_count_label,
                     "is_new_today": is_new_on_platform_today(l),
                     "notes": l.notes,
                     "map_lat": l.map_lat,
