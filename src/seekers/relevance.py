@@ -7,6 +7,9 @@ import os
 import re
 from typing import Any
 
+_AUTO_ACCEPT_SCORE = 90
+_BORDERLINE_MIN_SCORE = 55
+
 _STRICT_HOUSING = (
     "huur",
     "huurwoning",
@@ -151,14 +154,37 @@ def score_relevance(title: str, snippet: str, *, subreddit: str = "") -> dict[st
     if sub == "r/eindhoven":
         score += 5
 
-    return {"relevant": score >= 55, "score": score, "reason": "keyword_match"}
+    return {"relevant": score >= _BORDERLINE_MIN_SCORE, "score": score, "reason": "keyword_match"}
+
+
+def _llm_mode() -> str:
+    """off | borderline | always — borderline is default when OPENAI_API_KEY is set."""
+    explicit = os.getenv("SEEKERS_LLM_ENABLED", "").strip().lower()
+    if explicit in {"0", "false", "no", "off"}:
+        return "off"
+    mode = os.getenv("SEEKERS_LLM_MODE", "").strip().lower()
+    if mode in {"off", "borderline", "always"}:
+        return mode
+    if explicit in {"1", "true", "yes", "on"}:
+        return "always"
+    if os.getenv("OPENAI_API_KEY", "").strip():
+        return "borderline"
+    return "off"
+
+
+def _needs_llm_review(kw: dict[str, Any]) -> bool:
+    if not kw["relevant"]:
+        return False
+    if kw["score"] >= _AUTO_ACCEPT_SCORE:
+        return False
+    return True
 
 
 def llm_relevance_check(title: str, snippet: str) -> bool | None:
-    """Optional OpenAI check. Returns None if disabled/unavailable."""
-    api_key = os.getenv("OPENAI_API_KEY", "").strip()
-    if os.getenv("SEEKERS_LLM_ENABLED", "").strip().lower() not in {"1", "true", "yes", "on"}:
+    """OpenAI check for borderline posts. Returns None if disabled/unavailable."""
+    if _llm_mode() == "off":
         return None
+    api_key = os.getenv("OPENAI_API_KEY", "").strip()
     if not api_key:
         return None
 
@@ -204,6 +230,12 @@ def is_relevant_post(title: str, snippet: str, *, subreddit: str = "", source: s
     kw = score_relevance(title, snippet, subreddit=subreddit)
     if not kw["relevant"]:
         return False
+
+    mode = _llm_mode()
+    if mode == "off":
+        return True
+    if mode == "borderline" and not _needs_llm_review(kw):
+        return True
 
     llm = llm_relevance_check(title, snippet)
     if llm is None:
