@@ -42,18 +42,36 @@ _STRICT_HOUSING = (
 
 _EINDHOVEN_AREA = (
     "eindhoven",
-    "geldrop",
-    "valken",
-    "best",
     "strijp",
     "woensel",
     "tongelre",
     "gestel",
-    "helmond",
-    "nuenen",
-    "waalre",
-    "son en breugel",
     "brainport",
+)
+
+# Other places — reject unless Eindhoven is explicitly the target.
+_OTHER_PLACES = (
+    "lichtenvoorde",
+    "roermond",
+    "tilburg",
+    "amsterdam",
+    "rotterdam",
+    "utrecht",
+    "enschede",
+    "den bosch",
+    "s-hertogenbosch",
+    "breda",
+    "geldrop",
+    "helmond",
+    "valken",
+    "best",
+    "waalre",
+    "nuenen",
+    "son en breugel",
+    "limburg",
+    "groningen",
+    "arnhem",
+    "nijmegen",
 )
 
 _NOISE = (
@@ -86,6 +104,22 @@ _NOISE = (
     "how is life/career",
     "master's after",
     "masters after",
+    "dutch design week",
+    "ddw accomodation",
+    "ddw accommodation",
+    "during ddw",
+    "for one week",
+    "one week only",
+    "for a month",
+    "subletting for a month",
+    "exhibited during",
+    "reduced rate",
+    "prefer to rent it to a woman",
+    "prefer to rent to a woman",
+    "send me a dm",
+    "women only",
+    "girls only",
+    "scam",
 )
 
 _HOUSING_SEEK = (
@@ -113,14 +147,26 @@ _HOUSING_SEEK = (
     "moving to eindhoven",
     "relocating to eindhoven",
     "living at xior",
-    "room available",
-    "ddw accomodation",
-    "ddw accommodation",
 )
 
 
 def _has_strict_housing(blob: str) -> bool:
     return any(k in blob for k in _STRICT_HOUSING)
+
+
+def _mentions_eindhoven(blob: str) -> bool:
+    if "eindhoven" in blob:
+        return True
+    return bool(re.search(r"\b56\d{2}\s?[A-Za-z]{2}\b", blob))
+
+
+def _is_outside_eindhoven(blob: str) -> bool:
+    for place in _OTHER_PLACES:
+        if place in blob and not _mentions_eindhoven(blob):
+            return True
+    if re.search(r"gezocht[^.]{0,40}(lichtenvoorde|roermond|tilburg|geldrop|helmond)", blob):
+        return True
+    return False
 
 
 def score_relevance(title: str, snippet: str, *, subreddit: str = "") -> dict[str, Any]:
@@ -131,11 +177,15 @@ def score_relevance(title: str, snippet: str, *, subreddit: str = "") -> dict[st
         if noise in blob:
             return {"relevant": False, "score": 0, "reason": f"noise:{noise}"}
 
+    if _is_outside_eindhoven(blob):
+        return {"relevant": False, "score": 0, "reason": "outside_eindhoven"}
+
     if re.search(r"looking for (?:a |an )?(?:job|gym|friend|coach|partner[^h]|electric)", blob):
         return {"relevant": False, "score": 0, "reason": "looking_for_non_housing"}
 
     has_housing = _has_strict_housing(blob)
-    has_area = any(a in blob for a in _EINDHOVEN_AREA) or sub == "r/eindhoven"
+    # r/eindhoven helps discovery but still require Eindhoven as housing target.
+    has_area = _mentions_eindhoven(blob) or any(a in blob for a in _EINDHOVEN_AREA)
     strong = any(s in blob for s in _HOUSING_SEEK)
 
     if not has_area:
@@ -196,8 +246,9 @@ def llm_relevance_check(title: str, snippet: str) -> bool | None:
     model = os.getenv("SEEKERS_LLM_MODEL", "gpt-4o-mini")
     prompt = (
         "You filter posts for a dashboard about HOUSING in Eindhoven, Netherlands.\n"
-        "Include: people seeking or offering rooms, apartments, houses, housemates, student housing.\n"
-        "Exclude: jobs, gyms, friends, concerts, services, general city questions.\n"
+        "Include: people seeking long-term rooms, apartments, houses, housemates in Eindhoven.\n"
+        "Exclude: jobs, gyms, scams, temporary/event stays (DDW), offerings to sublet, "
+        "posts outside Eindhoven.\n"
         "Answer ONLY yes or no.\n\n"
         f"Title: {title}\nBody: {snippet[:800]}"
     )
@@ -222,11 +273,6 @@ def llm_relevance_check(title: str, snippet: str) -> bool | None:
 
 
 def is_relevant_post(title: str, snippet: str, *, subreddit: str = "", source: str = "") -> bool:
-    if source == "marktplaats":
-        return True
-    if source == "facebook":
-        return score_relevance(title, snippet, subreddit=subreddit)["relevant"]
-
     kw = score_relevance(title, snippet, subreddit=subreddit)
     if not kw["relevant"]:
         return False

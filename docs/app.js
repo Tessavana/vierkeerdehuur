@@ -1,5 +1,6 @@
 const MOVE_OUT_DEADLINE = new Date("2026-07-26T23:59:59+02:00");
 const MAP_VISITED_KEY = "housing_map_visited_urls_v1";
+const SEEKERS_SEEN_KEY = "housing_seekers_seen_v1";
 
 let __allListings = [];
 let __mapLayerGroup = null;
@@ -376,6 +377,74 @@ function renderOverviewTable(status) {
   `;
 }
 
+function formatSeekerAuthor(raw) {
+  if (!raw) return "";
+  const cleaned = String(raw).replace(/^\/u\//, "").replace(/^u\//, "");
+  return cleaned ? `@${cleaned}` : "";
+}
+
+function seekerPostId(p) {
+  return p.id || p.url || `${p.source}-${p.title}`;
+}
+
+function loadSeenSeekers() {
+  try {
+    return new Set(JSON.parse(sessionStorage.getItem(SEEKERS_SEEN_KEY) || "[]"));
+  } catch {
+    return new Set();
+  }
+}
+
+function saveSeenSeekers(ids) {
+  sessionStorage.setItem(SEEKERS_SEEN_KEY, JSON.stringify([...ids].slice(-120)));
+}
+
+function seekerCardHtml(p, idx, seenSet) {
+  const kind = p.kind || "unknown";
+  const kindLabel = kind === "seeking" ? "zoekt" : kind === "offering" ? "biedt" : "bericht";
+  const kindClass =
+    kind === "seeking" ? "seeker-tag seeker-tag-seek" : kind === "offering" ? "seeker-tag seeker-tag-offer" : "seeker-tag";
+  const when = formatSeekerTime(p.posted_at);
+  const budget = p.budget_eur ? ` · max €${p.budget_eur}` : "";
+  const loc = p.location_hint ? ` · ${p.location_hint}` : "";
+  const group = p.group_name || p.source || "";
+  const author = formatSeekerAuthor(p.author);
+  const pid = seekerPostId(p);
+  const isNew = !seenSet.has(pid);
+  const delay = Math.min(idx, 12) * 70;
+  const sourceIcon =
+    p.source === "reddit" ? "🔴" : p.source === "marktplaats" ? "🟡" : p.source === "facebook" ? "🔵" : "•";
+  return `
+    <article class="seeker-card seeker-card-enter${isNew ? " seeker-card-new" : ""}" data-seeker-id="${pid}" style="animation-delay:${delay}ms">
+      <div class="seeker-card-glow" aria-hidden="true"></div>
+      <div class="seeker-card-top">
+        <span class="${kindClass}">${kindLabel}</span>
+        <span class="seeker-source">${sourceIcon} ${group}${author ? `<span class="seeker-author muted">${author}</span>` : ""}</span>
+        ${when.relative ? `<span class="seeker-time" title="${when.full}">${when.relative}</span>` : ""}
+      </div>
+      ${when.full ? `<div class="seeker-datetime muted">${when.full}</div>` : ""}
+      <h3 class="seeker-title">${p.title || "—"}</h3>
+      ${p.snippet && p.snippet !== p.title ? `<p class="seeker-snippet muted">${p.snippet.slice(0, 220)}${p.snippet.length > 220 ? "…" : ""}</p>` : ""}
+      <div class="seeker-meta muted">${budget}${loc}</div>
+      <a class="seeker-link" href="${p.url}" target="_blank" rel="noopener noreferrer">open bron →</a>
+    </article>`;
+}
+
+function renderSeekersLiveStrip(posts, seenSet) {
+  const strip = document.getElementById("seekers-live-strip");
+  if (!strip || !posts.length) {
+    if (strip) strip.innerHTML = "";
+    return;
+  }
+  const fresh = posts.filter((p) => !seenSet.has(seekerPostId(p))).slice(0, 4);
+  const items = (fresh.length ? fresh : posts.slice(0, 4)).map((p) => {
+    const when = formatSeekerTime(p.posted_at);
+    const isNew = !seenSet.has(seekerPostId(p));
+    return `<a class="seekers-live-chip${isNew ? " seekers-live-chip-new" : ""}" href="${p.url}" target="_blank" rel="noopener noreferrer">${p.title.slice(0, 52)}${p.title.length > 52 ? "…" : ""}<span class="muted">${when.relative ? ` · ${when.relative}` : ""}</span></a>`;
+  });
+  strip.innerHTML = `<div class="seekers-live-label"><span class="live-dot"></span> binnenkomend</div><div class="seekers-live-track">${items.join("")}</div>`;
+}
+
 function formatSeekerTime(iso) {
   if (!iso) return { relative: "", full: "" };
   const d = new Date(iso);
@@ -439,40 +508,21 @@ function renderSeekersFeed(feed) {
   renderRedditOverview(feed && feed.reddit_overview);
   const posts = (feed && feed.posts) || [];
   const sources = (feed && feed.sources_active) || [];
+  const seenSet = loadSeenSeekers();
   if (subtitle) {
     const src = sources.length ? sources.join(" · ") : "—";
-    subtitle.textContent = `${posts.length} berichten · bronnen: ${src}`;
+    const newCount = posts.filter((p) => !seenSet.has(seekerPostId(p))).length;
+    const newLabel = newCount ? ` · ${newCount} nieuw` : "";
+    subtitle.textContent = `${posts.length} zoekers · bronnen: ${src}${newLabel}`;
   }
+  renderSeekersLiveStrip(posts, seenSet);
   if (!posts.length) {
-    el.innerHTML = `<div class="muted">Nog geen zoekers gevonden. Reddit en Marktplaats worden elke scan bijgewerkt.</div>`;
+    el.innerHTML = `<div class="muted">Nog geen zoekers gevonden in Eindhoven. Reddit en Marktplaats worden elke scan bijgewerkt.</div>`;
     return;
   }
-  el.innerHTML = posts
-    .map((p) => {
-      const kind = p.kind || "unknown";
-      const kindLabel = kind === "seeking" ? "zoekt" : kind === "offering" ? "biedt" : "bericht";
-      const kindClass =
-        kind === "seeking" ? "seeker-tag seeker-tag-seek" : kind === "offering" ? "seeker-tag seeker-tag-offer" : "seeker-tag";
-      const when = formatSeekerTime(p.posted_at);
-      const budget = p.budget_eur ? ` · max €${p.budget_eur}` : "";
-      const loc = p.location_hint ? ` · ${p.location_hint}` : "";
-      const group = p.group_name || p.source || "";
-      const author = p.author ? `<span class="seeker-author muted"> · u/${p.author}</span>` : "";
-      return `
-        <article class="seeker-card">
-          <div class="seeker-card-top">
-            <span class="${kindClass}">${kindLabel}</span>
-            <span class="seeker-source">${group}${author}</span>
-            ${when.relative ? `<span class="seeker-time" title="${when.full}">${when.relative}</span>` : ""}
-          </div>
-          ${when.full ? `<div class="seeker-datetime muted">${when.full}</div>` : ""}
-          <h3 class="seeker-title">${p.title || "—"}</h3>
-          ${p.snippet && p.snippet !== p.title ? `<p class="seeker-snippet muted">${p.snippet.slice(0, 220)}${p.snippet.length > 220 ? "…" : ""}</p>` : ""}
-          <div class="seeker-meta muted">${budget}${loc}</div>
-          <a class="seeker-link" href="${p.url}" target="_blank" rel="noopener noreferrer">open bron</a>
-        </article>`;
-    })
-    .join("");
+  el.innerHTML = posts.map((p, idx) => seekerCardHtml(p, idx, seenSet)).join("");
+  posts.forEach((p) => seenSet.add(seekerPostId(p)));
+  saveSeenSeekers(seenSet);
 }
 
 async function loadSeekersFeed() {

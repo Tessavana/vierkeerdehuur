@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vier keer de huur</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="./styles.css?v=20260823b" />
+    <link rel="stylesheet" href="./styles.css?v=20260823c" />
   </head>
   <body>
     <main class="container">
@@ -30,7 +30,8 @@
 
       <section class="panel seekers-section">
         <h2>Mensen die zoeken</h2>
-        <p class="muted" id="seekers-subtitle">Live feed · wie zoekt een woning in en rond Eindhoven</p>
+        <p class="muted" id="seekers-subtitle">Live feed · alleen zoekers in Eindhoven</p>
+        <div id="seekers-live-strip" class="seekers-live-strip" aria-live="polite"></div>
         <div id="reddit-overview" class="reddit-overview"></div>
         <div id="seekers-feed" class="seekers-feed"></div>
       </section>
@@ -93,6 +94,6 @@
     </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="./app.js?v=20260823b"></script>
+    <script src="./app.js?v=20260823c"></script>
   </body>
 </html>

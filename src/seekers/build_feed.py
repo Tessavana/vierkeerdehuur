@@ -32,9 +32,11 @@ def _save_registry(registry: dict[str, dict]) -> None:
     _REGISTRY.write_text(json.dumps(registry, indent=2, ensure_ascii=True), encoding="utf-8")
 
 
-def _reddit_is_relevant(post: SeekerPost) -> bool:
+def _post_is_relevant(post: SeekerPost) -> bool:
+    if post.kind == "offering":
+        return False
     return is_relevant_post(
-        post.title, post.snippet, subreddit=post.group_name, source="reddit"
+        post.title, post.snippet, subreddit=post.group_name, source=post.source
     )
 
 
@@ -59,7 +61,7 @@ def _merge_registry(posts: list[SeekerPost]) -> list[SeekerPost]:
         except (TypeError, KeyError):
             stale.append(key)
             continue
-        if post.source == "reddit" and not _reddit_is_relevant(post):
+        if not _post_is_relevant(post):
             stale.append(key)
             continue
         merged.append(post)
@@ -119,7 +121,9 @@ def build_seekers_feed() -> dict:
 
     merged.sort(key=_sort_key, reverse=True)
     seeking = [p for p in merged if p.kind == "seeking"]
-    display = merged[: int(os.getenv("SEEKERS_FEED_MAX", "40"))]
+    display = [p for p in merged if p.kind == "seeking"][
+        : int(os.getenv("SEEKERS_FEED_MAX", "40"))
+    ]
     reddit_merged = [p for p in merged if p.source == "reddit"]
     if reddit_merged and "reddit" not in sources_ok:
         sources_ok.append("reddit")

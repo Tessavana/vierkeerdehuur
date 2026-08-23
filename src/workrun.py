@@ -6,6 +6,7 @@ from pathlib import Path
 from src.config import load_config
 from src.filters import evaluate_rental, score_rental
 from src.listing_detail import enrich_listing, is_new_on_platform_today, normalize_available_from
+from src.listing_dedupe import dedupe_listings
 from src.listing_llm_extract import maybe_llm_fill_listing
 from src.listing_registry import apply_listing_lifecycle
 from src.market_registry import build_market_stats, record_market_listings
@@ -143,7 +144,9 @@ def run_workrun() -> dict:
 
     save_scan_bundle(bundle)
 
-    deduped = _dedupe_by_url(all_matches)
+    deduped, dupe_count = dedupe_listings(all_matches)
+    if dupe_count:
+        print(f"deduped {dupe_count} duplicate listing(s)")
     apply_listing_lifecycle(deduped)
     deduped.sort(key=_sort_newest_first)
 
@@ -168,6 +171,7 @@ def run_workrun() -> dict:
         "listings": deduped,
         "excluded_listings": excluded_items,
         "market_stats": market_stats,
+        "duplicate_listings_removed": dupe_count,
         "application_status": _load_application_status(),
         "seekers_feed": seekers_feed,
     }
@@ -208,18 +212,6 @@ def _sort_newest_first(item: dict) -> tuple:
         ts = 0.0
     listed = item.get("platform_listed_date") or ""
     return (-ts, listed, not item.get("is_new_today", False))
-
-
-def _dedupe_by_url(items: list[dict]) -> list[dict]:
-    out: list[dict] = []
-    seen: set[str] = set()
-    for item in items:
-        key = item["url"].strip().lower()
-        if key in seen:
-            continue
-        seen.add(key)
-        out.append(item)
-    return out
 
 
 def _load_application_status() -> dict:
