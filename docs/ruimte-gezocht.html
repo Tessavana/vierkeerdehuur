@@ -6,122 +6,48 @@
     <meta name="theme-color" content="#171717" />
     <title>Ruimte Gezocht · Eindhoven</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="./ruimte-gezocht.css?v=1" />
+    <link rel="stylesheet" href="./ruimte-gezocht.css?v=4" />
   </head>
   <body>
-    <div id="app" class="rg-app">
-      <!-- HOME -->
-      <section class="rg-screen active" data-screen="home">
-        <header class="rg-header">
+    <div class="rg-app">
+      <header class="rg-bar">
+        <div class="rg-bar-left">
           <p class="rg-kicker">Ruimte Gezocht</p>
-          <h1>In een stad die blijft groeien, blijf jij zoeken.</h1>
-          <p class="rg-lead">
-            Wat is er nú te huur in Eindhoven — en wat daarvan is eigenlijk <em>voor jou</em>?
-          </p>
-        </header>
-        <div class="rg-quote">
-          <p>En jij?</p>
-          <p><strong>Hoeveel Eindhoven blijft er voor jou over?</strong></p>
+          <p class="rg-tagline">Hoeveel Eindhoven blijft er voor jou over?</p>
         </div>
-        <div class="rg-lens-grid">
-          <button type="button" class="rg-lens-card" data-go="seeker-setup">
-            <span class="rg-lens-icon">🏠</span>
-            <strong>Ik zoek een woning</strong>
-            <span>Wat blijft er van Eindhoven over voor mij?</span>
+        <div class="rg-bar-actions">
+          <button type="button" class="rg-saved-btn" id="saved-btn" hidden aria-label="Opgeslagen woningen">
+            ♥ <span id="saved-count">0</span>
           </button>
-          <button type="button" class="rg-lens-card" data-go="landlord-setup">
-            <span class="rg-lens-icon">🔑</span>
-            <strong>Ik verhuur een woning</strong>
-            <span>Voor wie is mijn woning bereikbaar?</span>
-          </button>
+          <button type="button" class="rg-filter-btn" id="filter-toggle" aria-expanded="false">Filters</button>
         </div>
-        <p class="rg-footnote muted">
-          Live data · <span id="rg-data-count">—</span> woningen in Eindhoven ·
-          <a href="./index.html">dashboard</a>
-        </p>
-      </section>
+      </header>
 
-      <!-- SEEKER SETUP -->
-      <section class="rg-screen" data-screen="seeker-setup">
-        <button type="button" class="rg-back" data-back="home">← terug</button>
-        <h2>Jouw situatie</h2>
-        <p class="rg-muted">Bijna absurd minimaal.</p>
+      <div class="rg-filters" id="filter-panel" hidden>
         <label class="rg-field">
-          <span>Wat verdien je bruto per maand?</span>
-          <div class="rg-input-wrap">
-            <span>€</span>
-            <input id="seeker-income" type="number" inputmode="numeric" value="3500" min="0" step="100" />
-          </div>
+          <span>Bruto per maand</span>
+          <div class="rg-input-wrap"><span>€</span><input id="income" type="number" value="3500" step="100" /></div>
         </label>
         <label class="rg-field">
-          <span>Met hoeveel personen zoek je?</span>
-          <input id="seeker-household" type="number" inputmode="numeric" value="1" min="1" max="8" />
+          <span>Personen</span>
+          <input id="household" type="number" value="1" min="1" max="8" />
         </label>
-        <button type="button" class="rg-btn rg-btn-primary" id="seeker-start">Bekijk mijn Eindhoven →</button>
-      </section>
-
-      <!-- LOCATION -->
-      <section class="rg-screen" data-screen="location">
-        <button type="button" class="rg-back" data-back="seeker-setup">← terug</button>
-        <h2>Waar ben je?</h2>
-        <p class="rg-muted">
-          Mag Ruimte Gezocht weten waar je bent? Dan laten we zien hoe dichtbij een bereikbare woning werkelijk is.
-        </p>
-        <button type="button" class="rg-btn rg-btn-primary" id="location-allow">Locatie delen</button>
-        <button type="button" class="rg-btn rg-btn-ghost" id="location-skip">Overslaan (centrum Eindhoven)</button>
-      </section>
-
-      <!-- SWIPE -->
-      <section class="rg-screen rg-screen-full" data-screen="swipe">
-        <div class="rg-swipe-top">
-          <button type="button" class="rg-icon-btn" data-go="map" title="Kaart">☰</button>
-          <span class="rg-swipe-counter" id="swipe-counter">1 / —</span>
-          <button type="button" class="rg-icon-btn" data-go="stats" title="Statistieken">⋯</button>
+        <div class="rg-filter-actions">
+          <button type="button" class="rg-btn rg-btn-ghost" id="loc-btn">📍 Locatie</button>
+          <button type="button" class="rg-btn rg-btn-primary" id="apply-filters">Toepassen</button>
         </div>
-        <div class="rg-card-stack" id="card-stack">
-          <div class="rg-card rg-card-empty muted">Woningen laden…</div>
-        </div>
-        <p class="rg-swipe-hint">↑ volgende</p>
-        <div class="rg-nearby" id="nearby-banner"></div>
-      </section>
+        <button type="button" class="rg-link-btn" id="landlord-open">Verhuur je? Draai de lens om →</button>
+      </div>
 
-      <!-- MAP -->
-      <section class="rg-screen rg-screen-full" data-screen="map">
-        <div class="rg-map-top">
-          <button type="button" class="rg-back" data-back="swipe">← swipe</button>
-          <div class="rg-map-toggle" role="group">
-            <button type="button" class="active" data-map-mode="all">Alle beschikbaar</button>
-            <button type="button" data-map-mode="yours">Jouw Eindhoven</button>
-          </div>
-        </div>
-        <div id="rg-map"></div>
-        <div class="rg-map-stats" id="map-stats"></div>
-      </section>
-
-      <!-- STATS -->
-      <section class="rg-screen" data-screen="stats">
-        <button type="button" class="rg-back" data-back="swipe">← swipe</button>
-        <h2>Jouw zoektocht</h2>
-        <div class="rg-stats-block" id="session-stats"></div>
-        <p class="rg-evil muted" id="evil-stat"></p>
-        <button type="button" class="rg-btn rg-btn-primary" data-go="swipe">Nog even doorzoeken? ↑</button>
-        <button type="button" class="rg-btn rg-btn-ghost" data-go="map">Bekijk op de kaart</button>
-      </section>
-
-      <!-- LANDLORD SETUP -->
-      <section class="rg-screen" data-screen="landlord-setup">
-        <button type="button" class="rg-back" data-back="home">← terug</button>
+      <div class="rg-landlord" id="landlord-panel" hidden>
+        <button type="button" class="rg-back" id="landlord-close">← terug</button>
         <h2>Verhuur je een woning?</h2>
-        <p class="rg-muted">Draai de lens om. Geen beschuldiging — alleen consequentie.</p>
         <label class="rg-field">
-          <span>Huurprijs per maand</span>
-          <div class="rg-input-wrap">
-            <span>€</span>
-            <input id="landlord-rent" type="number" inputmode="numeric" value="1450" min="300" step="50" />
-          </div>
+          <span>Huurprijs</span>
+          <div class="rg-input-wrap"><span>€</span><input id="landlord-rent" type="number" value="1450" step="50" /></div>
         </label>
         <label class="rg-field">
-          <span>Inkomenseis (× huur)</span>
+          <span>Inkomenseis</span>
           <select id="landlord-mult">
             <option value="3">3×</option>
             <option value="3.5">3,5×</option>
@@ -129,20 +55,36 @@
             <option value="4.5">4,5×</option>
           </select>
         </label>
-        <button type="button" class="rg-btn rg-btn-primary" id="landlord-calc">Bereken bereikbaarheid →</button>
-      </section>
+        <button type="button" class="rg-btn rg-btn-primary" id="landlord-calc">Bereken →</button>
+        <div id="landlord-result" class="rg-landlord-result"></div>
+      </div>
 
-      <!-- LANDLORD RESULT -->
-      <section class="rg-screen" data-screen="landlord-result">
-        <button type="button" class="rg-back" data-back="landlord-setup">← terug</button>
-        <h2>Dit is wat jouw eis betekent</h2>
-        <div class="rg-landlord-result" id="landlord-result"></div>
-        <p class="rg-tagline muted">Een woning kan beschikbaar zijn zonder bereikbaar te zijn.</p>
-        <button type="button" class="rg-btn rg-btn-ghost" data-go="home">Terug naar start</button>
-      </section>
+      <main class="rg-feed" id="feed" tabindex="0">
+        <p class="rg-feed-loading muted">Woningen laden…</p>
+      </main>
+
+      <nav class="rg-nav">
+        <button type="button" class="rg-nav-btn active" data-view="feed">Woningen</button>
+        <button type="button" class="rg-nav-btn" data-view="seekers">Je bent niet alleen</button>
+        <button type="button" class="rg-nav-btn" data-view="map" id="nav-map">Kaart</button>
+        <a class="rg-nav-btn" href="./index.html">Data</a>
+      </nav>
+
+      <div class="rg-map-overlay" id="map-overlay" hidden>
+        <div class="rg-map-head">
+          <button type="button" class="rg-back" id="map-close">← feed</button>
+          <div class="rg-map-toggle">
+            <button type="button" class="active" data-map-mode="all">Alles</button>
+            <button type="button" data-map-mode="yours">Jouw Eindhoven</button>
+          </div>
+        </div>
+        <div id="rg-map"></div>
+        <p class="rg-map-stats" id="map-stats"></p>
+      </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="./ruimte-gezocht.js?v=1"></script>
+    <script src="./geo-utils.js?v=2"></script>
+    <script src="./ruimte-gezocht.js?v=4"></script>
   </body>
 </html>

@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -196,6 +197,12 @@ def _write_outputs(payload: dict) -> None:
     Path("data").mkdir(exist_ok=True)
     (docs_data / "latest_listings.json").write_text(json.dumps(payload, indent=2, ensure_ascii=True), encoding="utf-8")
     (Path("data") / "latest_listings.json").write_text(json.dumps(payload, indent=2, ensure_ascii=True), encoding="utf-8")
+    cache_path = Path(os.getenv("GEOCODE_CACHE_PATH", "data/geocode_cache.json"))
+    if cache_path.exists():
+        try:
+            shutil.copy(cache_path, docs_data / "geocode_cache.json")
+        except OSError:
+            pass
 
 
 def _ensure_income_fields(item: dict) -> dict:

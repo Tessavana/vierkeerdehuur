@@ -473,77 +473,18 @@ function formatSeekerTime(iso) {
   return { relative, full };
 }
 
-function aloneCardHtml(p) {
-  const when = formatSeekerTime(p.posted_at);
-  const author = formatSeekerAuthor(p.author);
-  const sub = p.group_name || "Reddit";
-  const snippet =
-    p.snippet && p.snippet !== p.title
-      ? `<p class="alone-snippet">${p.snippet.slice(0, 280)}${p.snippet.length > 280 ? "…" : ""}</p>`
-      : "";
-  return `
-    <article class="alone-card">
-      <div class="alone-card-top">
-        <span class="seeker-source-dot seeker-source-reddit" aria-hidden="true"></span>
-        <span class="alone-sub">${sub}</span>
-        ${author ? `<span class="alone-author muted">${author}</span>` : ""}
-        ${when.relative ? `<span class="alone-time muted">${when.relative}</span>` : ""}
-      </div>
-      <h3 class="alone-title"><a href="${p.url}" target="_blank" rel="noopener noreferrer">${p.title || "—"}</a></h3>
-      ${snippet}
-    </article>`;
-}
-
-function renderAloneFeed(feed) {
-  const el = document.getElementById("alone-feed");
-  const subtitle = document.getElementById("alone-subtitle");
-  if (!el) return;
-
-  const reddit =
-    (feed && feed.reddit_posts && feed.reddit_posts.length
-      ? feed.reddit_posts
-      : (feed && feed.posts ? feed.posts.filter((p) => p.source === "reddit") : [])) || [];
-
-  const overview = feed && feed.reddit_overview;
-  const subs =
-    overview && overview.subreddits && overview.subreddits.length
-      ? overview.subreddits.join(" · ")
-      : overview && overview.subreddit
-        ? overview.subreddit
-        : "Reddit";
-
-  if (subtitle) {
-    subtitle.textContent =
-      reddit.length > 0
-        ? `${reddit.length} posts · ${subs} · hopeloos zoeken, tips, advies`
-        : "Geen recente Reddit-posts gevonden";
-  }
-
-  if (!reddit.length) {
-    el.innerHTML = `<div class="muted">Nog geen Reddit-posts in de feed. Volgende scan pakt r/eindhoven en r/NetherlandsHousing op.</div>`;
-    return;
-  }
-
-  el.innerHTML = reddit.map(aloneCardHtml).join("");
-}
-
-function renderRedditOverview(overview) {
-  /* reddit overview moved to Je bent niet alleen section */
-}
-
 function renderSeekersFeed(feed) {
   const el = document.getElementById("seekers-feed");
   const subtitle = document.getElementById("seekers-subtitle");
   if (!el) return;
-  renderAloneFeed(feed);
-  const posts = ((feed && feed.posts) || []).filter((p) => p.source !== "reddit");
+  const posts = (feed && feed.posts) || [];
   const sources = (feed && feed.sources_active) || [];
   const seenSet = loadSeenSeekers();
   if (subtitle) {
     const src = sources.length ? sources.join(" · ") : "—";
     const newCount = posts.filter((p) => !seenSet.has(seekerPostId(p))).length;
     const newLabel = newCount ? ` · ${newCount} nieuw` : "";
-    subtitle.textContent = `${posts.length} zoekers · bronnen: ${src}${newLabel} · zonder Reddit`;
+    subtitle.textContent = `${posts.length} zoekers · bronnen: ${src}${newLabel}`;
   }
   if (!posts.length) {
     el.innerHTML = `<div class="muted">Nog geen zoekers gevonden in Eindhoven. Reddit en Marktplaats worden elke scan bijgewerkt.</div>`;
@@ -587,7 +528,8 @@ async function loadRun() {
     updated.textContent = `Laatste update: ${new Date(data.generated_at_utc).toLocaleString("nl-NL")}`;
   }
   const subtitle = document.getElementById("results-subtitle");
-  const listings = data.listings || [];
+  const cache = await loadGeocodeCache();
+  const listings = attachResolvedCoords(data.listings || [], cache);
   if (subtitle) {
     subtitle.textContent = `${listings.length} match${listings.length === 1 ? "" : "es"} · nieuwste eerst · oranje pin = vandaag op platform`;
   }

@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vier keer de huur</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="./styles.css?v=20260823f" />
+    <link rel="stylesheet" href="./styles.css?v=20260823g" />
   </head>
   <body>
     <main class="container">
       <section class="hero">
         <div class="hero-top-right">
           <div class="last-updated" id="last-updated">Laatste update: —</div>
-          <a class="hero-mobile-link" href="./ruimte-gezocht.html">Ruimte Gezocht →</a>
         </div>
         <h1>Vier Keer de Huur</h1>
         <p class="hero-lead">
@@ -29,17 +28,11 @@
         </div>
       </section>
 
-      <section class="panel alone-section">
-        <h2>Je bent niet alleen</h2>
-        <p class="muted" id="alone-subtitle">Recent op Reddit · anderen die ook hopeloos zoeken, tips vragen, advies delen</p>
-        <div id="alone-feed" class="alone-feed"></div>
-      </section>
-
-      <section class="panel seekers-section">
-        <h2>Mensen die zoeken</h2>
-        <p class="muted" id="seekers-subtitle">Live feed · alleen zoekers in Eindhoven</p>
-        <div id="seekers-feed" class="seekers-feed"></div>
-      </section>
+      <a class="hero-mobile-banner" href="./ruimte-gezocht.html">
+        <span class="hero-mobile-banner-kicker">Twee kanten van dezelfde markt</span>
+        <span class="hero-mobile-banner-title">Swipe door Eindhoven · Ruimte Gezocht →</span>
+        <span class="hero-mobile-banner-sub">Filters, mini-kaart, inkomenseis — alles in je zak. Dit dashboard blijft je data-overzicht.</span>
+      </a>
 
       <section class="panel map-section">
         <h2>Matches op de kaart</h2>
@@ -67,6 +60,11 @@
       <section class="panel listings-panel">
         <h2>Matches binnen budget</h2>
         <p class="muted" id="results-subtitle">Nieuwste eerst · alleen woningen binnen je filters</p>
+        <div class="listings-feed-block">
+          <h3 class="listings-feed-heading">Live feed · zoekers</h3>
+          <p class="muted" id="seekers-subtitle">Zoekers in Eindhoven · alle bronnen</p>
+          <div id="seekers-feed" class="seekers-feed"></div>
+        </div>
         <div class="listings-table-wrap">
           <div class="listing-header listings-table-header">
             <div>Platform</div>
@@ -101,6 +99,7 @@
     </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="./app.js?v=20260823f"></script>
+    <script src="./geo-utils.js?v=2"></script>
+    <script src="./app.js?v=20260823g"></script>
   </body>
 </html>
