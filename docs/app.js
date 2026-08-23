@@ -108,7 +108,7 @@ function tagPassesFilter(listing) {
 function formatApplications(l) {
   if (l.application_count_label) return l.application_count_label;
   if (l.application_count != null) return String(l.application_count);
-  return "—";
+  return "-";
 }
 
 function applicationsClass(l) {
@@ -131,7 +131,7 @@ function formatIncomeRequirement(l) {
     const mult = Number(l.income_multiplier);
     return `${Number.isInteger(mult) ? mult : String(mult).replace(".", ",")}× huur`;
   }
-  return "—";
+  return "-";
 }
 
 function listingRow(l) {
@@ -191,11 +191,11 @@ function renderStats(stats, maxRent, listingsCount) {
       </div>
       <div class="market-metrics-grid">
         <div class="metric-mini"><span class="metric-mini-label">Nieuw vandaag</span><span class="metric-mini-val">${stats.new_on_platform_today ?? 0}</span></div>
-        <div class="metric-mini"><span class="metric-mini-label">Gem. huur (markt)</span><span class="metric-mini-val">${stats.avg_rent_all != null ? `€${stats.avg_rent_all}` : "—"}</span></div>
-        <div class="metric-mini"><span class="metric-mini-label">Mediaan (markt)</span><span class="metric-mini-val">${stats.median_rent_all != null ? `€${stats.median_rent_all}` : "—"}</span></div>
-        <div class="metric-mini"><span class="metric-mini-label">Gem. m²</span><span class="metric-mini-val">${stats.avg_size_m2 != null ? `${stats.avg_size_m2} m²` : "—"}</span></div>
-        <div class="metric-mini"><span class="metric-mini-label">€/m² (markt)</span><span class="metric-mini-val">${stats.avg_eur_per_m2 != null ? `€${stats.avg_eur_per_m2}` : "—"}</span></div>
-        <div class="metric-mini"><span class="metric-mini-label">Goedkoopste match</span><span class="metric-mini-val">${stats.cheapest_in_budget != null ? `€${stats.cheapest_in_budget}` : "—"}</span></div>
+        <div class="metric-mini"><span class="metric-mini-label">Gem. huur (markt)</span><span class="metric-mini-val">${stats.avg_rent_all != null ? `€${stats.avg_rent_all}` : "-"}</span></div>
+        <div class="metric-mini"><span class="metric-mini-label">Mediaan (markt)</span><span class="metric-mini-val">${stats.median_rent_all != null ? `€${stats.median_rent_all}` : "-"}</span></div>
+        <div class="metric-mini"><span class="metric-mini-label">Gem. m²</span><span class="metric-mini-val">${stats.avg_size_m2 != null ? `${stats.avg_size_m2} m²` : "-"}</span></div>
+        <div class="metric-mini"><span class="metric-mini-label">€/m² (markt)</span><span class="metric-mini-val">${stats.avg_eur_per_m2 != null ? `€${stats.avg_eur_per_m2}` : "-"}</span></div>
+        <div class="metric-mini"><span class="metric-mini-label">Goedkoopste match</span><span class="metric-mini-val">${stats.cheapest_in_budget != null ? `€${stats.cheapest_in_budget}` : "-"}</span></div>
         <div class="metric-mini metric-mini-wide outdoor-stat">
           <span class="outdoor-stat-num">${outdoorYes}</span>
           <span class="outdoor-stat-text">woningen gevonden met buitenruimte</span>
@@ -443,7 +443,7 @@ function seekerCardHtml(p, idx, seenSet) {
         ${when.relative ? `<span class="seeker-time" title="${when.full}">${when.relative}</span>` : ""}
       </div>
       ${when.full ? `<div class="seeker-datetime muted">${when.full}</div>` : ""}
-      <h3 class="seeker-title">${p.title || "—"}</h3>
+      <h3 class="seeker-title">${p.title || "?"}</h3>
       ${p.snippet && p.snippet !== p.title ? `<p class="seeker-snippet muted">${p.snippet.slice(0, 220)}${p.snippet.length > 220 ? "…" : ""}</p>` : ""}
       <div class="seeker-meta muted">${budget}${loc}</div>
       <a class="seeker-link" href="${p.url}" target="_blank" rel="noopener noreferrer">open bron →</a>
@@ -481,7 +481,7 @@ function renderSeekersFeed(feed) {
   const sources = (feed && feed.sources_active) || [];
   const seenSet = loadSeenSeekers();
   if (subtitle) {
-    const src = sources.length ? sources.join(" · ") : "—";
+    const src = sources.length ? sources.join(" · ") : "geen";
     const newCount = posts.filter((p) => !seenSet.has(seekerPostId(p))).length;
     const newLabel = newCount ? ` · ${newCount} nieuw` : "";
     subtitle.textContent = `${posts.length} zoekers · bronnen: ${src}${newLabel}`;
@@ -529,7 +529,7 @@ async function loadRun() {
   }
   const subtitle = document.getElementById("results-subtitle");
   const cache = await loadGeocodeCache();
-  const listings = attachResolvedCoords(data.listings || [], cache);
+  const listings = await attachResolvedCoordsAsync(data.listings || [], cache);
   if (subtitle) {
     subtitle.textContent = `${listings.length} match${listings.length === 1 ? "" : "es"} · nieuwste eerst · oranje pin = vandaag op platform`;
   }
@@ -549,7 +549,7 @@ setInterval(updateDeadlineRow, 1000);
 updateDeadlineRow();
 loadRun().catch((err) => {
   const headline = document.getElementById("headline-status");
-  if (headline) headline.textContent = `Status: woning gevonden via Facebook — met huisgenoot — site error: ${err}`;
+  if (headline) headline.textContent = `Status: woning gevonden via Facebook, met huisgenoot, site error: ${err}`;
 });
 
 window.addEventListener("resize", () => {

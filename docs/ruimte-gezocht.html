@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#171717" />
     <title>Ruimte Gezocht · Eindhoven</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="./ruimte-gezocht.css?v=4" />
+    <link rel="stylesheet" href="./ruimte-gezocht.css?v=5" />
   </head>
   <body>
     <div class="rg-app">
@@ -24,17 +24,37 @@
       </header>
 
       <div class="rg-filters" id="filter-panel" hidden>
+        <p class="rg-filters-intro">Stel je zoekprofiel in. Daarna zie je matches op de kaart.</p>
         <label class="rg-field">
           <span>Bruto per maand</span>
           <div class="rg-input-wrap"><span>€</span><input id="income" type="number" value="3500" step="100" /></div>
         </label>
         <label class="rg-field">
-          <span>Personen</span>
-          <input id="household" type="number" value="1" min="1" max="8" />
+          <span>Buitenruimte</span>
+          <select id="outdoor-filter">
+            <option value="any">Maakt niet uit</option>
+            <option value="yes">Ja, verplicht</option>
+            <option value="no">Nee / niet nodig</option>
+          </select>
         </label>
+        <div class="rg-field-row">
+          <label class="rg-field">
+            <span>Min. m²</span>
+            <input id="min-m2" type="number" value="0" min="0" step="5" placeholder="0" />
+          </label>
+          <label class="rg-field">
+            <span>Max. m²</span>
+            <input id="max-m2" type="number" value="0" min="0" step="5" placeholder="0" />
+          </label>
+        </div>
+        <div class="rg-field">
+          <span>Wijken in Eindhoven</span>
+          <p class="rg-field-hint muted">Niets aangevinkt = alle wijken</p>
+          <div id="wijk-filters" class="rg-wijk-filters"></div>
+        </div>
         <div class="rg-filter-actions">
-          <button type="button" class="rg-btn rg-btn-ghost" id="loc-btn">📍 Locatie</button>
-          <button type="button" class="rg-btn rg-btn-primary" id="apply-filters">Toepassen</button>
+          <button type="button" class="rg-btn rg-btn-ghost" id="loc-btn">Locatie</button>
+          <button type="button" class="rg-btn rg-btn-primary" id="apply-filters">Toon matches</button>
         </div>
         <button type="button" class="rg-link-btn" id="landlord-open">Verhuur je? Draai de lens om →</button>
       </div>
@@ -84,7 +104,7 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="./geo-utils.js?v=2"></script>
-    <script src="./ruimte-gezocht.js?v=4"></script>
+    <script src="./geo-utils.js?v=3"></script>
+    <script src="./ruimte-gezocht.js?v=5"></script>
   </body>
 </html>

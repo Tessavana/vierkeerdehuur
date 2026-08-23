@@ -97,6 +97,71 @@ html, body {
   color: #fff;
 }
 
+.rg-filters-intro {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.rg-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.rg-field-hint {
+  margin: 4px 0 8px;
+  font-size: 11px;
+}
+
+.rg-wijk-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.rg-wijk-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #fff;
+}
+
+.rg-wijk-chip input { accent-color: var(--fg); }
+
+.rg-welcome {
+  scroll-snap-align: start;
+  min-height: calc(100dvh - var(--bar-h) - var(--nav-h));
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.rg-welcome h2 { margin: 0 0 12px; font-size: 28px; }
+.rg-welcome p { margin: 0 0 10px; line-height: 1.5; }
+.rg-welcome-btn { margin-top: 20px; }
+
+.rg-nav-btn:disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.rg-btn-primary { background: #2d6a4f; border-color: #2d6a4f; color: #fff; }
+.rg-filter-btn[aria-expanded="true"] { background: #2d6a4f; border-color: #2d6a4f; color: #fff; }
+.rg-open-btn { background: #2d6a4f; border-color: #2d6a4f; }
+.rg-saved-btn.active { background: #2d6a4f; border-color: #2d6a4f; color: #fff; }
+
 .rg-filters {
   flex-shrink: 0;
   padding: 14px;

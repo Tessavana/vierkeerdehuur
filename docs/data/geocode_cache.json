@@ -1,0 +1,107 @@
+{
+ "https://rentfinder.nl/properties/te-huur-appartement-bomanshof-217-j-in-eindhoven-1": {
+  "lat": 51.431028,
+  "lon": 5.485014,
+  "wijk": "Oud-Stratum"
+ },
+ "https://rentfinder.nl/properties/te-huur-appartement-frederiklaan-in-eindhoven": {
+  "lat": 51.440492,
+  "lon": 5.466951,
+  "wijk": "Oud-Strijp"
+ },
+ "https://rentfinder.nl/properties/te-huur-appartement-geldropseweg-in-eindhoven-2": {
+  "lat": 51.433829,
+  "lon": 5.4886,
+  "wijk": "Oud-Stratum"
+ },
+ "https://rentfinder.nl/properties/te-huur-appartement-grote-berg-in-eindhoven": {
+  "lat": 51.435733,
+  "lon": 5.476034,
+  "wijk": "Centrum"
+ },
+ "https://rentfinder.nl/properties/te-huur-appartement-kathodelaan-in-eindhoven-1": {
+  "lat": 51.450277,
+  "lon": 5.442512,
+  "wijk": "Halve Maan"
+ },
+ "https://rentfinder.nl/properties/te-huur-appartement-nederlandplein-in-eindhoven-1": {
+  "lat": 51.478683,
+  "lon": 5.463832,
+  "wijk": "Aanschot"
+ },
+ "https://rentfinder.nl/properties/te-huur-appartement-spiraeastraat-in-eindhoven": {
+  "lat": 51.426677,
+  "lon": 5.491468,
+  "wijk": "Oud-Stratum"
+ },
+ "https://rentfinder.nl/properties/te-huur-appartement-tongelresestraat-in-eindhoven-1": {
+  "lat": 51.445724,
+  "lon": 5.514106,
+  "wijk": "Oud-Tongelre"
+ },
+ "https://rentfinder.nl/properties/te-huur-kamer-canadastraat-in-eindhoven-1": {
+  "lat": 51.448406,
+  "lon": 5.449288,
+  "wijk": "Halve Maan"
+ },
+ "https://rentfinder.nl/properties/te-huur-studio-bomanshof-in-eindhoven": {
+  "lat": 51.43136,
+  "lon": 5.48496,
+  "wijk": "Oud-Stratum"
+ },
+ "https://rentfinder.nl/properties/te-huur-studio-boutenslaan-in-eindhoven-1": {
+  "lat": 51.422756,
+  "lon": 5.473073,
+  "wijk": "Oud-Gestel"
+ },
+ "https://rentfinder.nl/properties/te-huur-studio-demer-in-eindhoven": {
+  "lat": 51.441073,
+  "lon": 5.477006,
+  "wijk": "Centrum"
+ },
+ "https://rentfinder.nl/properties/te-huur-studio-nieuwstraat-in-eindhoven": {
+  "lat": 51.440404,
+  "lon": 5.479215,
+  "wijk": "Centrum"
+ },
+ "https://vbtverhuurmakelaars.nl/woning/Eindhoven-Frits-Philipslaan-40/": {
+  "lat": 51.442563,
+  "lon": 5.466063,
+  "wijk": "Oud-Strijp"
+ },
+ "https://www.huurwoningen.com/huren/eindhoven/09521c29/nieuwstraat/": {
+  "lat": 51.440222,
+  "lon": 5.479084,
+  "wijk": ""
+ },
+ "https://www.huurwoningen.com/huren/eindhoven/4174c5b4/hulstlaan/": {
+  "lat": 51.440957,
+  "lon": 5.464779,
+  "wijk": ""
+ },
+ "https://www.huurwoningen.com/huren/eindhoven/95b3026a/demer/": {
+  "lat": 51.440263,
+  "lon": 5.47707,
+  "wijk": ""
+ },
+ "https://www.huurwoningen.com/huren/eindhoven/b2b66e4c/sophia-van-wurtemberglaan/": {
+  "lat": 51.435764,
+  "lon": 5.465583,
+  "wijk": ""
+ },
+ "https://www.huurwoningen.com/huren/eindhoven/bde74541/frits-philipslaan/": {
+  "lat": 51.442284,
+  "lon": 5.465716,
+  "wijk": ""
+ },
+ "https://www.huurwoningen.com/huren/eindhoven/c34abbc1/bomanshof/": {
+  "lat": 51.431522,
+  "lon": 5.484594,
+  "wijk": ""
+ },
+ "https://www.huurwoningen.com/huren/eindhoven/dbf826d1/bomanshof/": {
+  "lat": 51.431522,
+  "lon": 5.484594,
+  "wijk": ""
+ }
+}

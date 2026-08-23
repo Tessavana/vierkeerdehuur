@@ -1,8 +1,9 @@
-/* Ruimte Gezocht — TikTok-style scroll feed */
+/* Ruimte Gezocht: TikTok-style scroll feed */
 
 const DEFAULT_MULT = 3.5;
 const INCOME_SAMPLES = [2400, 2800, 3200, 3500, 3800, 4200, 4500, 5000, 5500, 6000, 7000, 8500];
 const ACTIONS_KEY = "rg_listing_actions_v1";
+const FILTERS_DONE_KEY = "rg_filters_done_v1";
 
 const state = {
   listings: [],
@@ -18,13 +19,19 @@ const state = {
   miniMaps: new Map(),
   currentView: "feed",
   hidePassed: true,
+  filtersReady: false,
+  filters: { outdoor: "any", minM2: 0, maxM2: 0, wijken: new Set() },
 };
 function $(sel) {
   return document.querySelector(sel);
 }
 
+function emptyVal() {
+  return "";
+}
+
 function formatEur(n) {
-  if (n == null || Number.isNaN(n)) return "—";
+  if (n == null || Number.isNaN(n)) return emptyVal();
   return `€${Math.round(n).toLocaleString("nl-NL")}`;
 }
 
@@ -39,7 +46,7 @@ function haversineKm(lat1, lon1, lat2, lon2) {
 }
 
 function formatDist(km) {
-  if (km == null) return "—";
+  if (km == null) return emptyVal();
   if (km < 1) return `${Math.round(km * 1000)} m`;
   return `${km.toFixed(1).replace(".", ",")} km`;
 }
@@ -54,17 +61,17 @@ function formatIncome(l) {
   }
   if (l.income_required_eur != null) return formatEur(l.income_required_eur);
   if (l.rent_eur != null) return `~${formatEur(Math.round(l.rent_eur * DEFAULT_MULT))}`;
-  return "—";
+  return emptyVal();
 }
 
 function formatApps(l) {
   if (l.application_count_label) return l.application_count_label;
   if (l.application_count != null) return String(l.application_count);
-  return "—";
+  return emptyVal();
 }
 
 function formatAvail(raw) {
-  if (!raw) return "—";
+  if (!raw) return emptyVal();
   const d = new Date(raw);
   if (!Number.isNaN(d.getTime()) && raw.match(/^\d{4}/)) {
     return d.toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
@@ -132,14 +139,17 @@ function updateSavedBadge() {
 }
 
 function listingsForView(view) {
-  const enriched = state.rawListings.map(enrichListing);
+  let list = applyListingFilters(state.rawListings).map(enrichListing);
   if (view === "saved") {
     const actions = loadActions();
-    return enriched.filter((l) => l.url && actions[l.url]?.status === "interested");
+    return list.filter((l) => l.url && actions[l.url]?.status === "interested");
   }
   if (state.hidePassed) {
-    return enriched.filter((l) => !l.url || listingAction(l.url) !== "passed");
+    list = list.filter((l) => !l.url || listingAction(l.url) !== "passed");
   }
+  return list;
+}
+
 function enrichListing(l) {
   const lat = l.map_lat;
   const lon = l.map_lon;
@@ -150,8 +160,8 @@ function enrichListing(l) {
 
 function slideHtml(l, idx, total) {
   const wijk = (l.neighborhood || "Eindhoven").toUpperCase();
-  const platform = l.platform || l.source || "—";
-  const tag = l.match_tag || "—";
+  const platform = l.platform || l.source || "?";
+  const tag = l.match_tag || "?";
   const aff = l.aff;
   const action = listingAction(l.url);
   const slideClass = ["rg-slide", aff.status, action === "interested" ? "interested" : "", action === "passed" ? "passed" : ""]
@@ -177,7 +187,7 @@ function slideHtml(l, idx, total) {
         <dt>Tag</dt><dd>${tag}</dd>
         <dt>Vereist</dt><dd>${aff.req.amount != null ? formatEur(aff.req.amount) : "onbekend"}</dd>
       </dl>
-      <h3 class="rg-slide-title">${l.title || "—"}</h3>
+      <h3 class="rg-slide-title">${l.title || "?"}</h3>
       <div class="rg-slide-actions">
         <button type="button" class="rg-action-btn interested${interestedActive}" data-action="interested">♥ Interessant</button>
         <button type="button" class="rg-action-btn passed${passedActive}" data-action="passed">✕ Skip</button>
@@ -202,16 +212,87 @@ function seekerHtml(p) {
         <span class="${kindClass}">${kindLabel}</span>
         <span class="rg-slide-platform">${src}</span>
       </div>
-      <h3 class="rg-slide-title">${p.title || "—"}</h3>
+      <h3 class="rg-slide-title">${p.title || "?"}</h3>
       ${p.snippet && p.snippet !== p.title ? `<p class="rg-seeker-snippet">${p.snippet.slice(0, 220)}${p.snippet.length > 220 ? "…" : ""}</p>` : ""}
       ${when || budget || loc ? `<p class="rg-slide-meta">${when}${budget}${loc}</p>` : ""}
       <a class="rg-open-btn" href="${p.url}" target="_blank" rel="noopener noreferrer">Open post →</a>
     </article>`;
 }
 
+function applyListingFilters(listings) {
+  const { outdoor, minM2, maxM2, wijken } = state.filters;
+  return listings.filter((l) => {
+    if (outdoor === "yes" && !l.outdoor_space) return false;
+    if (outdoor === "no" && l.outdoor_space) return false;
+    const m2 = l.size_m2 != null ? Number(l.size_m2) : null;
+    if (minM2 > 0 && (m2 == null || m2 < minM2)) return false;
+    if (maxM2 > 0 && (m2 == null || m2 > maxM2)) return false;
+    if (wijken.size > 0) {
+      const w = (l.neighborhood || "").toLowerCase();
+      const ok = [...wijken].some((wk) => w.includes(wk.toLowerCase()) || wk.toLowerCase().includes(w));
+      if (!ok) return false;
+    }
+    return true;
+  });
+}
+
+function collectWijken(listings) {
+  const set = new Set();
+  for (const l of listings) {
+    const w = (l.neighborhood || "").trim();
+    if (w) set.add(w);
+  }
+  return [...set].sort((a, b) => a.localeCompare(b, "nl"));
+}
+
+function renderWijkFilters() {
+  const wrap = $("#wijk-filters");
+  if (!wrap) return;
+  const wijken = collectWijken(state.rawListings);
+  if (!wijken.length) {
+    wrap.innerHTML = `<p class="muted">Wijken verschijnen na laden.</p>`;
+    return;
+  }
+  wrap.innerHTML = wijken
+    .map(
+      (w) =>
+        `<label class="rg-wijk-chip"><input type="checkbox" value="${w}" ${state.filters.wijken.has(w) ? "checked" : ""} /><span>${w}</span></label>`
+    )
+    .join("");
+}
+
+function readFiltersFromForm() {
+  state.userIncome = parseInt($("#income").value, 10) || 3500;
+  state.filters.outdoor = $("#outdoor-filter")?.value || "any";
+  state.filters.minM2 = parseInt($("#min-m2")?.value, 10) || 0;
+  state.filters.maxM2 = parseInt($("#max-m2")?.value, 10) || 0;
+  state.filters.wijken = new Set();
+  document.querySelectorAll("#wijk-filters input:checked").forEach((el) => state.filters.wijken.add(el.value));
+}
+
+function showWelcomeScreen() {
+  const feed = $("#feed");
+  if (!feed) return;
+  feed.innerHTML = `
+    <div class="rg-welcome">
+      <h2>Welkom</h2>
+      <p>Stel eerst je filters in: inkomen, buitenruimte, m² en wijken.</p>
+      <p class="muted">Daarna zie je matches, mini-kaart en je shortlist.</p>
+      <button type="button" class="rg-btn rg-btn-primary rg-welcome-btn" id="welcome-open-filters">Filters instellen</button>
+    </div>`;
+  $("#welcome-open-filters")?.addEventListener("click", () => {
+    $("#filter-panel").hidden = false;
+    $("#filter-toggle").setAttribute("aria-expanded", "true");
+  });
+}
+
 function renderFeed(view) {
   const feed = $("#feed");
   if (!feed) return;
+  if (!state.filtersReady) {
+    showWelcomeScreen();
+    return;
+  }
   const mode = view || state.currentView;
   state.listings = listingsForView(mode === "saved" ? "saved" : "feed");
   state.miniMaps.clear();
@@ -285,11 +366,17 @@ function initMiniMapsObserver() {
 }
 
 function applyFilters() {
-  state.userIncome = parseInt($("#income").value, 10) || 3500;
+  readFiltersFromForm();
+  state.filtersReady = true;
+  localStorage.setItem(FILTERS_DONE_KEY, "1");
   state.miniMaps.clear();
-  renderFeed(state.currentView);
   $("#filter-panel").hidden = true;
   $("#filter-toggle").setAttribute("aria-expanded", "false");
+  document.querySelectorAll(".rg-nav-btn[data-view]").forEach((b) => {
+    b.disabled = false;
+  });
+  renderFeed(state.currentView === "seekers" ? "feed" : state.currentView);
+  if (state.currentView === "map" || state.map) refreshBigMap();
 }
 
 function toggleFilters() {
@@ -363,10 +450,11 @@ function calcLandlord() {
     <div class="big">${formatEur(required)}</div>
     <p>≈ ${formatEur(required * 12)} per jaar</p>
     <p style="margin-top:16px">Bereikbaar voor <span class="pct">${pct}%</span> van representatieve zoekers.</p>
-    <p class="muted">Dit is wat jouw eis betekent — geen beschuldiging.</p>`;
+    <p class="muted">Dit is wat jouw eis betekent, geen beschuldiging.</p>`;
 }
 
 function setView(view) {
+  if (!state.filtersReady && view !== "feed") return;
   state.currentView = view;
   document.querySelectorAll(".rg-nav-btn[data-view]").forEach((b) => {
     b.classList.toggle("active", view !== "saved" && b.dataset.view === view);
@@ -374,8 +462,8 @@ function setView(view) {
   const tagline = $(".rg-tagline");
   if (tagline) {
     const labels = {
-      seekers: "Je bent niet alleen — zelfde live feed als het dashboard",
-      saved: `${interestedCount()} opgeslagen · jouw shortlist`,
+      seekers: "Je bent niet alleen, zelfde live feed als het dashboard",
+      saved: `${interestedCount()} opgeslagen, jouw shortlist`,
       feed: "Hoeveel Eindhoven blijft er voor jou over?",
     };
     if (labels[view]) tagline.textContent = labels[view];
@@ -398,7 +486,7 @@ async function loadAll() {
     const res = await fetch("./data/latest_listings.json", { cache: "no-store" });
     const data = await res.json();
     const raw = data.listings || [];
-    state.rawListings = attachResolvedCoords(raw, cache);
+    state.rawListings = await attachResolvedCoordsAsync(raw, cache);
   } catch {
     state.rawListings = [];
   }
@@ -411,9 +499,19 @@ async function loadAll() {
   } catch {
     state.seekers = [];
   }
-  state.listings = listingsForView("feed");
+  renderWijkFilters();
   updateSavedBadge();
-  renderFeed("feed");
+  state.filtersReady = localStorage.getItem(FILTERS_DONE_KEY) === "1";
+  if (!state.filtersReady) {
+    $("#filter-panel").hidden = false;
+    $("#filter-toggle").setAttribute("aria-expanded", "true");
+    document.querySelectorAll(".rg-nav-btn[data-view]").forEach((b) => {
+      if (b.dataset.view !== "feed") b.disabled = true;
+    });
+    showWelcomeScreen();
+  } else {
+    renderFeed("feed");
+  }
 }
 
 function bindEvents() {

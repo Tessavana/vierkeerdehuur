@@ -1,38 +1,45 @@
-/** Client-side coords: geocode cache + postcode centroids (Eindhoven). */
+/** Geocoding via PDOK + cache. Eindhoven-only coords. */
 const EINDHOVEN_CENTER = { lat: 51.4416, lon: 5.4697 };
+const EINDHOVEN_BBOX = { minLat: 51.39, maxLat: 51.52, minLon: 5.39, maxLon: 5.58 };
+const PDOK_FREE = "https://api.pdok.nl/bzk/locatieserver/search/v3_1/free";
+const CLIENT_CACHE_KEY = "housing_geocode_client_v1";
 
-const POSTCODE_CENTER = {
-  5611: [51.441, 5.479],
-  5612: [51.438, 5.482],
-  5613: [51.448, 5.453],
-  5614: [51.451, 5.441],
-  5615: [51.455, 5.435],
-  5616: [51.422, 5.497],
-  5621: [51.452, 5.468],
-  5622: [51.456, 5.472],
-  5623: [51.459, 5.476],
-  5625: [51.463, 5.481],
-  5626: [51.467, 5.485],
-  5627: [51.471, 5.489],
-  5628: [51.475, 5.493],
-  5631: [51.479, 5.497],
-  5632: [51.483, 5.501],
-  5633: [51.487, 5.505],
-  5641: [51.432, 5.512],
-  5642: [51.428, 5.516],
-  5643: [51.424, 5.520],
-  5644: [51.420, 5.524],
-  5645: [51.416, 5.528],
-  5646: [51.412, 5.532],
-  5651: [51.448, 5.432],
-  5652: [51.444, 5.428],
-  5653: [51.440, 5.424],
-  5654: [51.436, 5.420],
-  5655: [51.432, 5.416],
-  5656: [51.428, 5.412],
-  5657: [51.424, 5.408],
-  5658: [51.420, 5.404],
+const POSTCODE_WIJK = {
+  5611: "Woensel",
+  5612: "Woensel",
+  5613: "Strijp",
+  5614: "Strijp",
+  5615: "Strijp",
+  5616: "Gestel",
+  5621: "Woensel",
+  5622: "Woensel",
+  5623: "Woensel",
+  5625: "Woensel",
+  5626: "Woensel",
+  5627: "Woensel",
+  5628: "Woensel",
+  5631: "Woensel",
+  5632: "Woensel",
+  5633: "Woensel",
+  5641: "Tongelre",
+  5642: "Tongelre",
+  5643: "Tongelre",
+  5644: "Tongelre",
+  5645: "Tongelre",
+  5646: "Tongelre",
+  5651: "Woensel",
+  5652: "Woensel",
+  5653: "Woensel",
+  5654: "Woensel",
+  5655: "Woensel",
+  5656: "Woensel",
+  5657: "Woensel",
+  5658: "Woensel",
 };
+
+function emptyVal() {
+  return "";
+}
 
 function hashStr(s) {
   let h = 0;
@@ -49,6 +56,40 @@ function isCityCenter(lat, lon) {
   return Math.abs(lat - EINDHOVEN_CENTER.lat) < 0.0005 && Math.abs(lon - EINDHOVEN_CENTER.lon) < 0.0005;
 }
 
+function inEindhoven(lat, lon) {
+  return lat >= EINDHOVEN_BBOX.minLat && lat <= EINDHOVEN_BBOX.maxLat && lon >= EINDHOVEN_BBOX.minLon && lon <= EINDHOVEN_BBOX.maxLon;
+}
+
+function parseStreet(listing) {
+  const blob = `${listing.location || ""} ${listing.title || ""} ${(listing.notes || "").slice(0, 800)}`;
+  const loc = (listing.location || "").trim();
+  const title = (listing.title || "").trim();
+  const pc = extractPostcode(blob);
+
+  for (const raw of [loc, title.replace(/\s+(in|te huur).*$/i, "").trim(), title]) {
+    if (!raw) continue;
+    const cleaned = raw.replace(/^Te huur\s+\w+\s+/i, "").replace(/\s+in Eindhoven.*$/i, "").trim();
+    const m = cleaned.match(/^([A-Za-zÀ-ÿ\s.'-]+?)\s+(\d+[A-Za-z0-9\-]*(?:\s*[-/]\s*\d+[A-Za-z0-9\-]*)?)\b/);
+    if (m) return { street: m[1].trim(), number: m[2].replace(/\s/g, ""), pc };
+    const parts = cleaned.split(",");
+    const head = parts[0].trim();
+    if (head && !/\d/.test(head)) return { street: head, number: "", pc };
+  }
+  return { street: "", number: "", pc };
+}
+
+function coordsFromDoc(doc) {
+  const c = doc.centroide_ll || "";
+  const m = c.match(/POINT\(([-\d.]+)\s+([-\d.]+)\)/);
+  if (!m) return null;
+  const lon = parseFloat(m[1]);
+  const lat = parseFloat(m[2]);
+  if (!inEindhoven(lat, lon)) return null;
+  const wijk = (doc.wijknaam || doc.buurtnaam || "").trim();
+  const pc = (doc.postcode || "").slice(0, 4);
+  return { lat, lon, wijk: wijk || POSTCODE_WIJK[pc] || "" };
+}
+
 function jitterFromUrl(url, lat, lon) {
   const h = hashStr(url || "x");
   const a = (h % 1000) / 80000;
@@ -56,32 +97,93 @@ function jitterFromUrl(url, lat, lon) {
   return { lat: lat + a - 0.006, lon: lon + b - 0.006 };
 }
 
+function loadClientCache() {
+  try {
+    return JSON.parse(localStorage.getItem(CLIENT_CACHE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveClientCacheEntry(url, entry) {
+  if (!url) return;
+  const c = loadClientCache();
+  c[url] = entry;
+  localStorage.setItem(CLIENT_CACHE_KEY, JSON.stringify(c));
+}
+
+async function queryPdok(q, adresOnly) {
+  const params = new URLSearchParams({ q, rows: "3", fq: "gemeentenaam:Eindhoven" });
+  if (adresOnly) params.set("fq", "type:adres AND gemeentenaam:Eindhoven");
+  const res = await fetch(`${PDOK_FREE}?${params}`);
+  if (!res.ok) return null;
+  const data = await res.json();
+  const docs = data.response?.docs || [];
+  for (const doc of docs) {
+    if (adresOnly && doc.type !== "adres" && doc.type !== "postcode" && doc.type !== "weg") continue;
+    const c = coordsFromDoc(doc);
+    if (c) return c;
+  }
+  return null;
+}
+
+function buildQueries(listing) {
+  const { street, number, pc } = parseStreet(listing);
+  const qs = [];
+  if (street && number && pc) qs.push({ q: `${street} ${number}, ${pc.slice(0, 4)} ${pc.slice(4)}, Eindhoven`, strict: true });
+  if (street && pc) qs.push({ q: `${street}, ${pc.slice(0, 4)} ${pc.slice(4)}, Eindhoven`, strict: false });
+  if (street) qs.push({ q: `${street}, Eindhoven`, strict: false });
+  if (pc) qs.push({ q: `${pc.slice(0, 4)} ${pc.slice(4)}, Eindhoven`, strict: false });
+  return qs;
+}
+
 function resolveListingCoords(listing, cache) {
   const url = listing.url || "";
-  if (cache && url && cache[url] && cache[url].lat != null) {
-    return { lat: cache[url].lat, lon: cache[url].lon, wijk: cache[url].wijk || "" };
+  const merged = { ...(cache || {}), ...loadClientCache() };
+  if (url && merged[url]?.lat != null && inEindhoven(merged[url].lat, merged[url].lon)) {
+    return { lat: merged[url].lat, lon: merged[url].lon, wijk: merged[url].wijk || "" };
   }
 
   let lat = listing.map_lat;
   let lon = listing.map_lon;
-  if (lat != null && lon != null && !isCityCenter(lat, lon)) {
+  if (lat != null && lon != null && !isCityCenter(lat, lon) && inEindhoven(lat, lon)) {
     return { lat, lon, wijk: listing.neighborhood || "" };
   }
 
-  const blob = `${listing.title || ""} ${listing.location || ""} ${listing.notes || ""}`;
-  const pc = extractPostcode(blob);
-  if (pc) {
-    const prefix = parseInt(pc.slice(0, 4), 10);
-    const center = POSTCODE_CENTER[prefix];
-    if (center) {
-      const j = jitterFromUrl(url || blob, center[0], center[1]);
-      return { lat: j.lat, lon: j.lon, wijk: listing.neighborhood || "" };
+  return null;
+}
+
+async function geocodeListing(listing, cache) {
+  const existing = resolveListingCoords(listing, cache);
+  if (existing) return existing;
+
+  const url = listing.url || "";
+  for (const { q, strict } of buildQueries(listing)) {
+    try {
+      const hit = await queryPdok(q, strict);
+      if (hit) {
+        if (url) saveClientCacheEntry(url, hit);
+        return hit;
+      }
+    } catch {
+      /* next query */
     }
+    await new Promise((r) => setTimeout(r, 120));
   }
 
-  if (lat != null && lon != null) {
-    const j = jitterFromUrl(url, lat, lon);
-    return { lat: j.lat, lon: j.lon, wijk: listing.neighborhood || "" };
+  const { pc } = parseStreet(listing);
+  if (pc) {
+    try {
+      const hit = await queryPdok(`${pc.slice(0, 4)} ${pc.slice(4)}, Eindhoven`, false);
+      if (hit) {
+        const j = jitterFromUrl(url, hit.lat, hit.lon);
+        const out = { lat: j.lat, lon: j.lon, wijk: hit.wijk || POSTCODE_WIJK[parseInt(pc.slice(0, 4), 10)] || "" };
+        if (url) saveClientCacheEntry(url, out);
+        return out;
+      }
+    } catch {
+      /* fallback below */
+    }
   }
 
   const j = jitterFromUrl(url, EINDHOVEN_CENTER.lat, EINDHOVEN_CENTER.lon);
@@ -102,6 +204,23 @@ function loadGeocodeCache() {
 function attachResolvedCoords(listings, cache) {
   return listings.map((l) => {
     const c = resolveListingCoords(l, cache);
-    return { ...l, map_lat: c.lat, map_lon: c.lon, neighborhood: l.neighborhood || c.wijk || l.neighborhood };
+    if (c) {
+      return { ...l, map_lat: c.lat, map_lon: c.lon, neighborhood: l.neighborhood || c.wijk || l.neighborhood };
+    }
+    return { ...l };
   });
+}
+
+async function attachResolvedCoordsAsync(listings, cache) {
+  const out = [];
+  for (const l of listings) {
+    const c = resolveListingCoords(l, cache) || (await geocodeListing(l, cache));
+    out.push({
+      ...l,
+      map_lat: c.lat,
+      map_lon: c.lon,
+      neighborhood: l.neighborhood || c.wijk || l.neighborhood,
+    });
+  }
+  return out;
 }
