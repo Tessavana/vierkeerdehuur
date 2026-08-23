@@ -1,4 +1,4 @@
-/* Ruimte Gezocht: TikTok-style scroll feed */
+/* Ruimte Gezocht: TikTok-style housing feed + standard tab navigation */
 
 const DEFAULT_MULT = 3.5;
 const INCOME_SAMPLES = [2400, 2800, 3200, 3500, 3800, 4200, 4500, 5000, 5500, 6000, 7000, 8500];
@@ -16,12 +16,13 @@ const state = {
   map: null,
   mapLayer: null,
   miniMaps: new Map(),
-  currentView: "feed",
-  displayMode: "feed",
+  currentTab: "feed",
+  feedMode: "feed",
   hidePassed: true,
   filtersReady: false,
   filters: { outdoor: "any", minM2: 0, maxM2: 0, wijken: new Set() },
 };
+
 function $(sel) {
   return document.querySelector(sel);
 }
@@ -139,8 +140,20 @@ function updateSavedBadge() {
   const n = interestedCount();
   if (countEl) countEl.textContent = String(n);
   if (btn) {
-    btn.hidden = n === 0 && state.currentView !== "saved";
-    btn.classList.toggle("active", state.currentView === "saved");
+    btn.hidden = n === 0 && state.feedMode !== "saved";
+    btn.classList.toggle("active", state.feedMode === "saved");
+  }
+}
+
+function updateSeekersBadge() {
+  const badge = $("#seekers-badge");
+  if (!badge) return;
+  const n = state.seekers.length;
+  if (n > 0) {
+    badge.hidden = false;
+    badge.textContent = n > 99 ? "99+" : String(n);
+  } else {
+    badge.hidden = true;
   }
 }
 
@@ -204,7 +217,7 @@ function slideHtml(l, idx, total) {
     </article>`;
 }
 
-function seekerHtml(p) {
+function seekerCardHtml(p) {
   const kind = p.kind || "unknown";
   const kindLabel = kind === "seeking" ? "zoekt" : kind === "offering" ? "biedt" : "bericht";
   const kindClass =
@@ -213,17 +226,20 @@ function seekerHtml(p) {
   const budget = p.budget_eur ? ` · max €${p.budget_eur}` : "";
   const loc = p.location_hint ? ` · ${p.location_hint}` : "";
   const src = p.source === "reddit" && p.group_name ? p.group_name : p.source || "";
+  const snippet =
+    p.snippet && p.snippet !== p.title
+      ? `<p class="rg-seeker-card-snippet">${p.snippet.slice(0, 200)}${p.snippet.length > 200 ? "…" : ""}</p>`
+      : "";
   return `
-    <article class="rg-slide rg-slide-seeker">
-      <div class="rg-slide-top">
+    <a class="rg-seeker-card" href="${p.url}" target="_blank" rel="noopener noreferrer">
+      <div class="rg-seeker-card-top">
         <span class="${kindClass}">${kindLabel}</span>
         <span class="rg-slide-platform">${src}</span>
       </div>
-      <h3 class="rg-slide-title">${p.title || "?"}</h3>
-      ${p.snippet && p.snippet !== p.title ? `<p class="rg-seeker-snippet">${p.snippet.slice(0, 220)}${p.snippet.length > 220 ? "…" : ""}</p>` : ""}
-      ${when || budget || loc ? `<p class="rg-slide-meta">${when}${budget}${loc}</p>` : ""}
-      <a class="rg-open-btn" href="${p.url}" target="_blank" rel="noopener noreferrer">Open post →</a>
-    </article>`;
+      <h3 class="rg-seeker-card-title">${p.title || "?"}</h3>
+      ${snippet}
+      ${when || budget || loc ? `<p class="rg-seeker-card-meta">${when}${budget}${loc}</p>` : ""}
+    </a>`;
 }
 
 function applyListingFilters(listings) {
@@ -261,13 +277,13 @@ function readFiltersFromForm() {
 }
 
 function showWelcomeScreen() {
-  const feed = $("#feed");
+  const feed = $("#feed-panel");
   if (!feed) return;
   feed.innerHTML = `
     <div class="rg-welcome">
       <h2>Welkom</h2>
       <p>Stel eerst je filters in: inkomen, buitenruimte, m² en stadsdeel.</p>
-      <p class="muted">Daarna zie je alleen woningen waar je op mag reageren.</p>
+      <p class="muted">Daarna swipe je door woningen waar je op mag reageren.</p>
       <button type="button" class="rg-btn rg-btn-primary rg-welcome-btn" id="welcome-open-filters">Filters instellen</button>
     </div>`;
   $("#welcome-open-filters")?.addEventListener("click", () => {
@@ -276,28 +292,32 @@ function showWelcomeScreen() {
   });
 }
 
-function updateModeToggle() {
-  const toggle = $("#mode-toggle");
-  if (!toggle) return;
-  toggle.hidden = !state.filtersReady || state.currentView === "seekers";
-  document.querySelectorAll(".rg-mode-btn").forEach((b) => {
-    b.disabled = !state.filtersReady;
+function updateChrome() {
+  const filterBtn = $("#filter-toggle");
+  if (filterBtn) {
+    const showFilters = state.currentTab === "feed" && state.filtersReady;
+    filterBtn.hidden = !showFilters;
+  }
+  document.querySelectorAll(".rg-tab-btn[data-tab]").forEach((btn) => {
+    const tab = btn.dataset.tab;
+    const needsFilters = tab === "feed" || tab === "map";
+    btn.disabled = needsFilters && !state.filtersReady;
   });
+  updateSeekersBadge();
 }
 
-function renderFeed(view) {
-  const feed = $("#feed");
+function renderFeed() {
+  const feed = $("#feed-panel");
   if (!feed) return;
   if (!state.filtersReady) {
     showWelcomeScreen();
     return;
   }
-  const mode = view || state.currentView;
-  state.listings = listingsForView(mode === "saved" ? "saved" : "feed");
+  state.listings = listingsForView(state.feedMode === "saved" ? "saved" : "feed");
   state.miniMaps.clear();
   if (!state.listings.length) {
     feed.innerHTML =
-      mode === "saved"
+      state.feedMode === "saved"
         ? `<p class="rg-feed-loading muted">Nog niets opgeslagen. Tik ♥ Interessant op een woning.</p>`
         : `<p class="rg-feed-loading muted">Geen woningen binnen bereik met deze filters.</p>`;
     updateSavedBadge();
@@ -309,34 +329,43 @@ function renderFeed(view) {
   updateSavedBadge();
 }
 
+function renderSeekersPanel() {
+  const list = $("#seekers-list");
+  const subline = $("#seekers-subline");
+  if (!list) return;
+  const seeking = state.seekers.filter((p) => p.kind === "seeking" || p.kind === "unknown");
+  if (subline) {
+    subline.textContent =
+      seeking.length > 0
+        ? `${seeking.length} berichten · live van Reddit & Marktplaats`
+        : "Anderen zoeken ook in Eindhoven";
+  }
+  if (!state.seekers.length) {
+    list.innerHTML = `<p class="rg-feed-loading muted">Nog geen zoekers in de feed.</p>`;
+    return;
+  }
+  list.innerHTML = state.seekers.map(seekerCardHtml).join("");
+}
+
 function handleListingAction(url, action) {
   const current = listingAction(url);
   const next = current === action ? null : action;
   setListingAction(url, next);
-  if (state.currentView === "feed" && next === "passed" && state.hidePassed) {
+  if (state.feedMode === "feed" && next === "passed" && state.hidePassed) {
     const slide = document.querySelector(`.rg-slide[data-url="${CSS.escape(url)}"]`);
     if (slide) {
       slide.style.transition = "opacity 0.25s, transform 0.25s";
       slide.style.opacity = "0";
       slide.style.transform = "translateX(-20px)";
       setTimeout(() => {
-        renderFeed("feed");
+        renderFeed();
+        if (state.currentTab === "map") refreshBigMap();
       }, 260);
       return;
     }
   }
-  renderFeed(state.currentView);
-  if (state.displayMode === "map") refreshBigMap();
-}
-
-function renderSeekersFeed() {
-  const feed = $("#feed");
-  if (!feed) return;
-  if (!state.seekers.length) {
-    feed.innerHTML = `<p class="rg-feed-loading muted">Nog geen zoekers in de feed.</p>`;
-    return;
-  }
-  feed.innerHTML = state.seekers.map(seekerHtml).join("");
+  renderFeed();
+  if (state.currentTab === "map") refreshBigMap();
 }
 
 function initMiniMapsObserver() {
@@ -361,7 +390,7 @@ function initMiniMapsObserver() {
         setTimeout(() => map.invalidateSize(), 100);
       });
     },
-    { root: $("#feed"), threshold: 0.3 }
+    { root: $("#feed-panel"), threshold: 0.3 }
   );
   document.querySelectorAll(".rg-mini-map").forEach((el) => obs.observe(el));
 }
@@ -373,30 +402,8 @@ function applyFilters() {
   state.miniMaps.clear();
   $("#filter-panel").hidden = true;
   $("#filter-toggle").setAttribute("aria-expanded", "false");
-  document.querySelectorAll(".rg-nav-btn[data-view]").forEach((b) => {
-    b.disabled = false;
-  });
-  renderFeed(state.currentView === "seekers" ? "feed" : state.currentView);
-  if (state.displayMode === "map" || state.map) refreshBigMap();
-  updateModeToggle();
-}
-
-function setDisplayMode(mode) {
-  state.displayMode = mode;
-  document.querySelectorAll(".rg-mode-btn").forEach((b) => {
-    b.classList.toggle("active", b.dataset.view === mode);
-  });
-  const feedEl = $("#feed");
-  const mapPanel = $("#map-panel");
-  if (mode === "map") {
-    if (feedEl) feedEl.hidden = true;
-    if (mapPanel) mapPanel.hidden = false;
-    initBigMap();
-    setTimeout(() => state.map && state.map.invalidateSize(), 150);
-  } else {
-    if (feedEl) feedEl.hidden = false;
-    if (mapPanel) mapPanel.hidden = true;
-  }
+  setTab(state.currentTab === "seekers" ? "feed" : state.currentTab || "feed");
+  updateChrome();
 }
 
 function toggleFilters() {
@@ -472,30 +479,65 @@ function calcLandlord() {
     <p class="muted">Dit is wat jouw eis betekent, geen beschuldiging.</p>`;
 }
 
-function setView(view) {
-  if (!state.filtersReady && view !== "feed") return;
-  state.currentView = view;
-  document.querySelectorAll(".rg-nav-btn[data-view]").forEach((b) => {
-    b.classList.toggle("active", view === "seekers" && b.dataset.view === "seekers");
+const TAB_TAGLINES = {
+  feed: "Swipe door woningen binnen bereik",
+  map: "Jouw matches op de kaart",
+  seekers: "Anderen zoeken ook in Eindhoven",
+};
+
+function setTab(tab) {
+  if ((tab === "feed" || tab === "map") && !state.filtersReady) {
+    if (tab === "feed") state.currentTab = "feed";
+    updateChrome();
+    return;
+  }
+
+  state.currentTab = tab;
+  if (tab === "feed") state.feedMode = "feed";
+
+  document.querySelectorAll(".rg-tab-btn[data-tab]").forEach((btn) => {
+    const active = btn.dataset.tab === tab;
+    btn.classList.toggle("active", active);
+    btn.toggleAttribute("aria-current", active);
   });
+
+  const feedPanel = $("#feed-panel");
+  const mapPanel = $("#map-panel");
+  const seekersPanel = $("#seekers-panel");
+
+  if (feedPanel) feedPanel.hidden = tab !== "feed";
+  if (mapPanel) mapPanel.hidden = tab !== "map";
+  if (seekersPanel) seekersPanel.hidden = tab !== "seekers";
+
+  const tagline = $(".rg-tagline");
+  if (tagline && TAB_TAGLINES[tab]) tagline.textContent = TAB_TAGLINES[tab];
+
+  if (tab === "feed") {
+    renderFeed();
+  } else if (tab === "map") {
+    initBigMap();
+    refreshBigMap();
+    setTimeout(() => state.map && state.map.invalidateSize(), 150);
+  } else if (tab === "seekers") {
+    renderSeekersPanel();
+  }
+
+  updateChrome();
+  updateSavedBadge();
+}
+
+function showSavedFeed() {
+  if (!state.filtersReady) return;
+  state.feedMode = state.feedMode === "saved" ? "feed" : "saved";
+  if (state.currentTab !== "feed") setTab("feed");
+  else renderFeed();
   const tagline = $(".rg-tagline");
   if (tagline) {
-    const labels = {
-      seekers: "Je bent niet alleen, zelfde live feed als het dashboard",
-      saved: `${interestedCount()} opgeslagen, jouw shortlist`,
-      feed: "Alleen woningen waar je op mag reageren",
-    };
-    if (labels[view]) tagline.textContent = labels[view];
+    tagline.textContent =
+      state.feedMode === "saved"
+        ? `${interestedCount()} opgeslagen in je shortlist`
+        : TAB_TAGLINES.feed;
   }
-  if (view === "seekers") {
-    setDisplayMode("feed");
-    renderSeekersFeed();
-  } else if (view === "saved" || view === "feed") {
-    setDisplayMode(state.displayMode === "map" ? "map" : "feed");
-    renderFeed(view);
-    if (state.displayMode === "map") refreshBigMap();
-  }
-  updateModeToggle();
   updateSavedBadge();
 }
 
@@ -519,18 +561,16 @@ async function loadAll() {
     state.seekers = [];
   }
   renderWijkFilters();
+  updateSeekersBadge();
   updateSavedBadge();
   state.filtersReady = localStorage.getItem(FILTERS_DONE_KEY) === "1";
-  updateModeToggle();
+  updateChrome();
   if (!state.filtersReady) {
     $("#filter-panel").hidden = false;
     $("#filter-toggle").setAttribute("aria-expanded", "true");
-    document.querySelectorAll(".rg-nav-btn[data-view]").forEach((b) => {
-      if (b.dataset.view !== "feed") b.disabled = true;
-    });
-    showWelcomeScreen();
+    setTab("feed");
   } else {
-    renderFeed("feed");
+    setTab("feed");
   }
 }
 
@@ -538,10 +578,8 @@ function bindEvents() {
   $("#filter-toggle")?.addEventListener("click", toggleFilters);
   $("#apply-filters")?.addEventListener("click", applyFilters);
   $("#loc-btn")?.addEventListener("click", requestLocation);
-  $("#saved-btn")?.addEventListener("click", () => {
-    setView(state.currentView === "saved" ? "feed" : "saved");
-  });
-  $("#feed")?.addEventListener("click", (e) => {
+  $("#saved-btn")?.addEventListener("click", showSavedFeed);
+  $("#feed-panel")?.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-action]");
     if (!btn) return;
     const slide = btn.closest(".rg-slide");
@@ -557,20 +595,8 @@ function bindEvents() {
     $("#landlord-panel").hidden = true;
   });
   $("#landlord-calc")?.addEventListener("click", calcLandlord);
-  document.querySelectorAll(".rg-mode-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      if (!state.filtersReady) return;
-      if (state.currentView === "seekers") state.currentView = "feed";
-      setDisplayMode(btn.dataset.view);
-      if (btn.dataset.view === "feed") {
-        renderFeed(state.currentView === "saved" ? "saved" : "feed");
-      } else {
-        refreshBigMap();
-      }
-    });
-  });
-  document.querySelectorAll(".rg-nav-btn[data-view]").forEach((btn) => {
-    btn.addEventListener("click", () => setView(btn.dataset.view));
+  document.querySelectorAll(".rg-tab-btn[data-tab]").forEach((btn) => {
+    btn.addEventListener("click", () => setTab(btn.dataset.tab));
   });
 }
 

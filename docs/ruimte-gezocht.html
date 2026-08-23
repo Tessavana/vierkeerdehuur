@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#171717" />
     <title>Ruimte Gezocht · Eindhoven</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="./ruimte-gezocht.css?v=6" />
+    <link rel="stylesheet" href="./ruimte-gezocht.css?v=8" />
   </head>
   <body>
     <div class="rg-app">
@@ -19,14 +19,9 @@
           <button type="button" class="rg-saved-btn" id="saved-btn" hidden aria-label="Opgeslagen">
             ♥ <span id="saved-count">0</span>
           </button>
-          <button type="button" class="rg-filter-btn" id="filter-toggle" aria-expanded="false">Filters</button>
+          <button type="button" class="rg-filter-btn" id="filter-toggle" aria-expanded="false" hidden>Filters</button>
         </div>
       </header>
-
-      <div class="rg-mode-toggle" id="mode-toggle">
-        <button type="button" class="rg-mode-btn active" data-view="feed">Feed</button>
-        <button type="button" class="rg-mode-btn" data-view="map">Kaart</button>
-      </div>
 
       <div class="rg-filters" id="filter-panel" hidden>
         <p class="rg-filters-intro">Stel je profiel in. Daarna zie je alleen woningen binnen bereik.</p>
@@ -85,23 +80,44 @@
       </div>
 
       <div class="rg-main" id="rg-main">
-        <main class="rg-feed" id="feed" tabindex="0">
+        <main class="rg-feed" id="feed-panel" tabindex="0">
           <p class="rg-feed-loading muted">Woningen laden…</p>
         </main>
         <div class="rg-map-panel" id="map-panel" hidden>
           <div id="rg-map"></div>
           <p class="rg-map-stats" id="map-stats"></p>
         </div>
+        <section class="rg-seekers-panel" id="seekers-panel" hidden aria-label="Je bent niet alleen">
+          <div class="rg-seekers-head">
+            <h2>Je bent niet alleen</h2>
+            <p class="muted" id="seekers-subline">Anderen zoeken ook in Eindhoven</p>
+          </div>
+          <div class="rg-seekers-list" id="seekers-list"></div>
+          <footer class="rg-seekers-foot">
+            <a class="rg-dashboard-link" href="./index.html">Volledig data-overzicht op dashboard →</a>
+          </footer>
+        </section>
       </div>
 
-      <nav class="rg-nav">
-        <button type="button" class="rg-nav-btn" data-view="seekers">Je bent niet alleen</button>
-        <a class="rg-nav-btn" href="./index.html">Dashboard</a>
+      <nav class="rg-tabbar" aria-label="Hoofdnavigatie">
+        <button type="button" class="rg-tab-btn active" data-tab="feed" aria-current="page">
+          <svg class="rg-tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 3l8 7.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></svg>
+          <span class="rg-tab-label">Huizen</span>
+        </button>
+        <button type="button" class="rg-tab-btn" data-tab="map">
+          <svg class="rg-tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11z" fill="none" stroke="currentColor" stroke-width="1.75"/><circle cx="12" cy="10" r="2.25" fill="none" stroke="currentColor" stroke-width="1.75"/></svg>
+          <span class="rg-tab-label">Kaart</span>
+        </button>
+        <button type="button" class="rg-tab-btn" data-tab="seekers">
+          <svg class="rg-tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a3 3 0 1 0-6 0 3 3 0 0 0 6 0z" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M4 19a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+          <span class="rg-tab-label">Samen</span>
+          <span class="rg-tab-badge" id="seekers-badge" hidden></span>
+        </button>
       </nav>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="./geo-utils.js?v=5"></script>
-    <script src="./ruimte-gezocht.js?v=7"></script>
+    <script src="./ruimte-gezocht.js?v=8"></script>
   </body>
 </html>
