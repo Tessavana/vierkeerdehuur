@@ -62,7 +62,7 @@ jobs:
       - name: Full scan
         env:
           SCAN_PROFILE: full
-          SEARCH_URLS: ${{ vars.SEARCH_URLS || 'https://kamernet.nl/en/for-rent/apartment-eindhoven,https://www.pararius.com/apartments/eindhoven,https://www.funda.nl/zoeken/huur?selected_area=%5B%22eindhoven%22%5D,https://www.vesteda.com/nl/huurwoningen-eindhoven,https://www.vbtverhuurmakelaars.nl/huurwoningen-eindhoven,https://www.rotsvast.nl/woningaanbod/huur/eindhoven/,https://nmgwonen.nl/huurwoningen/eindhoven/,https://www.huurwoningen.nl/in/eindhoven/,https://www.huislijn.nl/huurwoningen/nederland/noord-brabant/eindhoven,https://rentfinder.nl' }}
+          SEARCH_URLS: ${{ vars.SEARCH_URLS || 'https://kamernet.nl/en/for-rent/apartment-eindhoven,https://www.pararius.com/apartments/eindhoven,https://www.funda.nl/zoeken/huur?selected_area=%5B%22eindhoven%22%5D,https://www.vesteda.com/nl/huurwoningen-eindhoven,https://www.vbtverhuurmakelaars.nl/huurwoningen-eindhoven,https://www.rotsvast.nl/woningaanbod/huur/eindhoven/,https://nmgwonen.nl/huurwoningen/eindhoven/,https://www.huurwoningen.nl/in/eindhoven/,https://www.huislijn.nl/huurwoningen/nederland/noord-brabant/eindhoven,https://rentfinder.nl,https://directwonen.nl/huurwoningen-huren/eindhoven' }}
           MAX_RENT: ${{ vars.MAX_RENT || '1150' }}
           MIN_SIZE: ${{ vars.MIN_SIZE || '20' }}
           POLL_INTERVAL_SECONDS: "300"
@@ -88,6 +88,7 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           SEEKERS_LLM_MODE: borderline
+          LISTING_LLM_MODE: missing_fields
         run: |
           python -m src.telegram_feedback
           python main.py --once

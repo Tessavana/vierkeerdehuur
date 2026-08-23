@@ -13,6 +13,7 @@ _FAST_PROVIDERS = frozenset(
         "HuislijnProvider",
         "RentfinderProvider",
         "VbtProvider",
+        "DirectWonenProvider",
     }
 )
 _HEAVY_PROVIDERS = frozenset(
@@ -33,6 +34,7 @@ _PROVIDER_PHASE: dict[str, int] = {
     "NmgProvider": 0,
     "VbtProvider": 1,
     "RentfinderProvider": 1,
+    "DirectWonenProvider": 1,
     "VestedaProvider": 2,
     "HuurwoningenProvider": 2,
 }

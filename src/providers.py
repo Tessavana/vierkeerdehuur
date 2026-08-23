@@ -7,6 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from src.models import Listing
+from src.sites.directwonen_listings import fetch_directwonen_eindhoven_listings
 from src.sites.huurwoningen_listings import fetch_huurwoningen_eindhoven_listings
 from src.sites.rentfinder_inertia import fetch_rentfinder_eindhoven_listings
 from src.sites.funda_huur import fetch_funda_eindhoven_huur_listings
@@ -142,6 +143,14 @@ class HuislijnProvider(ListingProvider):
                 )
             )
         return _dedupe_listings(listings)
+
+
+class DirectWonenProvider(ListingProvider):
+    def __init__(self, url: str) -> None:
+        self.url = url
+
+    def fetch(self) -> list[Listing]:
+        return fetch_directwonen_eindhoven_listings(self.url)
 
 
 class RentfinderProvider(ListingProvider):

@@ -6,31 +6,19 @@ from pathlib import Path
 from src.config import load_config
 from src.filters import evaluate_rental, score_rental
 from src.listing_detail import enrich_listing, is_new_on_platform_today, normalize_available_from
+from src.listing_llm_extract import maybe_llm_fill_listing
 from src.listing_registry import apply_listing_lifecycle
 from src.market_registry import build_market_stats, record_market_listings
 from src.eindhoven_geo import attach_map_coordinates
 from src.scan_bundle import load_scan_bundle, save_scan_bundle
 from src.scan_schedule import provider_should_fetch_live
 from src.seekers.build_feed import build_seekers_feed
-from src.providers import (
-    FundaProvider,
-    HuislijnProvider,
-    HuurwoningenProvider,
-    JsonFileProvider,
-    KamernetProvider,
-    ListingProvider,
-    NmgProvider,
-    ParariusProvider,
-    RentfinderProvider,
-    RotsvastProvider,
-    VbtProvider,
-    VestedaProvider,
-)
+from src.provider_registry import build_providers
 
 
 def run_workrun() -> dict:
     config = load_config()
-    providers = _build_providers(config.search_urls)
+    providers = build_providers(config.search_urls)
     bundle = load_scan_bundle()
     provider_results: list[dict] = []
     all_matches: list[dict] = []
@@ -196,11 +184,20 @@ def _write_outputs(payload: dict) -> None:
 
 
 def _maybe_enrich(listing):
-    if listing.notes and len(listing.notes) > 250 and listing.platform_listed_date:
+    needs_fields = listing.rent_eur is None or listing.size_m2 is None
+    if (
+        not needs_fields
+        and listing.notes
+        and len(listing.notes) > 250
+        and listing.platform_listed_date
+    ):
         return listing
-    if listing.notes and len(listing.notes) > 800:
+    if not needs_fields and listing.notes and len(listing.notes) > 800:
         return listing
-    return enrich_listing(listing)
+    enriched = enrich_listing(listing)
+    if needs_fields and (enriched.rent_eur is None or enriched.size_m2 is None):
+        enriched = maybe_llm_fill_listing(enriched)
+    return enriched
 
 
 def _sort_newest_first(item: dict) -> tuple:
@@ -223,35 +220,6 @@ def _dedupe_by_url(items: list[dict]) -> list[dict]:
         seen.add(key)
         out.append(item)
     return out
-
-
-def _build_providers(urls: list[str]) -> list[ListingProvider]:
-    providers: list[ListingProvider] = []
-    for url in urls:
-        lower = url.lower()
-        if url.startswith("file://"):
-            providers.append(JsonFileProvider(Path(url.replace("file://", "", 1))))
-        elif "kamernet.nl" in lower:
-            providers.append(KamernetProvider(url))
-        elif "funda.nl" in lower:
-            providers.append(FundaProvider(url))
-        elif "vbt" in lower:
-            providers.append(VbtProvider(url))
-        elif "vesteda.com" in lower:
-            providers.append(VestedaProvider(url))
-        elif "rotsvast.nl" in lower:
-            providers.append(RotsvastProvider(url))
-        elif "nmgwonen.nl" in lower or "nmg.nl" in lower:
-            providers.append(NmgProvider(url))
-        elif "huislijn.nl" in lower:
-            providers.append(HuislijnProvider(url))
-        elif "huurwoningen.nl" in lower or "huurwoningen.com" in lower:
-            providers.append(HuurwoningenProvider(url))
-        elif "rentfinder" in lower:
-            providers.append(RentfinderProvider(url))
-        else:
-            providers.append(ParariusProvider(url))
-    return providers
 
 
 def _load_application_status() -> dict:
@@ -291,6 +259,7 @@ def _platform_label(source: str, provider_name: str) -> str:
         "huurwoningen": "Huurwoningen",
         "huislijn": "Huislijn",
         "rentfinder": "Rentfinder",
+        "directwonen": "DirectWonen",
     }
     return labels.get((source or "").lower(), provider_name or source or "?")
 

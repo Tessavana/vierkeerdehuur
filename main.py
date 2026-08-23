@@ -1,21 +1,7 @@
 import argparse
-from pathlib import Path
 
 from src.config import load_config
-from src.providers import (
-    FundaProvider,
-    HuislijnProvider,
-    HuurwoningenProvider,
-    JsonFileProvider,
-    KamernetProvider,
-    ListingProvider,
-    NmgProvider,
-    ParariusProvider,
-    RentfinderProvider,
-    RotsvastProvider,
-    VbtProvider,
-    VestedaProvider,
-)
+from src.provider_registry import build_providers
 from src.runner import run_loop, run_once
 from src.scan_schedule import filter_providers_for_incremental
 from src.status_app import run_status_server
@@ -28,35 +14,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--status-server", action="store_true", help="Run localhost status dashboard")
     parser.add_argument("--port", type=int, default=8080, help="Status dashboard port")
     return parser.parse_args()
-
-
-def build_providers(urls: list[str]) -> list[ListingProvider]:
-    providers: list[ListingProvider] = []
-    for url in urls:
-        url_lower = url.lower()
-        if url.startswith("file://"):
-            providers.append(JsonFileProvider(Path(url.replace("file://", "", 1))))
-        elif "kamernet.nl" in url_lower:
-            providers.append(KamernetProvider(url))
-        elif "funda.nl" in url_lower:
-            providers.append(FundaProvider(url))
-        elif "vbt" in url_lower:
-            providers.append(VbtProvider(url))
-        elif "vesteda.com" in url_lower:
-            providers.append(VestedaProvider(url))
-        elif "rotsvast.nl" in url_lower:
-            providers.append(RotsvastProvider(url))
-        elif "nmgwonen.nl" in url_lower or "nmg.nl" in url_lower:
-            providers.append(NmgProvider(url))
-        elif "huislijn.nl" in url_lower:
-            providers.append(HuislijnProvider(url))
-        elif "huurwoningen.nl" in url_lower or "huurwoningen.com" in url_lower:
-            providers.append(HuurwoningenProvider(url))
-        elif "rentfinder" in url_lower:
-            providers.append(RentfinderProvider(url))
-        else:
-            providers.append(ParariusProvider(url))
-    return providers
 
 
 def main() -> None:

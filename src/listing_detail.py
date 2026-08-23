@@ -14,6 +14,7 @@ from zoneinfo import ZoneInfo
 import requests
 from bs4 import BeautifulSoup
 
+from src.extract import extract_location_hint, extract_rent_eur, extract_size_m2, parse_json_ld, parse_posted_date
 from src.filters import NEWCOMER_RESTRICTION_MARKERS, STUDENT_ONLY_MARKERS
 from src.models import Listing
 from src.web_fetch import HEADERS, fetch_html_with_fallback
@@ -156,6 +157,9 @@ def _parse_platform_listed_date(soup: BeautifulSoup, text: str) -> date | None:
 
     if re.search(r"\bvandaag\b", lowered) and ("geplaatst" in lowered or "sinds" in lowered or "nieuw" in lowered):
         return _today_amsterdam()
+    rel = parse_posted_date(text)
+    if rel:
+        return rel
     return None
 
 
@@ -180,10 +184,22 @@ def parse_detail_html(html: str, url: str) -> dict:
     soup = BeautifulSoup(html, "html.parser")
     text = soup.get_text(" ", strip=True)
     listed = _parse_platform_listed_date(soup, text)
+    structured = parse_json_ld(soup)
+    if structured.get("rent_eur") is None:
+        structured["rent_eur"] = extract_rent_eur(text)
+    if structured.get("size_m2") is None:
+        structured["size_m2"] = extract_size_m2(text)
+    if not structured.get("location"):
+        structured["location"] = extract_location_hint(text)
+    if not structured.get("platform_listed_date") and listed:
+        structured["platform_listed_date"] = listed.isoformat()
     return {
         "description": _extract_description(soup, text),
-        "platform_listed_date": listed.isoformat() if listed else None,
+        "platform_listed_date": structured.get("platform_listed_date"),
         "available_from": _parse_available_from(text),
+        "rent_eur": structured.get("rent_eur"),
+        "size_m2": structured.get("size_m2"),
+        "location": structured.get("location"),
     }
 
 
@@ -216,6 +232,13 @@ def enrich_listing(listing: Listing, use_cache: bool = True) -> Listing:
     if avail and ("T" in avail or re.match(r"\d{4}-\d{2}-\d{2}T", avail)):
         avail = avail[:10] if re.match(r"\d{4}-\d{2}-\d{2}", avail) else None
     listed_date = fields.get("platform_listed_date")
+    rent = listing.rent_eur or fields.get("rent_eur")
+    size = listing.size_m2 or fields.get("size_m2")
+    location = listing.location
+    if location in ("Unknown", "", "Eindhoven") and fields.get("location"):
+        loc = str(fields["location"]).strip()
+        if loc and loc.lower() != "unknown":
+            location = loc
 
     blob = f"{desc or ''} {notes or ''}".lower()
     outdoor_known = False
@@ -248,6 +271,9 @@ def enrich_listing(listing: Listing, use_cache: bool = True) -> Listing:
         notes=notes,
         available_from=avail,
         platform_listed_date=listed_date,
+        rent_eur=rent,
+        size_m2=size,
+        location=location,
         outdoor_space=outdoor_space,
         outdoor_known=outdoor_known,
     )

@@ -55,8 +55,6 @@ def fetch_rotsvast_eindhoven_listings(list_url: str | None = None) -> list[Listi
         lat = p.get("lat")
         lon = p.get("lng")
         notes_parts = []
-        if lat and lon:
-            notes_parts.append(f"map_lat={lat};map_lon={lon}")
         if status:
             notes_parts.append(f"status={p.get('status')}")
         listings.append(
@@ -72,6 +70,8 @@ def fetch_rotsvast_eindhoven_listings(list_url: str | None = None) -> list[Listi
                 contract_months=None,
                 available_from=None,
                 notes="; ".join(notes_parts) if notes_parts else None,
+                map_lat=float(lat) if lat not in (None, "", 0, "0") else None,
+                map_lon=float(lon) if lon not in (None, "", 0, "0") else None,
             )
         )
     return listings
