@@ -326,6 +326,7 @@ function handleListingAction(url, action) {
     }
   }
   renderFeed(state.currentView);
+  if (state.displayMode === "map") refreshBigMap();
 }
 
 function renderSeekersFeed() {
@@ -435,20 +436,27 @@ function refreshBigMap() {
   if (!state.mapLayer) return;
   state.mapLayer.clearLayers();
   const mapListings = listingsForView("feed");
+  const favCount = mapListings.filter((l) => listingAction(l.url) === "interested").length;
   mapListings.forEach((l) => {
-    L.circleMarker([l.map_lat, l.map_lon], {
-      radius: 7,
-      color: "#171717",
-      fillColor: "#171717",
-      fillOpacity: 1,
-      weight: 1,
-    })
-      .addTo(state.mapLayer)
-      .bindPopup(`<b>${formatEur(l.rent_eur)}</b><br/>${resolveNeighborhood(l)}<br/><a href="${l.url}" target="_blank">open</a>`);
+    const isFavorite = listingAction(l.url) === "interested";
+    const popupHtml = `<b>${isFavorite ? "♥ " : ""}${formatEur(l.rent_eur)}</b><br/>${resolveNeighborhood(l)}<br/><a href="${l.url}" target="_blank">open</a>`;
+    addListingMapMarker(state.mapLayer, l.map_lat, l.map_lon, {
+      url: l.url,
+      popupHtml,
+      isFavorite,
+      pinStyle: {
+        radius: 7,
+        color: "#171717",
+        fillColor: "#171717",
+        fillOpacity: 1,
+        weight: 1,
+      },
+    });
   });
   L.circleMarker([state.userLat, state.userLon], { radius: 6, color: "#888", fillColor: "#888", fillOpacity: 1 }).addTo(state.mapLayer);
   const total = mapListings.length;
-  $("#map-stats").textContent = `${total} woningen binnen bereik op de kaart`;
+  const favLine = favCount ? `${favCount} favoriet${favCount === 1 ? "" : "en"} · ` : "";
+  $("#map-stats").textContent = `${favLine}${total} woningen binnen bereik op de kaart`;
 }
 
 function calcLandlord() {

@@ -292,3 +292,48 @@ async function attachResolvedCoordsAsync(listings, cache) {
   }
   return out;
 }
+
+const FAVORITES_STORAGE_KEY = "rg_listing_actions_v1";
+
+function loadFavoriteUrls() {
+  try {
+    const raw = localStorage.getItem(FAVORITES_STORAGE_KEY);
+    const actions = raw ? JSON.parse(raw) : {};
+    return new Set(
+      Object.entries(actions)
+        .filter(([, v]) => v && v.status === "interested")
+        .map(([url]) => url)
+    );
+  } catch {
+    return new Set();
+  }
+}
+
+function isFavoriteUrl(url) {
+  return url ? loadFavoriteUrls().has(url) : false;
+}
+
+function favoriteHeartIcon() {
+  if (!window.L) return null;
+  return L.divIcon({
+    className: "map-heart-icon",
+    html: '<span class="map-heart-glyph" aria-hidden="true">♥</span>',
+    iconSize: [26, 26],
+    iconAnchor: [13, 13],
+  });
+}
+
+function addListingMapMarker(layerGroup, lat, lon, options) {
+  const { url, popupHtml, isFavorite, pinStyle } = options;
+  let marker;
+  if (isFavorite && favoriteHeartIcon()) {
+    marker = L.marker([lat, lon], { icon: favoriteHeartIcon(), zIndexOffset: 500 });
+  } else {
+    marker = L.circleMarker([lat, lon], pinStyle);
+  }
+  if (popupHtml) {
+    marker.bindPopup(popupHtml);
+  }
+  marker.addTo(layerGroup);
+  return marker;
+}

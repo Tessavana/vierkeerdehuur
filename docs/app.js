@@ -295,6 +295,7 @@ function refreshMapMarkers() {
   __mapLayerGroup.clearLayers();
   window.__activeTagFilters = getActiveTagFilters();
   const visitedUrls = loadVisitedUrls();
+  const favoriteUrls = loadFavoriteUrls();
   const filtered = __allListings.filter(tagPassesFilter);
   const usedCoords = new Map();
 
@@ -308,31 +309,38 @@ function refreshMapMarkers() {
     const latAdj = lat + offset * 0.00025;
     const lonAdj = lon + offset * 0.00025;
 
+    const isFavorite = favoriteUrls.has(listing.url);
     const isVisited = visitedUrls.has(listing.url);
     const isNewToday = isListedToday(listing);
     const fillColor = isNewToday ? "#e67e22" : isVisited ? "#9ca3af" : "#171717";
     const pinColor = isNewToday ? "#c0392b" : isVisited ? "#6b7280" : "#171717";
 
-    const marker = L.circleMarker([latAdj, lonAdj], {
-      radius: isNewToday ? 9 : 8,
-      color: pinColor,
-      weight: 2,
-      fillColor,
-      fillOpacity: 1,
-    });
     const wijk = dash(resolveNeighborhood(listing));
     const platform = dash(listing.platform || listing.source);
     const tagHtml = `<span class="${matchTagClass(listing.match_tag || "okay")}">${listing.match_tag ?? "okay"}</span>`;
     const newLine = isNewToday ? "<b>Nieuw op platform vandaag</b><br/>" : "";
-    marker.bindPopup(
-      `${newLine}${tagHtml}<br/><b>${listing.title}</b><br/>${platform}${wijk !== "-" ? ` · ${wijk}` : ""}<br/>EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²`
-    );
+    const favLine = isFavorite ? "<b>♥ Favoriet</b><br/>" : "";
+    const popupHtml = `${favLine}${newLine}${tagHtml}<br/><b>${listing.title}</b><br/>${platform}${wijk !== "-" ? ` · ${wijk}` : ""}<br/>EUR ${listing.rent_eur ?? "?"} | ${listing.size_m2 ?? "?"} m²`;
+
+    const marker = addListingMapMarker(__mapLayerGroup, latAdj, lonAdj, {
+      url: listing.url,
+      popupHtml,
+      isFavorite,
+      pinStyle: {
+        radius: isNewToday ? 9 : 8,
+        color: pinColor,
+        weight: 2,
+        fillColor,
+        fillOpacity: 1,
+      },
+    });
     marker.on("click", () => {
       addVisitedUrl(listing.url);
-      marker.setStyle({ color: "#4b5563", weight: 2, fillColor: "#9ca3af", fillOpacity: 1 });
+      if (!isFavorite) {
+        marker.setStyle({ color: "#4b5563", weight: 2, fillColor: "#9ca3af", fillOpacity: 1 });
+      }
       showSelectedMatch(listing);
     });
-    __mapLayerGroup.addLayer(marker);
   }
 
   if (filtered.length > 0) {
