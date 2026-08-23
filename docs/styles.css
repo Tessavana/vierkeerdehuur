@@ -36,46 +36,6 @@ body {
   font-weight: 800;
   color: #171717;
 }
-.support-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 2px solid #171717;
-  background: #fff;
-  border-radius: 999px;
-  padding: 8px 14px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.support-btn:hover:not(:disabled) { background: #f0f0f0; }
-.support-btn.support-done { opacity: 0.7; cursor: default; }
-.support-heart { color: #171717; flex-shrink: 0; }
-.support-count-wrap {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-left: 4px;
-}
-.support-count-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #5f5f5f;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.support-count {
-  background: #171717;
-  color: #fff;
-  border-radius: 999px;
-  padding: 2px 8px;
-  font-size: 12px;
-  min-width: 1.5em;
-  text-align: center;
-}
-.support-btn.support-done {
-  pointer-events: none;
-}
 .last-updated { font-size: 13px; color: #5f5f5f; }
 .hero-status { margin: 0; font-size: 15px; color: #3e3e3e; }
 h1 { margin: 0 0 12px; font-size: clamp(28px, 6vw, 44px); line-height: 1.05; }
@@ -314,13 +274,21 @@ h3 { margin: 0 0 8px; font-size: 18px; }
 .reddit-overview-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin-bottom: 8px; }
 .reddit-overview-stats { display: flex; gap: 16px; margin: 0 0 10px; font-size: 14px; }
 .reddit-stat b { font-size: 18px; }
-.reddit-ask-list li { margin-bottom: 8px; line-height: 1.45; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
-.reddit-ask-list .seeker-tag { font-size: 11px; padding: 2px 6px; }
+.reddit-ask-list {
   margin: 0;
   padding-left: 18px;
   font-size: 14px;
   line-height: 1.5;
 }
+.reddit-ask-list li {
+  margin-bottom: 8px;
+  line-height: 1.45;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: baseline;
+}
+.reddit-ask-list .seeker-tag { font-size: 11px; padding: 2px 6px; }
 .reddit-ask-list a { color: #171717; font-weight: 600; }
 .seeker-datetime { font-size: 12px; margin-bottom: 4px; }
 .seekers-feed {

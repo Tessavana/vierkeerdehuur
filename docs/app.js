@@ -1,8 +1,5 @@
 const MOVE_OUT_DEADLINE = new Date("2026-07-26T23:59:59+02:00");
 const MAP_VISITED_KEY = "housing_map_visited_urls_v1";
-const SUPPORT_CLICKED_KEY = "housing_support_clicked_v1";
-const COUNTAPI_BASE = "https://countapi.mileshilliard.com/api/v1";
-const COUNTAPI_KEY = "vierkeerdehuur-tessa-support";
 
 let __allListings = [];
 let __mapLayerGroup = null;
@@ -379,50 +376,6 @@ function renderOverviewTable(status) {
   `;
 }
 
-async function fetchSupportCount() {
-  try {
-    const res = await fetch(`${COUNTAPI_BASE}/get/${COUNTAPI_KEY}`, { cache: "no-store" });
-    if (res.status === 404) return 0;
-    const data = await res.json();
-    return parseInt(String(data.value ?? 0), 10) || 0;
-  } catch {
-    return null;
-  }
-}
-
-async function initSupportButton() {
-  const btn = document.getElementById("support-btn");
-  const countEl = document.getElementById("support-count");
-  if (!btn || !countEl) return;
-
-  function lockButton() {
-    btn.classList.add("support-done");
-    btn.disabled = true;
-    btn.setAttribute("aria-disabled", "true");
-  }
-
-  const globalCount = await fetchSupportCount();
-  countEl.textContent = globalCount === null ? "—" : String(globalCount);
-
-  if (localStorage.getItem(SUPPORT_CLICKED_KEY)) {
-    lockButton();
-  }
-
-  btn.addEventListener("click", async () => {
-    if (btn.disabled || localStorage.getItem(SUPPORT_CLICKED_KEY)) return;
-    localStorage.setItem(SUPPORT_CLICKED_KEY, "1");
-    lockButton();
-    try {
-      const res = await fetch(`${COUNTAPI_BASE}/hit/${COUNTAPI_KEY}`, { cache: "no-store" });
-      const data = await res.json();
-      countEl.textContent = String(parseInt(String(data.value ?? 0), 10) || 0);
-    } catch {
-      const c = await fetchSupportCount();
-      if (c !== null) countEl.textContent = String(c);
-    }
-  });
-}
-
 function formatSeekerTime(iso) {
   if (!iso) return { relative: "", full: "" };
   const d = new Date(iso);
@@ -533,8 +486,21 @@ async function loadSeekersFeed() {
 }
 
 async function loadRun() {
+  // Seekers first so a chart/map error never blanks the feed.
+  try {
+    const seekers = await loadSeekersFeed();
+    if (seekers) renderSeekersFeed(seekers);
+  } catch (err) {
+    console.error("seekers feed failed", err);
+    renderSeekersFeed(null);
+  }
+
   const res = await fetch("./data/latest_listings.json", { cache: "no-store" });
   const data = await res.json();
+
+  if (!document.getElementById("seekers-feed")?.innerHTML) {
+    renderSeekersFeed(data.seekers_feed || null);
+  }
 
   renderOverviewTable(data.application_status || {});
   const updated = document.getElementById("last-updated");
@@ -549,16 +515,17 @@ async function loadRun() {
 
   renderListingsTable(listings);
   window.__lastMarketStats = data.market_stats;
-  renderStats(data.market_stats, data.max_rent, listings.length);
-  const seekers = (await loadSeekersFeed()) || data.seekers_feed;
-  renderSeekersFeed(seekers);
+  try {
+    renderStats(data.market_stats, data.max_rent, listings.length);
+  } catch (err) {
+    console.error("stats render failed", err);
+  }
   initMapTagFilters();
   await renderMap(listings);
 }
 
 setInterval(updateDeadlineRow, 1000);
 updateDeadlineRow();
-initSupportButton();
 loadRun().catch((err) => {
   const headline = document.getElementById("headline-status");
   if (headline) headline.textContent = `Status: nog steeds geen woning — site error: ${err}`;
