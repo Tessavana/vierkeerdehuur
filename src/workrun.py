@@ -3,6 +3,7 @@ import os
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
+from threading import Lock
 
 from src.config import load_config
 from src.filters import evaluate_rental, score_rental
@@ -10,35 +11,43 @@ from src.listing_detail import enrich_listing, is_new_on_platform_today, normali
 from src.application_count import attach_application_count
 from src.income_requirement import attach_income_requirement, extract_income_requirement, apply_platform_income_defaults
 from src.listing_dedupe import dedupe_listings
+from src.listing_registry import apply_listing_lifecycle
 from src.listing_llm_extract import maybe_llm_fill_listing
 from src.listing_liveness import filter_alive_listings
 from src.market_registry import build_market_stats, record_market_listings
 from src.eindhoven_geo import attach_map_coordinates
 from src.neighborhood import resolve_neighborhood
 from src.scan_bundle import load_scan_bundle, save_scan_bundle
-from src.listing_registry import apply_listing_lifecycle
-from src.scan_schedule import scan_profile, provider_should_fetch_live, _HEAVY_PROVIDERS
+from src.scan_runner import ScanClock, run_live_providers_parallel, scan_time_budget_seconds
+from src.scan_schedule import provider_should_fetch_live, scan_profile, scan_tier
 from src.seekers.build_feed import build_seekers_feed
 from src.provider_registry import build_providers
+
+_bundle_lock = Lock()
 
 
 def run_workrun() -> dict:
     config = load_config()
     providers = build_providers(config.search_urls)
     bundle = load_scan_bundle()
+    clock = ScanClock(scan_time_budget_seconds())
     provider_results: list[dict] = []
     all_matches: list[dict] = []
     excluded_items: list[dict] = []
 
+    live_jobs: list = []
     for provider in providers:
         provider_name = provider.__class__.__name__
         live = provider_should_fetch_live(provider_name)
         cached = bundle.get(provider_name) if not live else None
+
         if not live and cached:
             validated, dropped = filter_alive_listings(cached)
             if not validated:
                 live = True
             else:
+                if dropped:
+                    bundle[provider_name] = validated
                 all_matches.extend(validated)
                 provider_results.append(
                     {
@@ -54,21 +63,74 @@ def run_workrun() -> dict:
                 continue
 
         if not live and not cached:
-            if scan_profile() == "fast" and provider_name in _HEAVY_PROVIDERS:
-                provider_results.append(
-                    {
-                        "provider": provider_name,
-                        "provider_name": _clean_provider_name(provider_name),
-                        "status": "skipped",
-                        "parsed": 0,
-                        "suitable": 0,
-                        "excluded": 0,
-                        "error": None,
-                    }
-                )
-                continue
-            live = True
+            provider_results.append(
+                {
+                    "provider": provider_name,
+                    "provider_name": _clean_provider_name(provider_name),
+                    "status": "skipped",
+                    "parsed": 0,
+                    "suitable": 0,
+                    "excluded": 0,
+                    "error": None,
+                }
+            )
+            continue
 
+        live_jobs.append((provider, _make_provider_job(config, all_matches, excluded_items, bundle, provider_results)))
+
+    if live_jobs:
+        print(f"scan tier={scan_tier()} · live providers={len(live_jobs)} · budget={scan_time_budget_seconds()}s")
+        run_live_providers_parallel(live_jobs, clock=clock)
+
+    save_scan_bundle(bundle)
+
+    deduped, dupe_count = dedupe_listings(all_matches)
+    if dupe_count:
+        print(f"deduped {dupe_count} duplicate listing(s)")
+    deduped, dead_count = filter_alive_listings(deduped)
+    if dead_count:
+        print(f"liveness: removed {dead_count} dead listing(s) after dedupe")
+    deduped = [_ensure_income_fields(item) for item in deduped]
+    apply_listing_lifecycle(deduped)
+    deduped.sort(key=_sort_newest_first)
+
+    if not clock.expired():
+        attach_map_coordinates(deduped)
+    else:
+        print("scan: skipped geocoding (time budget)")
+    deduped = [_ensure_neighborhood(item) for item in deduped]
+
+    market_rows = [{**item, "in_budget": True} for item in deduped] + [
+        {**item, "in_budget": False} for item in excluded_items
+    ]
+    record_market_listings(market_rows)
+    market_stats = build_market_stats(deduped, excluded_items, config.max_rent)
+
+    seekers_feed = build_seekers_feed()
+    payload = {
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "city": "Eindhoven",
+        "max_rent": config.max_rent,
+        "scan_profile": os.getenv("SCAN_PROFILE", "full"),
+        "scan_tier": scan_tier(),
+        "scan_elapsed_seconds": round(clock.elapsed(), 1),
+        "provider_results": provider_results,
+        "listings": deduped,
+        "excluded_listings": excluded_items,
+        "market_stats": market_stats,
+        "duplicate_listings_removed": dupe_count,
+        "dead_listings_removed": dead_count,
+        "application_status": _load_application_status(),
+        "seekers_feed": seekers_feed,
+    }
+    _write_outputs(payload)
+    return payload
+
+
+def _make_provider_job(config, all_matches, excluded_items, bundle, provider_results):
+    def _run(provider) -> dict:
+        provider_name = provider.__class__.__name__
+        clean = _clean_provider_name(provider_name)
         try:
             listings = provider.fetch()
             suitable: list = []
@@ -86,10 +148,8 @@ def run_workrun() -> dict:
                     excluded_items.append(
                         {
                             "provider": provider_name,
-                            "platform": _platform_label(
-                                listing.source, _clean_provider_name(provider_name)
-                            ),
-                            "provider_name": _clean_provider_name(provider_name),
+                            "platform": _platform_label(listing.source, clean),
+                            "provider_name": clean,
                             "source": listing.source,
                             "title": listing.title,
                             "location": listing.location,
@@ -97,7 +157,9 @@ def run_workrun() -> dict:
                             "size_m2": listing.size_m2,
                             "url": listing.url,
                             "reason": reason,
-                            "neighborhood": resolve_neighborhood(listing.title, listing.location, listing.notes or ""),
+                            "neighborhood": resolve_neighborhood(
+                                listing.title, listing.location, listing.notes or ""
+                            ),
                             "available_from": listing.available_from,
                             "notes": listing.notes,
                         }
@@ -105,8 +167,8 @@ def run_workrun() -> dict:
             normalized = [
                 {
                     "provider": provider_name,
-                    "platform": _platform_label(l.source, _clean_provider_name(provider_name)),
-                    "provider_name": _clean_provider_name(provider_name),
+                    "platform": _platform_label(l.source, clean),
+                    "provider_name": clean,
                     "source": l.source,
                     "title": l.title,
                     "location": l.location,
@@ -131,89 +193,53 @@ def run_workrun() -> dict:
                 }
                 for l in suitable
             ]
-            all_matches.extend(normalized)
-            bundle[provider_name] = normalized
-            provider_results.append(
-                {
-                    "provider": provider_name,
-                    "provider_name": _clean_provider_name(provider_name),
-                    "status": "ok",
-                    "parsed": len(listings),
-                    "suitable": len(suitable),
-                    "excluded": excluded_count,
-                    "error": None,
-                }
-            )
+            with _bundle_lock:
+                all_matches.extend(normalized)
+                bundle[provider_name] = normalized
+                provider_results.append(
+                    {
+                        "provider": provider_name,
+                        "provider_name": clean,
+                        "status": "ok",
+                        "parsed": len(listings),
+                        "suitable": len(suitable),
+                        "excluded": excluded_count,
+                        "error": None,
+                    }
+                )
+            return provider_results[-1]
         except Exception as exc:
             fallback = bundle.get(provider_name)
-            if fallback:
-                all_matches.extend(fallback)
-                provider_results.append(
-                    {
-                        "provider": provider_name,
-                        "provider_name": _clean_provider_name(provider_name),
-                        "status": "error_fallback_cache",
-                        "parsed": len(fallback),
-                        "suitable": len(fallback),
-                        "excluded": 0,
-                        "error": str(exc),
-                    }
-                )
-            else:
-                provider_results.append(
-                    {
-                        "provider": provider_name,
-                        "provider_name": _clean_provider_name(provider_name),
-                        "status": "error",
-                        "parsed": 0,
-                        "suitable": 0,
-                        "excluded": 0,
-                        "error": str(exc),
-                    }
-                )
+            with _bundle_lock:
+                if fallback:
+                    validated, _ = filter_alive_listings(fallback)
+                    all_matches.extend(validated)
+                    provider_results.append(
+                        {
+                            "provider": provider_name,
+                            "provider_name": clean,
+                            "status": "error_fallback_cache",
+                            "parsed": len(validated),
+                            "suitable": len(validated),
+                            "excluded": 0,
+                            "error": str(exc),
+                        }
+                    )
+                else:
+                    provider_results.append(
+                        {
+                            "provider": provider_name,
+                            "provider_name": clean,
+                            "status": "error",
+                            "parsed": 0,
+                            "suitable": 0,
+                            "excluded": 0,
+                            "error": str(exc),
+                        }
+                    )
+            return provider_results[-1]
 
-    save_scan_bundle(bundle)
-
-    deduped, dupe_count = dedupe_listings(all_matches)
-    if dupe_count:
-        print(f"deduped {dupe_count} duplicate listing(s)")
-    deduped, dead_count = filter_alive_listings(deduped)
-    if dead_count:
-        print(f"liveness: removed {dead_count} dead listing(s) after dedupe")
-    deduped = [_ensure_income_fields(item) for item in deduped]
-    apply_listing_lifecycle(deduped)
-    deduped.sort(key=_sort_newest_first)
-
-    attach_map_coordinates(deduped)
-    deduped = [_ensure_neighborhood(item) for item in deduped]
-
-    market_rows = [
-        {**item, "in_budget": True}
-        for item in deduped
-    ] + [
-        {**item, "in_budget": False}
-        for item in excluded_items
-    ]
-    record_market_listings(market_rows)
-    market_stats = build_market_stats(deduped, excluded_items, config.max_rent)
-
-    seekers_feed = build_seekers_feed()
-    payload = {
-        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "city": "Eindhoven",
-        "max_rent": config.max_rent,
-        "scan_profile": os.getenv("SCAN_PROFILE", "full"),
-        "provider_results": provider_results,
-        "listings": deduped,
-        "excluded_listings": excluded_items,
-        "market_stats": market_stats,
-        "duplicate_listings_removed": dupe_count,
-        "dead_listings_removed": dead_count,
-        "application_status": _load_application_status(),
-        "seekers_feed": seekers_feed,
-    }
-    _write_outputs(payload)
-    return payload
+    return _run
 
 
 def _write_outputs(payload: dict) -> None:
@@ -228,6 +254,12 @@ def _write_outputs(payload: dict) -> None:
             shutil.copy(cache_path, docs_data / "geocode_cache.json")
         except OSError:
             pass
+    liveness_cache = Path(os.getenv("LIVENESS_CACHE_PATH", "data/liveness_cache.json"))
+    if liveness_cache.exists():
+        try:
+            shutil.copy(liveness_cache, docs_data / "liveness_cache.json")
+        except OSError:
+            pass
 
 
 def _ensure_income_fields(item: dict) -> dict:
@@ -240,9 +272,7 @@ def _ensure_income_fields(item: dict) -> dict:
         return {**item, **platform_defaults}
     if item.get("income_multiplier") is not None or item.get("income_required_eur") is not None:
         return item
-    blob = " ".join(
-        p for p in (item.get("title"), item.get("location"), item.get("notes")) if p
-    )
+    blob = " ".join(p for p in (item.get("title"), item.get("location"), item.get("notes")) if p)
     fields = extract_income_requirement(blob, rent_eur=item.get("rent_eur"))
     if not fields:
         return item
@@ -347,4 +377,7 @@ def _match_tag(score: int) -> str:
 
 if __name__ == "__main__":
     result = run_workrun()
-    print(f"Generated {len(result['listings'])} listing(s) from {len(result['provider_results'])} provider(s).")
+    print(
+        f"Generated {len(result['listings'])} listing(s) from {len(result['provider_results'])} provider(s) "
+        f"in {result.get('scan_elapsed_seconds', '?')}s (tier={result.get('scan_tier')})."
+    )

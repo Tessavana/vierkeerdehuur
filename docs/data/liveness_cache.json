@@ -1,0 +1,62 @@
+{
+ "https://rentfinder.nl/properties/te-huur-2-kamer-appartement-herman-gorterlaan-in-eindhoven-1": {
+  "alive": true,
+  "source": "rentfinder",
+  "ts": 1787497391.0851514
+ },
+ "https://rentfinder.nl/properties/te-huur-2-kamer-appartement-koppele-in-eindhoven": {
+  "alive": true,
+  "source": "rentfinder",
+  "ts": 1787497390.5334024
+ },
+ "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-havensingel-in-eindhoven-1": {
+  "alive": true,
+  "source": "rentfinder",
+  "ts": 1787497391.2219646
+ },
+ "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-heeghtakker-in-eindhoven": {
+  "alive": true,
+  "source": "rentfinder",
+  "ts": 1787497391.1822884
+ },
+ "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-simon-van-leeuwenstraat-in-eindhoven": {
+  "alive": true,
+  "source": "rentfinder",
+  "ts": 1787497391.1388774
+ },
+ "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-pisanostraat-in-eindhoven": {
+  "alive": true,
+  "source": "rentfinder",
+  "ts": 1787497390.7304459
+ },
+ "https://rentfinder.nl/properties/te-huur-5-kamer-appartement-nederlandplein-in-eindhoven": {
+  "alive": true,
+  "source": "rentfinder",
+  "ts": 1787497390.7708147
+ },
+ "https://rentfinder.nl/properties/te-huur-appartement-zeelsterstraat-in-eindhoven": {
+  "alive": true,
+  "source": "rentfinder",
+  "ts": 1787497391.262463
+ },
+ "https://rentfinder.nl/properties/te-huur-studio-bleekweg-in-eindhoven-1": {
+  "alive": true,
+  "source": "rentfinder",
+  "ts": 1787497390.6177607
+ },
+ "https://rentfinder.nl/properties/te-huur-studio-korenbloemstraat-in-eindhoven": {
+  "alive": true,
+  "source": "rentfinder",
+  "ts": 1787497390.4766355
+ },
+ "https://vbtverhuurmakelaars.nl/woning/Eindhoven-Frits-Philipslaan-72/": {
+  "alive": false,
+  "source": "vbt",
+  "ts": 1787497410.5612054
+ },
+ "https://vbtverhuurmakelaars.nl/woning/Eindhoven-Gerard-Philipslaan-164/": {
+  "alive": false,
+  "source": "vbt",
+  "ts": 1787497410.5541966
+ }
+}

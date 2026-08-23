@@ -1,13 +1,20 @@
-# Full scan (~6–12 min): Playwright sources + Telegram alerts. Runs less often.
-name: Housing Scan (full)
+# Express scan (~2–4 min): HTTP providers live in parallel; Playwright sources from cache.
+name: Housing Scan (express)
 
 on:
+  push:
+    branches: ["main"]
+    paths:
+      - "docs/**"
+      - "src/**"
+      - ".github/workflows/housing-scan-express.yml"
+      - ".github/workflows/housing-scan-fast.yml"
   workflow_dispatch:
   schedule:
-    - cron: "25 */2 * * *"
+    - cron: "*/10 * * * *"
 
 concurrency:
-  group: housing-scan-full
+  group: housing-scan
   cancel-in-progress: true
 
 jobs:
@@ -46,55 +53,36 @@ jobs:
           restore-keys: |
             housing-state-
 
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ runner.os }}
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          python -m playwright install chromium
 
       - uses: actions/configure-pages@v5
 
-      - name: Full scan
+      - name: Express workrun
         env:
-          SCAN_PROFILE: full
-          SEARCH_URLS: ${{ vars.SEARCH_URLS || 'https://kamernet.nl/en/for-rent/apartment-eindhoven,https://www.pararius.com/apartments/eindhoven,https://www.funda.nl/zoeken/huur?selected_area=%5B%22eindhoven%22%5D,https://www.vesteda.com/nl/huurwoningen-eindhoven,https://www.vbtverhuurmakelaars.nl/huurwoningen-eindhoven,https://www.rotsvast.nl/woningaanbod/huur/eindhoven/,https://nmgwonen.nl/huurwoningen/eindhoven/,https://www.huurwoningen.nl/in/eindhoven/,https://www.huurwoningen.nl/in/veldhoven/,https://www.huislijn.nl/huurwoningen/nederland/noord-brabant/eindhoven,https://rentfinder.nl,https://directwonen.nl/huurwoningen-huren/eindhoven' }}
+          SCAN_PROFILE: fast
+          SCAN_TIER: express
+          SCAN_TIME_BUDGET_SECONDS: "420"
+          SCAN_PROVIDER_TIMEOUT_SECONDS: "90"
+          SCAN_PARALLEL_WORKERS: "5"
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+          OPENAI_API_KEY: ""
+          SEEKERS_LLM_MODE: "off"
+          LISTING_LLM_MODE: "off"
+          ENABLE_PLAYWRIGHT_FALLBACK: "false"
+          SEARCH_URLS: ${{ vars.SEARCH_URLS || 'https://kamernet.nl/en/for-rent/apartment-eindhoven,https://www.pararius.com/apartments/eindhoven,https://www.funda.nl/zoeken/huur?selected_area=%5B%22eindhoven%22%5D,https://www.vesteda.com/nl/huurwoningen-eindhoven,https://www.vbtverhuurmakelaars.nl/huurwoningen-eindhoven,https://www.rotsvast.nl/woningaanbod/huur/eindhoven/,https://nmgwonen.nl/huurwoningen/eindhoven/,https://www.huurwoningen.nl/in/eindhoven/,https://www.huislijn.nl/huurwoningen/nederland/noord-brabant/eindhoven,https://rentfinder.nl,https://directwonen.nl/huurwoningen-huren/eindhoven' }}
           MAX_RENT: ${{ vars.MAX_RENT || '1150' }}
           MIN_SIZE: ${{ vars.MIN_SIZE || '20' }}
-          POLL_INTERVAL_SECONDS: "300"
           SQLITE_PATH: data/listings.db
-          ENABLE_PLAYWRIGHT_FALLBACK: "true"
-          INCREMENTAL_SCAN: "true"
-          SCAN_ROTATION: "3"
-          GITHUB_RUN_NUMBER: ${{ github.run_number }}
-          HUURWONINGEN_MAX_PAGES: "16"
-          HUURWONINGEN_MAX_DETAILS: "280"
-          REDDIT_SEEKER_RSS: "https://www.reddit.com/r/eindhoven/new.rss,https://www.reddit.com/r/NetherlandsHousing/new.rss"
-          RENTFINDER_MAX_PAGES: "12"
-          VESTEDA_MAX_DETAIL_PAGES: "20"
-          FUNDA_USE_API: "true"
-          FUNDA_API_MAX_PRICE: "2500"
-          FUNDA_MAX_PAGES: "12"
-          FUNDA_MAX_DETAIL_PAGES: "40"
-          VBT_WONINGEN_CACHE_TTL_SECONDS: "2700"
-          NMG_MAX_PAGES: "6"
-          NMG_MAX_DETAIL_PAGES: "40"
+          VBT_WONINGEN_CACHE_TTL_SECONDS: "3600"
           GEOCODE_USE_PDOK: "true"
-          TELEGRAM_ENABLED: ${{ secrets.TELEGRAM_BOT_TOKEN != '' && secrets.TELEGRAM_CHAT_ID != '' }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          SEEKERS_LLM_MODE: borderline
-          LISTING_LLM_MODE: missing_fields
-        run: |
-          python -m src.telegram_feedback
-          python main.py --once
-          python -m src.workrun
+          LISTING_LIVENESS_CHECK: "true"
+          LISTING_LIVENESS_WORKERS: "16"
+          LISTING_LIVENESS_TTL_ALIVE: "14400"
+          REDDIT_SEEKER_RSS: "https://www.reddit.com/r/eindhoven/new.rss,https://www.reddit.com/r/NetherlandsHousing/new.rss"
+        run: python -m src.workrun
 
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -121,6 +109,9 @@ jobs:
   deploy:
     needs: scan
     runs-on: ubuntu-latest
+    concurrency:
+      group: github-pages-deploy
+      cancel-in-progress: true
     permissions:
       pages: write
       id-token: write

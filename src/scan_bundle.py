@@ -4,13 +4,13 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from src.scan_schedule import incremental_scan_enabled, scan_rotation_modulus
+from src.scan_schedule import bundle_enabled
 
 BUNDLE_PATH = Path("data/scan_bundle.json")
 
 
 def load_scan_bundle() -> dict[str, list[dict]]:
-    if not incremental_scan_enabled() or scan_rotation_modulus() <= 1:
+    if not bundle_enabled():
         return {}
     if not BUNDLE_PATH.exists():
         return {}
@@ -25,7 +25,7 @@ def load_scan_bundle() -> dict[str, list[dict]]:
 
 
 def save_scan_bundle(bundle: dict[str, list[dict]]) -> None:
-    if not incremental_scan_enabled() or scan_rotation_modulus() <= 1:
+    if not bundle_enabled():
         return
     BUNDLE_PATH.parent.mkdir(parents=True, exist_ok=True)
     payload = {

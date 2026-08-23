@@ -1,20 +1,13 @@
-# Light scan (~1–2 min): HTTP/API sources; Playwright providers rotate on cache.
-name: Housing Scan (fast)
+# Deep scan (~8–12 min): rotates Playwright providers; refreshes cache bundle.
+name: Housing Scan (deep)
 
 on:
-  push:
-    branches: ["main"]
-    paths:
-      - "docs/**"
-      - "src/**"
-      - ".github/workflows/housing-scan-fast.yml"
   workflow_dispatch:
   schedule:
-    # Every 10 min — live scrape + deploy (never stale committed JSON).
-    - cron: "*/10 * * * *"
+    - cron: "15 */4 * * *"
 
 concurrency:
-  group: housing-scan
+  group: housing-scan-deep
   cancel-in-progress: true
 
 jobs:
@@ -41,6 +34,7 @@ jobs:
             data/telegram_offset.txt
             data/scan_bundle.json
             data/geocode_cache.json
+            data/liveness_cache.json
             data/listing_registry.json
             data/market_registry.json
             data/detail_cache.json
@@ -66,9 +60,13 @@ jobs:
 
       - uses: actions/configure-pages@v5
 
-      - name: Fast workrun
+      - name: Deep workrun
         env:
           SCAN_PROFILE: fast
+          SCAN_TIER: deep
+          SCAN_TIME_BUDGET_SECONDS: "900"
+          SCAN_PROVIDER_TIMEOUT_SECONDS: "180"
+          SCAN_PARALLEL_WORKERS: "3"
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
           OPENAI_API_KEY: ""
           SEEKERS_LLM_MODE: "off"
@@ -81,10 +79,11 @@ jobs:
           GEOCODE_USE_PDOK: "true"
           FUNDA_USE_API: "true"
           FUNDA_API_MAX_PRICE: "2500"
-          PARARIUS_MAX_DETAILS: "20"
-          HUURWONINGEN_MAX_PAGES: "6"
-          HUURWONINGEN_MAX_DETAILS: "80"
+          PARARIUS_MAX_DETAILS: "15"
+          HUURWONINGEN_MAX_PAGES: "4"
+          HUURWONINGEN_MAX_DETAILS: "40"
           LISTING_LIVENESS_CHECK: "true"
+          LISTING_LIVENESS_WORKERS: "12"
           DIRECTWONEN_MAX_PAGES: "2"
           REDDIT_SEEKER_RSS: "https://www.reddit.com/r/eindhoven/new.rss,https://www.reddit.com/r/NetherlandsHousing/new.rss"
         run: python -m src.workrun
@@ -101,6 +100,7 @@ jobs:
             data/telegram_offset.txt
             data/scan_bundle.json
             data/geocode_cache.json
+            data/liveness_cache.json
             data/listing_registry.json
             data/market_registry.json
             data/detail_cache.json

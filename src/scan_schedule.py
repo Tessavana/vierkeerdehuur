@@ -1,35 +1,39 @@
-"""Incremental scan: rotate heavy providers; fast profile for frequent light runs."""
+"""Incremental scan tiers: express (fast CI) vs deep (Playwright rotation)."""
 
 import os
 
 NUM_PROVIDER_GROUPS = 3
 
-# Fast = HTTP/API only (~1–2 min). Heavy = Playwright or many detail pages.
-_FAST_PROVIDERS = frozenset(
+# HTTP/API — live every express run.
+_EXPRESS_ALWAYS_LIVE = frozenset(
     {
-        "ParariusProvider",
+        "VbtProvider",
+        "RentfinderProvider",
         "RotsvastProvider",
         "KamernetProvider",
         "HuislijnProvider",
-        "RentfinderProvider",
-        "VbtProvider",
-        "DirectWonenProvider",
-        "HuurwoningenProvider",
     }
 )
-# Playwright-heavy: use cached bundle on most fast runs (see _fast_rotate_live).
-_FAST_ROTATE_PROVIDERS: dict[str, int] = {
-    "HuurwoningenProvider": 6,
-    "ParariusProvider": 3,
-    "DirectWonenProvider": 3,
-}
-_HEAVY_PROVIDERS = frozenset(
+
+# Playwright-heavy — cache-only on express; rotated on deep runs.
+_EXPRESS_CACHE_ONLY = frozenset(
     {
         "FundaProvider",
         "NmgProvider",
         "VestedaProvider",
+        "HuurwoningenProvider",
+        "ParariusProvider",
     }
 )
+
+_FAST_ROTATE_PROVIDERS: dict[str, int] = {
+    "HuurwoningenProvider": 6,
+    "ParariusProvider": 3,
+    "DirectWonenProvider": 4,
+    "FundaProvider": 4,
+    "NmgProvider": 6,
+    "VestedaProvider": 6,
+}
 
 _PROVIDER_PHASE: dict[str, int] = {
     "ParariusProvider": 0,
@@ -50,10 +54,22 @@ def scan_profile() -> str:
     return os.getenv("SCAN_PROFILE", "full").strip().lower()
 
 
-def incremental_scan_enabled() -> bool:
+def scan_tier() -> str:
+    raw = os.getenv("SCAN_TIER", "").strip().lower()
+    if raw in {"express", "deep"}:
+        return raw
+    return "express" if scan_profile() == "fast" else "deep"
+
+
+def bundle_enabled() -> bool:
+    """Fast/express runs rely on the bundle for cache-only providers."""
     if scan_profile() == "fast":
         return True
     return os.getenv("INCREMENTAL_SCAN", "false").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def incremental_scan_enabled() -> bool:
+    return bundle_enabled()
 
 
 def scan_rotation_modulus() -> int:
@@ -82,13 +98,13 @@ def _fast_rotate_live(class_name: str) -> bool:
 
 
 def current_phase() -> int | None:
-    if scan_profile() == "fast":
+    if scan_tier() == "express":
         return None
     if not incremental_scan_enabled():
         return None
     mod = scan_rotation_modulus()
     if mod <= 1:
-        return None
+        mod = NUM_PROVIDER_GROUPS
     return _github_run_number() % mod
 
 
@@ -96,17 +112,21 @@ def provider_should_fetch_live(class_name: str) -> bool:
     if class_name == "JsonFileProvider":
         return True
 
-    profile = scan_profile()
-    if profile == "fast":
-        if class_name in _HEAVY_PROVIDERS:
+    tier = scan_tier()
+
+    if tier == "express":
+        if class_name in _EXPRESS_CACHE_ONLY:
             return False
+        if class_name in _EXPRESS_ALWAYS_LIVE:
+            return True
         return _fast_rotate_live(class_name)
 
-    phase = current_phase()
-    if phase is None:
+    # deep tier: rotate Playwright providers; always refresh HTTP sources.
+    if class_name in _EXPRESS_ALWAYS_LIVE:
         return True
-    group = _PROVIDER_PHASE.get(class_name, 0)
-    return group == (phase % NUM_PROVIDER_GROUPS)
+    if class_name in _EXPRESS_CACHE_ONLY:
+        return _fast_rotate_live(class_name)
+    return _fast_rotate_live(class_name)
 
 
 def filter_providers_for_incremental(providers: list) -> list:
