@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vier keer de huur</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="./styles.css?v=20260823h" />
+    <link rel="stylesheet" href="./styles.css?v=20260823i" />
   </head>
   <body>
     <main class="container">
       <section class="hero">
         <div class="hero-top-right">
           <div class="last-updated" id="last-updated">Laatste update: ...</div>
+          <p class="stale-data-banner" id="stale-data-banner" hidden></p>
         </div>
         <h1>Vier Keer de Huur</h1>
         <p class="hero-lead">
@@ -29,16 +30,17 @@
       </section>
 
       <a class="hero-mobile-banner" href="./ruimte-gezocht.html">
-        <span class="hero-mobile-banner-kicker">Twee kanten van dezelfde markt</span>
-        <span class="hero-mobile-banner-title">Swipe door Eindhoven · Ruimte Gezocht →</span>
-        <span class="hero-mobile-banner-sub">Filters, mini-kaart, inkomenseis in je zak. Dit dashboard blijft je data-overzicht.</span>
+        <span class="hero-mobile-banner-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="hero-mobile-banner-body">
+          <span class="hero-mobile-banner-kicker">Twee kanten van dezelfde markt</span>
+          <span class="hero-mobile-banner-title">Swipe door Eindhoven · Ruimte Gezocht →</span>
+          <span class="hero-mobile-banner-sub">Filters, mini-kaart, inkomenseis in je zak. Dit dashboard blijft je data-overzicht.</span>
+        </span>
       </a>
-
-      <section class="panel seekers-panel">
-        <h2>Live feed · zoekers</h2>
-        <p class="muted" id="seekers-subtitle">Zoekers in Eindhoven · alle bronnen</p>
-        <div id="seekers-feed" class="seekers-feed"></div>
-      </section>
 
       <section class="panel map-section">
         <h2>Matches op de kaart</h2>
@@ -56,6 +58,12 @@
             <div id="selected-match" class="muted">Klik op een pin op de kaart om details te zien.</div>
           </aside>
         </div>
+      </section>
+
+      <section class="panel seekers-panel">
+        <h2>Live feed · zoekers</h2>
+        <p class="muted" id="seekers-subtitle">Zoekers in Eindhoven · alle bronnen</p>
+        <div id="seekers-feed" class="seekers-feed"></div>
       </section>
 
       <section class="panel overview-section">

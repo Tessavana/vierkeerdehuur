@@ -4,76 +4,105 @@ const EINDHOVEN_BBOX = { minLat: 51.39, maxLat: 51.52, minLon: 5.39, maxLon: 5.5
 const PDOK_FREE = "https://api.pdok.nl/bzk/locatieserver/search/v3_1/free";
 const CLIENT_CACHE_KEY = "housing_geocode_client_v1";
 
+const OFFICIAL_STADSDELEN = [
+  "Woensel-noord",
+  "Woensel-zuid",
+  "Strijp",
+  "Centrum",
+  "Tongelre",
+  "Gestel",
+  "Stratum",
+];
+
 const POSTCODE_WIJK = {
   5611: "Centrum",
-  5612: "Woensel",
+  5612: "Woensel-zuid",
   5613: "Strijp",
   5614: "Strijp",
   5615: "Strijp",
   5616: "Gestel",
-  5617: "Strijp-S",
+  5617: "Strijp",
   5618: "Gestel",
-  5629: "Meerhoven",
-  5630: "Meerhoven",
-  5621: "Woensel",
-  5622: "Woensel",
-  5623: "Woensel",
-  5625: "Woensel",
-  5626: "Woensel",
-  5627: "Woensel",
-  5628: "Woensel",
-  5631: "Woensel",
-  5632: "Woensel",
-  5633: "Woensel",
+  5621: "Woensel-zuid",
+  5622: "Woensel-zuid",
+  5623: "Woensel-zuid",
+  5625: "Woensel-zuid",
+  5626: "Woensel-zuid",
+  5627: "Woensel-zuid",
+  5628: "Woensel-zuid",
+  5629: "Woensel-noord",
+  5630: "Woensel-noord",
+  5631: "Woensel-noord",
+  5632: "Woensel-noord",
+  5633: "Woensel-noord",
   5641: "Tongelre",
   5642: "Tongelre",
   5643: "Tongelre",
-  5644: "Tongelre",
-  5645: "Tongelre",
-  5646: "Tongelre",
-  5651: "Woensel",
-  5652: "Woensel",
-  5653: "Woensel",
-  5654: "Woensel",
-  5655: "Woensel",
-  5656: "Woensel",
-  5657: "Woensel",
-  5658: "Woensel",
+  5644: "Stratum",
+  5645: "Stratum",
+  5646: "Stratum",
+  5651: "Woensel-zuid",
+  5652: "Woensel-zuid",
+  5653: "Woensel-zuid",
+  5654: "Woensel-zuid",
+  5655: "Woensel-zuid",
+  5656: "Woensel-zuid",
+  5657: "Woensel-zuid",
+  5658: "Woensel-zuid",
 };
 
-function wijkFromPostcode(pc) {
-  if (!pc || pc.length < 4) return "";
-  const prefix = parseInt(pc.slice(0, 4), 10);
-  return POSTCODE_WIJK[prefix] || "";
-}
-
-function resolveNeighborhood(l) {
-  if (l.neighborhood) return l.neighborhood;
-  const blob = `${l.title || ""} ${l.location || ""} ${l.notes || ""}`;
-  const pc = blob.match(/\b(\d{4})\s*([A-Za-z]{2})\b/) || blob.match(/\b(\d{4})([A-Za-z]{2})\b/);
-  if (pc) {
-    const w = wijkFromPostcode(`${pc[1]}${pc[2].toUpperCase()}`);
-    if (w) return w;
-  }
-  const lower = blob.toLowerCase();
-  const keys = [
-    ["strijp-s", "Strijp-S"],
-    ["strijp-r", "Strijp-R"],
-    ["blixembosch", "Blixembosch"],
-    ["regentekwartier", "Centrum"],
-    ["oud-strijp", "Oud-Strijp"],
-    ["meerhoven", "Meerhoven"],
+function normalizeStadsdeel(raw) {
+  if (!raw) return "Centrum";
+  const key = String(raw).trim().toLowerCase().replace(/_/g, "-");
+  const keywords = [
+    ["woensel-noord", "Woensel-noord"],
+    ["woensel-zuid", "Woensel-zuid"],
+    ["meerhoven", "Woensel-noord"],
     ["strijp", "Strijp"],
-    ["woensel", "Woensel"],
+    ["centrum", "Centrum"],
+    ["regentekwartier", "Centrum"],
     ["tongelre", "Tongelre"],
     ["gestel", "Gestel"],
     ["stratum", "Stratum"],
+    ["woensel", "Woensel-zuid"],
+  ];
+  for (const [k, v] of keywords) {
+    if (key.includes(k)) return v;
+  }
+  for (const s of OFFICIAL_STADSDELEN) {
+    if (s.toLowerCase() === key) return s;
+  }
+  return "Centrum";
+}
+
+function wijkFromPostcode(pc) {
+  if (!pc || pc.length < 4) return "Centrum";
+  const prefix = parseInt(pc.slice(0, 4), 10);
+  return POSTCODE_WIJK[prefix] || "Centrum";
+}
+
+function resolveNeighborhood(l) {
+  if (l.neighborhood) return normalizeStadsdeel(l.neighborhood);
+  const blob = `${l.title || ""} ${l.location || ""} ${l.notes || ""}`;
+  const pc = blob.match(/\b(\d{4})\s*([A-Za-z]{2})\b/) || blob.match(/\b(\d{4})([A-Za-z]{2})\b/);
+  if (pc) return wijkFromPostcode(`${pc[1]}${pc[2].toUpperCase()}`);
+  const lower = blob.toLowerCase();
+  const keys = [
+    ["woensel-noord", "Woensel-noord"],
+    ["woensel-zuid", "Woensel-zuid"],
+    ["meerhoven", "Woensel-noord"],
+    ["strijp", "Strijp"],
     ["centrum", "Centrum"],
+    ["regentekwartier", "Centrum"],
+    ["tongelre", "Tongelre"],
+    ["gestel", "Gestel"],
+    ["stratum", "Stratum"],
+    ["woensel", "Woensel-zuid"],
   ];
   for (const [k, v] of keys) {
     if (lower.includes(k)) return v;
   }
-  return "Eindhoven";
+  return "Centrum";
 }
 
 function emptyVal() {

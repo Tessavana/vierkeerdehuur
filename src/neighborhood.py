@@ -1,46 +1,74 @@
-"""Resolve Eindhoven wijk from listing address text (title, location, notes)."""
+"""Resolve Eindhoven stadsdeel — only the 7 official names."""
 
 from __future__ import annotations
 
 import re
 
-from src.eindhoven_geo import _POSTCODE_WIJK
+# Official stadsdelen (Eindhoven gemeente).
+OFFICIAL_STADSDELEN: tuple[str, ...] = (
+    "Woensel-noord",
+    "Woensel-zuid",
+    "Strijp",
+    "Centrum",
+    "Tongelre",
+    "Gestel",
+    "Stratum",
+)
 
-# Longer phrases first.
-_KEYWORD_WIJK: list[tuple[str, str]] = [
-    ("strijp-s", "Strijp-S"),
-    ("strijp-r", "Strijp-R"),
-    ("blixembosch-buiten", "Blixembosch"),
-    ("blixembosch", "Blixembosch"),
-    ("regentekwartier", "Centrum"),
-    ("het regentekwartier", "Centrum"),
-    ("oud-strijp", "Oud-Strijp"),
-    ("oud-stratum", "Oud-Stratum"),
-    ("meerhoven", "Meerhoven"),
-    ("tivoli", "Tivoli"),
-    ("picuskade", "Woensel"),
+# Postcode prefix -> official stadsdeel.
+_POSTCODE_STADSDEEL: dict[str, str] = {
+    "5611": "Centrum",
+    "5612": "Woensel-zuid",
+    "5613": "Strijp",
+    "5614": "Strijp",
+    "5615": "Strijp",
+    "5616": "Gestel",
+    "5617": "Strijp",
+    "5618": "Gestel",
+    "5621": "Woensel-zuid",
+    "5622": "Woensel-zuid",
+    "5623": "Woensel-zuid",
+    "5625": "Woensel-zuid",
+    "5626": "Woensel-zuid",
+    "5627": "Woensel-zuid",
+    "5628": "Woensel-zuid",
+    "5629": "Woensel-noord",
+    "5630": "Woensel-noord",
+    "5631": "Woensel-noord",
+    "5632": "Woensel-noord",
+    "5633": "Woensel-noord",
+    "5641": "Tongelre",
+    "5642": "Tongelre",
+    "5643": "Tongelre",
+    "5644": "Stratum",
+    "5645": "Stratum",
+    "5646": "Stratum",
+    "5651": "Woensel-zuid",
+    "5652": "Woensel-zuid",
+    "5653": "Woensel-zuid",
+    "5654": "Woensel-zuid",
+    "5655": "Woensel-zuid",
+    "5656": "Woensel-zuid",
+    "5657": "Woensel-zuid",
+    "5658": "Woensel-zuid",
+}
+
+_KEYWORD_STADSDEEL: list[tuple[str, str]] = [
+    ("woensel-noord", "Woensel-noord"),
+    ("woensel-zuid", "Woensel-zuid"),
+    ("meerhoven", "Woensel-noord"),
+    ("strijp-s", "Strijp"),
+    ("strijp-r", "Strijp"),
     ("strijp", "Strijp"),
-    ("woensel", "Woensel"),
+    ("oud-strijp", "Strijp"),
+    ("centrum", "Centrum"),
+    ("regentekwartier", "Centrum"),
     ("tongelre", "Tongelre"),
     ("gestel", "Gestel"),
     ("stratum", "Stratum"),
-    ("centrum", "Centrum"),
-    ("meerrijk", "Meerrijk"),
-    ("bergen", "Bergen"),
-    ("vonderkwartier", "Vonderkwartier"),
-    ("engelsbergen", "Engelsbergen"),
-    ("schrijversbuurt", "Schrijversbuurt"),
-    ("genneper", "Genneper"),
-    ("vaartbroek", "Vaartbroek"),
-    ("rijpelberg", "Gestel"),
-    ("hartje rio", "Gestel"),
-    ("next stadsdeel", "Strijp-S"),
+    ("oud-stratum", "Stratum"),
+    ("woensel", "Woensel-zuid"),
 ]
-
-_WIJK_IN_TEXT = re.compile(
-    r"(?:gelegen\s+in\s+(?:de\s+)?wijk|wijk)\s+([A-Za-zÀ-ÿ\-'\s]{3,40})",
-    re.I,
-)
 
 
 def extract_postcode(text: str) -> str | None:
@@ -53,32 +81,27 @@ def extract_postcode(text: str) -> str | None:
     return None
 
 
-def wijk_from_postcode(pc: str | None) -> str:
+def normalize_stadsdeel(raw: str) -> str:
+    """Map any label to one of the 7 official stadsdelen."""
+    if not raw:
+        return "Centrum"
+    key = raw.strip().lower().replace("_", "-")
+    for needle, label in _KEYWORD_STADSDEEL:
+        if needle in key or key == needle:
+            return label
+    for official in OFFICIAL_STADSDELEN:
+        if official.lower() == key:
+            return official
+    pc = extract_postcode(raw)
+    if pc and pc[:4] in _POSTCODE_STADSDEEL:
+        return _POSTCODE_STADSDEEL[pc[:4]]
+    return "Centrum"
+
+
+def stadsdeel_from_postcode(pc: str | None) -> str:
     if not pc or len(pc) < 4:
-        return ""
-    prefix = pc[:4]
-    if prefix in _POSTCODE_WIJK:
-        return _POSTCODE_WIJK[prefix]
-    # Eindhoven ranges not in BAG lookup table.
-    try:
-        n = int(prefix)
-    except ValueError:
-        return ""
-    if 5611 <= n <= 5617:
-        if n in {5616, 5617}:
-            return "Gestel" if n == 5616 else "Strijp-S"
-        if n in {5613, 5614, 5615}:
-            return "Strijp"
-        return "Centrum" if n == 5611 else "Woensel"
-    if 5627 <= n <= 5633:
-        return "Woensel"
-    if 5629 <= n <= 5630:
-        return "Meerhoven"
-    if 5641 <= n <= 5646:
-        return "Tongelre"
-    if 5651 <= n <= 5658:
-        return "Woensel"
-    return ""
+        return "Centrum"
+    return _POSTCODE_STADSDEEL.get(pc[:4], "Centrum")
 
 
 def resolve_neighborhood(
@@ -88,25 +111,15 @@ def resolve_neighborhood(
     *,
     geocode_wijk: str = "",
 ) -> str:
-    if (geocode_wijk or "").strip():
-        return geocode_wijk.strip()
+    if geocode_wijk:
+        return normalize_stadsdeel(geocode_wijk)
 
     blob = f"{title} {location} {notes or ''}"
     searchable = blob.lower()
 
-    m = _WIJK_IN_TEXT.search(blob)
-    if m:
-        raw = m.group(1).strip().split(".")[0].split(",")[0].strip()
-        if raw and len(raw) < 40:
-            return raw.title()
-
-    for needle, label in _KEYWORD_WIJK:
+    for needle, label in _KEYWORD_STADSDEEL:
         if needle in searchable:
             return label
 
     pc = extract_postcode(location) or extract_postcode(title) or extract_postcode(notes or "")
-    from_pc = wijk_from_postcode(pc)
-    if from_pc:
-        return from_pc
-
-    return "Eindhoven"
+    return stadsdeel_from_postcode(pc)

@@ -2,9 +2,15 @@
 name: Housing Scan (fast)
 
 on:
+  push:
+    branches: ["main"]
+    paths:
+      - "docs/**"
+      - "src/**"
+      - ".github/workflows/housing-scan-fast.yml"
   workflow_dispatch:
   schedule:
-    # Every 10 min — data refresh. Docs deploy separately on push (pages-deploy.yml).
+    # Every 10 min — live scrape + deploy (never stale committed JSON).
     - cron: "*/10 * * * *"
 
 concurrency:
@@ -76,8 +82,9 @@ jobs:
           FUNDA_USE_API: "true"
           FUNDA_API_MAX_PRICE: "2500"
           PARARIUS_MAX_DETAILS: "20"
-          HUURWONINGEN_MAX_PAGES: "3"
-          HUURWONINGEN_MAX_DETAILS: "40"
+          HUURWONINGEN_MAX_PAGES: "6"
+          HUURWONINGEN_MAX_DETAILS: "80"
+          LISTING_LIVENESS_CHECK: "true"
           DIRECTWONEN_MAX_PAGES: "2"
           REDDIT_SEEKER_RSS: "https://www.reddit.com/r/eindhoven/new.rss,https://www.reddit.com/r/NetherlandsHousing/new.rss"
         run: python -m src.workrun

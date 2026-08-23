@@ -2,29 +2,34 @@
 <html lang="nl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
     <meta name="theme-color" content="#171717" />
     <title>Ruimte Gezocht · Eindhoven</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="./ruimte-gezocht.css?v=5" />
+    <link rel="stylesheet" href="./ruimte-gezocht.css?v=6" />
   </head>
   <body>
     <div class="rg-app">
       <header class="rg-bar">
         <div class="rg-bar-left">
           <p class="rg-kicker">Ruimte Gezocht</p>
-          <p class="rg-tagline">Hoeveel Eindhoven blijft er voor jou over?</p>
+          <p class="rg-tagline" id="rg-tagline">Woningen waar je op mag reageren</p>
         </div>
         <div class="rg-bar-actions">
-          <button type="button" class="rg-saved-btn" id="saved-btn" hidden aria-label="Opgeslagen woningen">
+          <button type="button" class="rg-saved-btn" id="saved-btn" hidden aria-label="Opgeslagen">
             ♥ <span id="saved-count">0</span>
           </button>
           <button type="button" class="rg-filter-btn" id="filter-toggle" aria-expanded="false">Filters</button>
         </div>
       </header>
 
+      <div class="rg-mode-toggle" id="mode-toggle">
+        <button type="button" class="rg-mode-btn active" data-view="feed">Feed</button>
+        <button type="button" class="rg-mode-btn" data-view="map">Kaart</button>
+      </div>
+
       <div class="rg-filters" id="filter-panel" hidden>
-        <p class="rg-filters-intro">Stel je zoekprofiel in. Daarna zie je matches op de kaart.</p>
+        <p class="rg-filters-intro">Stel je profiel in. Daarna zie je alleen woningen binnen bereik.</p>
         <label class="rg-field">
           <span>Bruto per maand</span>
           <div class="rg-input-wrap"><span>€</span><input id="income" type="number" value="3500" step="100" /></div>
@@ -48,8 +53,8 @@
           </label>
         </div>
         <div class="rg-field">
-          <span>Wijken in Eindhoven</span>
-          <p class="rg-field-hint muted">Niets aangevinkt = alle wijken</p>
+          <span>Stadsdeel</span>
+          <p class="rg-field-hint muted">Niets aangevinkt = heel Eindhoven</p>
           <div id="wijk-filters" class="rg-wijk-filters"></div>
         </div>
         <div class="rg-filter-actions">
@@ -79,32 +84,24 @@
         <div id="landlord-result" class="rg-landlord-result"></div>
       </div>
 
-      <main class="rg-feed" id="feed" tabindex="0">
-        <p class="rg-feed-loading muted">Woningen laden…</p>
-      </main>
+      <div class="rg-main" id="rg-main">
+        <main class="rg-feed" id="feed" tabindex="0">
+          <p class="rg-feed-loading muted">Woningen laden…</p>
+        </main>
+        <div class="rg-map-panel" id="map-panel" hidden>
+          <div id="rg-map"></div>
+          <p class="rg-map-stats" id="map-stats"></p>
+        </div>
+      </div>
 
       <nav class="rg-nav">
-        <button type="button" class="rg-nav-btn active" data-view="feed">Woningen</button>
         <button type="button" class="rg-nav-btn" data-view="seekers">Je bent niet alleen</button>
-        <button type="button" class="rg-nav-btn" data-view="map" id="nav-map">Kaart</button>
-        <a class="rg-nav-btn" href="./index.html">Data</a>
+        <a class="rg-nav-btn" href="./index.html">Dashboard</a>
       </nav>
-
-      <div class="rg-map-overlay" id="map-overlay" hidden>
-        <div class="rg-map-head">
-          <button type="button" class="rg-back" id="map-close">← feed</button>
-          <div class="rg-map-toggle">
-            <button type="button" class="active" data-map-mode="all">Alles</button>
-            <button type="button" data-map-mode="yours">Jouw Eindhoven</button>
-          </div>
-        </div>
-        <div id="rg-map"></div>
-        <p class="rg-map-stats" id="map-stats"></p>
-      </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="./geo-utils.js?v=3"></script>
-    <script src="./ruimte-gezocht.js?v=5"></script>
+    <script src="./geo-utils.js?v=4"></script>
+    <script src="./ruimte-gezocht.js?v=6"></script>
   </body>
 </html>

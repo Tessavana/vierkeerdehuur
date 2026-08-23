@@ -533,6 +533,16 @@ async function loadRun() {
   if (updated) {
     updated.textContent = `Laatste update: ${new Date(data.generated_at_utc).toLocaleString("nl-NL")}`;
   }
+  const staleBanner = document.getElementById("stale-data-banner");
+  if (staleBanner && data.generated_at_utc) {
+    const ageH = (Date.now() - new Date(data.generated_at_utc).getTime()) / 3600000;
+    if (ageH > 6) {
+      staleBanner.hidden = false;
+      staleBanner.textContent = `Let op: data is ${Math.round(ageH)} uur oud. Volgende scan ververst de matches.`;
+    } else {
+      staleBanner.hidden = true;
+    }
+  }
   const subtitle = document.getElementById("results-subtitle");
   const cache = await loadGeocodeCache();
   const listings = await attachResolvedCoordsAsync(data.listings || [], cache);

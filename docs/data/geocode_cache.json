@@ -1,4 +1,29 @@
 {
+ "https://rentfinder.nl/properties/te-huur-2-kamer-appartement-herman-gorterlaan-in-eindhoven-1": {
+  "lat": 51.417831,
+  "lon": 5.481504,
+  "wijk": ""
+ },
+ "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-heeghtakker-in-eindhoven": {
+  "lat": 51.472757,
+  "lon": 5.486424,
+  "wijk": ""
+ },
+ "https://rentfinder.nl/properties/te-huur-3-kamer-appartement-simon-van-leeuwenstraat-in-eindhoven": {
+  "lat": 51.442734,
+  "lon": 5.432237,
+  "wijk": ""
+ },
+ "https://rentfinder.nl/properties/te-huur-4-kamer-appartement-pisanostraat-in-eindhoven": {
+  "lat": 51.460507,
+  "lon": 5.475188,
+  "wijk": ""
+ },
+ "https://rentfinder.nl/properties/te-huur-5-kamer-appartement-nederlandplein-in-eindhoven": {
+  "lat": 51.478615,
+  "lon": 5.463666,
+  "wijk": ""
+ },
  "https://rentfinder.nl/properties/te-huur-appartement-bomanshof-217-j-in-eindhoven-1": {
   "lat": 51.431028,
   "lon": 5.485014,
@@ -44,6 +69,11 @@
   "lon": 5.449288,
   "wijk": "Halve Maan"
  },
+ "https://rentfinder.nl/properties/te-huur-studio-bleekweg-in-eindhoven-1": {
+  "lat": 51.435581,
+  "lon": 5.484314,
+  "wijk": ""
+ },
  "https://rentfinder.nl/properties/te-huur-studio-bomanshof-in-eindhoven": {
   "lat": 51.43136,
   "lon": 5.48496,
@@ -58,6 +88,11 @@
   "lat": 51.441073,
   "lon": 5.477006,
   "wijk": "Centrum"
+ },
+ "https://rentfinder.nl/properties/te-huur-studio-korenbloemstraat-in-eindhoven": {
+  "lat": 51.418,
+  "lon": 5.501359,
+  "wijk": ""
  },
  "https://rentfinder.nl/properties/te-huur-studio-nieuwstraat-in-eindhoven": {
   "lat": 51.440404,

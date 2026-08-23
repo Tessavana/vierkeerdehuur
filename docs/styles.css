@@ -37,20 +37,47 @@ body {
   color: #171717;
 }
 .last-updated { font-size: 13px; color: #5f5f5f; }
+.stale-data-banner {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #8a3b00;
+  background: #fff3e0;
+  border: 1px solid #e8a54b;
+  border-radius: 8px;
+  max-width: 280px;
+}
 .hero-mobile-banner {
-  display: block;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
   margin-bottom: 18px;
-  padding: 18px 20px;
-  border: 2px solid #e8a54b;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #fff9f0 0%, #fff 55%, #f0f7f4 100%);
-  color: #2a2a2a;
+  padding: 16px 18px;
+  border: 2px solid #171717;
+  border-radius: 12px;
+  background: #fff;
+  color: #171717;
   text-decoration: none;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: background 0.15s;
 }
 .hero-mobile-banner:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(232, 165, 75, 0.25);
+  background: #f4f4f4;
+}
+.hero-mobile-banner-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 2px solid #171717;
+  border-radius: 10px;
+  color: #171717;
+}
+.hero-mobile-banner-body {
+  min-width: 0;
+  flex: 1;
 }
 .hero-mobile-banner-kicker {
   display: block;
@@ -58,7 +85,7 @@ body {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #b35900;
+  color: #171717;
   margin-bottom: 6px;
 }
 .hero-mobile-banner-title {
@@ -73,7 +100,7 @@ body {
   display: block;
   font-size: 14px;
   line-height: 1.45;
-  color: #555;
+  color: #666;
 }
 .hero-mobile-link {
   display: inline-block;

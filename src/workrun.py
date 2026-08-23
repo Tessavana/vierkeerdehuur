@@ -11,12 +11,13 @@ from src.application_count import attach_application_count
 from src.income_requirement import attach_income_requirement, extract_income_requirement, apply_platform_income_defaults
 from src.listing_dedupe import dedupe_listings
 from src.listing_llm_extract import maybe_llm_fill_listing
-from src.listing_registry import apply_listing_lifecycle
+from src.listing_liveness import filter_alive_listings
 from src.market_registry import build_market_stats, record_market_listings
 from src.eindhoven_geo import attach_map_coordinates
 from src.neighborhood import resolve_neighborhood
 from src.scan_bundle import load_scan_bundle, save_scan_bundle
-from src.scan_schedule import provider_should_fetch_live, scan_profile
+from src.listing_registry import apply_listing_lifecycle
+from src.scan_schedule import scan_profile, provider_should_fetch_live, _HEAVY_PROVIDERS
 from src.seekers.build_feed import build_seekers_feed
 from src.provider_registry import build_providers
 
@@ -34,21 +35,38 @@ def run_workrun() -> dict:
         live = provider_should_fetch_live(provider_name)
         cached = bundle.get(provider_name) if not live else None
         if not live and cached:
-            all_matches.extend(cached)
-            provider_results.append(
-                {
-                    "provider": provider_name,
-                    "provider_name": _clean_provider_name(provider_name),
-                    "status": "cached",
-                    "parsed": len(cached),
-                    "suitable": len(cached),
-                    "excluded": 0,
-                    "error": None,
-                }
-            )
-            continue
+            validated, dropped = filter_alive_listings(cached)
+            if not validated:
+                live = True
+            else:
+                all_matches.extend(validated)
+                provider_results.append(
+                    {
+                        "provider": provider_name,
+                        "provider_name": _clean_provider_name(provider_name),
+                        "status": "cached",
+                        "parsed": len(cached),
+                        "suitable": len(validated),
+                        "excluded": dropped,
+                        "error": None if not dropped else f"{dropped} dead URL(s) removed from cache",
+                    }
+                )
+                continue
 
         if not live and not cached:
+            if scan_profile() == "fast" and provider_name in _HEAVY_PROVIDERS:
+                provider_results.append(
+                    {
+                        "provider": provider_name,
+                        "provider_name": _clean_provider_name(provider_name),
+                        "status": "skipped",
+                        "parsed": 0,
+                        "suitable": 0,
+                        "excluded": 0,
+                        "error": None,
+                    }
+                )
+                continue
             live = True
 
         try:
@@ -159,6 +177,9 @@ def run_workrun() -> dict:
     deduped, dupe_count = dedupe_listings(all_matches)
     if dupe_count:
         print(f"deduped {dupe_count} duplicate listing(s)")
+    deduped, dead_count = filter_alive_listings(deduped)
+    if dead_count:
+        print(f"liveness: removed {dead_count} dead listing(s) after dedupe")
     deduped = [_ensure_income_fields(item) for item in deduped]
     apply_listing_lifecycle(deduped)
     deduped.sort(key=_sort_newest_first)
@@ -187,6 +208,7 @@ def run_workrun() -> dict:
         "excluded_listings": excluded_items,
         "market_stats": market_stats,
         "duplicate_listings_removed": dupe_count,
+        "dead_listings_removed": dead_count,
         "application_status": _load_application_status(),
         "seekers_feed": seekers_feed,
     }

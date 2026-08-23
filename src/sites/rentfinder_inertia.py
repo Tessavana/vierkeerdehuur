@@ -68,6 +68,9 @@ def fetch_rentfinder_eindhoven_listings(max_pages: int | None = None) -> list[Li
                 continue
             if row.get("deleted_at"):
                 continue
+            status = (row.get("status") or row.get("availability") or "").strip().lower()
+            if status in {"rented", "verhuurd", "unavailable", "inactive", "archived"}:
+                continue
             title = (row.get("title") or "").strip() or slug
             place = (row.get("place") or "").strip()
             street = (row.get("street") or "").strip()

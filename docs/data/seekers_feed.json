@@ -1,18 +1,32 @@
 {
-  "generated_at_utc": "2026-08-23T12:43:29.194346+00:00",
+  "generated_at_utc": "2026-08-23T14:39:17.764144+00:00",
   "sources_active": [
     "reddit",
     "marktplaats"
   ],
-  "total": 6,
-  "seeking_count": 6,
+  "total": 7,
+  "seeking_count": 7,
   "reddit_overview": {
-    "subreddit": "r/eindhoven",
-    "total_relevant": 2,
-    "seeking": 2,
+    "subreddits": [
+      "r/NetherlandsHousing",
+      "r/eindhoven"
+    ],
+    "subreddit": "r/NetherlandsHousing \u00b7 r/eindhoven",
+    "total_relevant": 5,
+    "seeking": 3,
     "offering": 0,
-    "unknown": 0,
+    "unknown": 2,
     "recent_asks": [
+      {
+        "title": "Looking for a housemate in Eindhoven",
+        "url": "https://www.reddit.com/r/NetherlandsHousing/comments/1vw2c9p/looking_for_a_housemate_in_eindhoven/",
+        "posted_at": "2026-08-23T09:12:56+00:00",
+        "author": "/u/Imaginary_Shirt_603",
+        "budget_eur": null,
+        "location_hint": "Eindhoven",
+        "kind": "seeking",
+        "group_name": "r/NetherlandsHousing"
+      },
       {
         "title": "Anyone currently living at Xior Zernikestraat? Looking for honest reviews on facilities.",
         "url": "https://www.reddit.com/r/eindhoven/comments/1vrgrxo/anyone_currently_living_at_xior_zernikestraat/",
@@ -35,6 +49,36 @@
       }
     ],
     "recent_posts": [
+      {
+        "title": "Looking for a housemate in Eindhoven",
+        "url": "https://www.reddit.com/r/NetherlandsHousing/comments/1vw2c9p/looking_for_a_housemate_in_eindhoven/",
+        "posted_at": "2026-08-23T09:12:56+00:00",
+        "author": "/u/Imaginary_Shirt_603",
+        "budget_eur": null,
+        "location_hint": "Eindhoven",
+        "kind": "seeking",
+        "group_name": "r/NetherlandsHousing"
+      },
+      {
+        "title": "Moving to Amsterdam for a new job, how to find a place while still working in Eindhoven",
+        "url": "https://www.reddit.com/r/NetherlandsHousing/comments/1vv9i90/moving_to_amsterdam_for_a_new_job_how_to_find_a/",
+        "posted_at": "2026-08-22T11:05:56+00:00",
+        "author": "/u/WizardOfMist",
+        "budget_eur": null,
+        "location_hint": "Eindhoven",
+        "kind": "unknown",
+        "group_name": "r/NetherlandsHousing"
+      },
+      {
+        "title": "Housing search Den Bosch/Eindhoven area with permanent employment contract",
+        "url": "https://www.reddit.com/r/NetherlandsHousing/comments/1vuhrnb/housing_search_den_boscheindhoven_area_with/",
+        "posted_at": "2026-08-21T14:22:32+00:00",
+        "author": "/u/Busy_Association6970",
+        "budget_eur": null,
+        "location_hint": "Eindhoven",
+        "kind": "unknown",
+        "group_name": "r/NetherlandsHousing"
+      },
       {
         "title": "Anyone currently living at Xior Zernikestraat? Looking for honest reviews on facilities.",
         "url": "https://www.reddit.com/r/eindhoven/comments/1vrgrxo/anyone_currently_living_at_xior_zernikestraat/",
@@ -59,90 +103,18 @@
   },
   "reddit_posts": [
     {
-      "id": "reddit-anyone_currently_living_at_xior_zernikestraat",
+      "id": "reddit-looking_for_a_housemate_in_eindhoven",
       "source": "reddit",
       "kind": "seeking",
-      "title": "Anyone currently living at Xior Zernikestraat? Looking for honest reviews on facilities.",
-      "snippet": "I'm moving to Eindhoven and have an offer from Xior on Zernikestraat. I know the housing market here is brutal and options are limited, but after reading several negative reviews online and hearing mixed feedback from people who've lived in Xior properties, I'm feeling pretty skeptical.",
-      "url": "https://www.reddit.com/r/eindhoven/comments/1vrgrxo/anyone_currently_living_at_xior_zernikestraat/",
-      "author": "/u/arqa977",
-      "posted_at": "2026-08-18T06:05:19+00:00",
+      "title": "Looking for a housemate in Eindhoven",
+      "snippet": "Hi! I will move to the Netherlands in 2 months and I've found a nice and cosy apartment at 5/6 km from the city center. I'm alone and the apartment (60 meters) costs 1400 euros a month with bills included. For me alone it's too much. Is someone interested to share the apartment? Thanks submitted by /u/Imaginary_Shirt_603 [link] [comments]",
+      "url": "https://www.reddit.com/r/NetherlandsHousing/comments/1vw2c9p/looking_for_a_housemate_in_eindhoven/",
+      "author": "/u/Imaginary_Shirt_603",
+      "posted_at": "2026-08-23T09:12:56+00:00",
       "budget_eur": null,
       "location_hint": "Eindhoven",
-      "group_name": "r/eindhoven",
-      "relevance_score": 115
-    },
-    {
-      "id": "reddit-what_are_the_best_ways_to_find_private_landlords",
-      "source": "reddit",
-      "kind": "seeking",
-      "title": "What are the best ways to find private landlords around Eindhoven?",
-      "snippet": "Looking for advice and recommendations. A young working couple is struggling to find accommodation despite having stable income and a guarantor.",
-      "url": "https://www.reddit.com/r/eindhoven/comments/1vqvre4/what_are_the_best_ways_to_find_private_landlords/",
-      "author": "/u/OrionEngineering",
-      "posted_at": "2026-08-17T15:36:43+00:00",
-      "budget_eur": null,
-      "location_hint": "Eindhoven",
-      "group_name": "r/eindhoven",
-      "relevance_score": 75
-    }
-  ],
-  "posts": [
-    {
-      "id": "marktplaats-m2419688566",
-      "source": "marktplaats",
-      "kind": "seeking",
-      "title": "Gezocht woonruimte regio Eindhoven \u2013 Langdurige huur",
-      "snippet": "Gezocht woonruimte regio Eindhoven \u2013 Langdurige huur",
-      "url": "https://www.marktplaats.nl/v/huizen-en-kamers/op-zoek-naar-een-kamer/m2419688566-gezocht-woonruimte-regio-eindhoven-langdurige-huur",
-      "author": "Marktplaats",
-      "posted_at": "2026-08-23T12:43:29.186977+00:00",
-      "budget_eur": null,
-      "location_hint": "Eindhoven",
-      "group_name": "Marktplaats gezocht",
-      "relevance_score": 0
-    },
-    {
-      "id": "marktplaats-m2433213623",
-      "source": "marktplaats",
-      "kind": "seeking",
-      "title": "Dringend gezocht: studio/tiny house/chalet-Eindhoven/Limburg",
-      "snippet": "Dringend gezocht: studio/tiny house/chalet-Eindhoven/Limburg",
-      "url": "https://www.marktplaats.nl/v/huizen-en-kamers/op-zoek-naar-een-huis/m2433213623-dringend-gezocht-studio-tiny-house-chalet-eindhoven-limburg",
-      "author": "Marktplaats",
-      "posted_at": "2026-08-23T12:43:29.186977+00:00",
-      "budget_eur": null,
-      "location_hint": "Eindhoven",
-      "group_name": "Marktplaats gezocht",
-      "relevance_score": 0
-    },
-    {
-      "id": "marktplaats-m2425415822",
-      "source": "marktplaats",
-      "kind": "seeking",
-      "title": "kamer/woning gezocht in Eindhoven",
-      "snippet": "kamer/woning gezocht in Eindhoven",
-      "url": "https://www.marktplaats.nl/v/huizen-en-kamers/kamers-te-huur/m2425415822-kamer-woning-gezocht-in-eindhoven",
-      "author": "Marktplaats",
-      "posted_at": "2026-08-23T12:43:29.185978+00:00",
-      "budget_eur": null,
-      "location_hint": "Eindhoven",
-      "group_name": "Marktplaats gezocht",
-      "relevance_score": 0
-    },
-    {
-      "id": "marktplaats-m2425176058",
-      "source": "marktplaats",
-      "kind": "seeking",
-      "title": "Woning gezocht \u2013Betrouwbare huurder (Rotterdam of Eindhoven",
-      "snippet": "Woning gezocht \u2013Betrouwbare huurder (Rotterdam of Eindhoven",
-      "url": "https://www.marktplaats.nl/v/huizen-en-kamers/op-zoek-naar-een-huis/m2425176058-woning-gezocht-betrouwbare-huurder-rotterdam-of-eindhoven",
-      "author": "Marktplaats",
-      "posted_at": "2026-08-23T12:43:29.185978+00:00",
-      "budget_eur": null,
-      "location_hint": "Eindhoven",
-      "group_name": "Marktplaats gezocht",
-      "relevance_score": 0
+      "group_name": "r/NetherlandsHousing",
+      "relevance_score": 110
     },
     {
       "id": "reddit-anyone_currently_living_at_xior_zernikestraat",
@@ -173,5 +145,105 @@
       "relevance_score": 75
     }
   ],
-  "notes": "Automatisch: Reddit + Marktplaats. Facebook alleen lokaal (python -m src.seekers.facebook_local)."
+  "posts": [
+    {
+      "id": "marktplaats-m2419688566",
+      "source": "marktplaats",
+      "kind": "seeking",
+      "title": "Gezocht woonruimte regio Eindhoven \u2013 Langdurige huur",
+      "snippet": "Gezocht woonruimte regio Eindhoven \u2013 Langdurige huur",
+      "url": "https://www.marktplaats.nl/v/huizen-en-kamers/op-zoek-naar-een-kamer/m2419688566-gezocht-woonruimte-regio-eindhoven-langdurige-huur",
+      "author": "Marktplaats",
+      "posted_at": "2026-08-23T14:39:17.755762+00:00",
+      "budget_eur": null,
+      "location_hint": "Eindhoven",
+      "group_name": "Marktplaats gezocht",
+      "relevance_score": 0
+    },
+    {
+      "id": "marktplaats-m2433213623",
+      "source": "marktplaats",
+      "kind": "seeking",
+      "title": "Dringend gezocht: studio/tiny house/chalet-Eindhoven/Limburg",
+      "snippet": "Dringend gezocht: studio/tiny house/chalet-Eindhoven/Limburg",
+      "url": "https://www.marktplaats.nl/v/huizen-en-kamers/op-zoek-naar-een-huis/m2433213623-dringend-gezocht-studio-tiny-house-chalet-eindhoven-limburg",
+      "author": "Marktplaats",
+      "posted_at": "2026-08-23T14:39:17.755762+00:00",
+      "budget_eur": null,
+      "location_hint": "Eindhoven",
+      "group_name": "Marktplaats gezocht",
+      "relevance_score": 0
+    },
+    {
+      "id": "marktplaats-m2425415822",
+      "source": "marktplaats",
+      "kind": "seeking",
+      "title": "kamer/woning gezocht in Eindhoven",
+      "snippet": "kamer/woning gezocht in Eindhoven",
+      "url": "https://www.marktplaats.nl/v/huizen-en-kamers/kamers-te-huur/m2425415822-kamer-woning-gezocht-in-eindhoven",
+      "author": "Marktplaats",
+      "posted_at": "2026-08-23T14:39:17.754636+00:00",
+      "budget_eur": null,
+      "location_hint": "Eindhoven",
+      "group_name": "Marktplaats gezocht",
+      "relevance_score": 0
+    },
+    {
+      "id": "marktplaats-m2425176058",
+      "source": "marktplaats",
+      "kind": "seeking",
+      "title": "Woning gezocht \u2013Betrouwbare huurder (Rotterdam of Eindhoven",
+      "snippet": "Woning gezocht \u2013Betrouwbare huurder (Rotterdam of Eindhoven",
+      "url": "https://www.marktplaats.nl/v/huizen-en-kamers/op-zoek-naar-een-huis/m2425176058-woning-gezocht-betrouwbare-huurder-rotterdam-of-eindhoven",
+      "author": "Marktplaats",
+      "posted_at": "2026-08-23T14:39:17.754636+00:00",
+      "budget_eur": null,
+      "location_hint": "Eindhoven",
+      "group_name": "Marktplaats gezocht",
+      "relevance_score": 0
+    },
+    {
+      "id": "reddit-looking_for_a_housemate_in_eindhoven",
+      "source": "reddit",
+      "kind": "seeking",
+      "title": "Looking for a housemate in Eindhoven",
+      "snippet": "Hi! I will move to the Netherlands in 2 months and I've found a nice and cosy apartment at 5/6 km from the city center. I'm alone and the apartment (60 meters) costs 1400 euros a month with bills included. For me alone it's too much. Is someone interested to share the apartment? Thanks submitted by /u/Imaginary_Shirt_603 [link] [comments]",
+      "url": "https://www.reddit.com/r/NetherlandsHousing/comments/1vw2c9p/looking_for_a_housemate_in_eindhoven/",
+      "author": "/u/Imaginary_Shirt_603",
+      "posted_at": "2026-08-23T09:12:56+00:00",
+      "budget_eur": null,
+      "location_hint": "Eindhoven",
+      "group_name": "r/NetherlandsHousing",
+      "relevance_score": 110
+    },
+    {
+      "id": "reddit-anyone_currently_living_at_xior_zernikestraat",
+      "source": "reddit",
+      "kind": "seeking",
+      "title": "Anyone currently living at Xior Zernikestraat? Looking for honest reviews on facilities.",
+      "snippet": "I'm moving to Eindhoven and have an offer from Xior on Zernikestraat. I know the housing market here is brutal and options are limited, but after reading several negative reviews online and hearing mixed feedback from people who've lived in Xior properties, I\u2019m feeling pretty skeptical. \u200bIf anyone currently lives at the Zernikestraat building (or recently moved out), I\u2019d really appreciate an honest reality check on a few specific things: \u200bQ1. What is the actual state of the rooms, heating, and W",
+      "url": "https://www.reddit.com/r/eindhoven/comments/1vrgrxo/anyone_currently_living_at_xior_zernikestraat/",
+      "author": "/u/arqa977",
+      "posted_at": "2026-08-18T06:05:19+00:00",
+      "budget_eur": null,
+      "location_hint": "Eindhoven",
+      "group_name": "r/eindhoven",
+      "relevance_score": 115
+    },
+    {
+      "id": "reddit-what_are_the_best_ways_to_find_private_landlords",
+      "source": "reddit",
+      "kind": "seeking",
+      "title": "What are the best ways to find private landlords around Eindhoven?",
+      "snippet": "Looking for advice and recommendations. A young working couple is struggling to find accommodation despite having stable income and a guarantor. Are there websites, local groups, housing agencies or private landlords that people here would recommend? submitted by /u/OrionEngineering [link] [comments]",
+      "url": "https://www.reddit.com/r/eindhoven/comments/1vqvre4/what_are_the_best_ways_to_find_private_landlords/",
+      "author": "/u/OrionEngineering",
+      "posted_at": "2026-08-17T15:36:43+00:00",
+      "budget_eur": null,
+      "location_hint": "Eindhoven",
+      "group_name": "r/eindhoven",
+      "relevance_score": 75
+    }
+  ],
+  "notes": "Automatisch: Reddit (r/eindhoven, r/NetherlandsHousing) + Marktplaats. Facebook alleen lokaal (python -m src.seekers.facebook_local)."
 }

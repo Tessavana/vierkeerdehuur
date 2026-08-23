@@ -15,9 +15,9 @@ const state = {
   hasLocation: false,
   map: null,
   mapLayer: null,
-  mapMode: "all",
   miniMaps: new Map(),
   currentView: "feed",
+  displayMode: "feed",
   hidePassed: true,
   filtersReady: false,
   filters: { outdoor: "any", minM2: 0, maxM2: 0, wijken: new Set() },
@@ -150,6 +150,7 @@ function listingsForView(view) {
     const actions = loadActions();
     return list.filter((l) => l.url && actions[l.url]?.status === "interested");
   }
+  list = list.filter((l) => l.aff.status === "reachable");
   if (state.hidePassed) {
     list = list.filter((l) => !l.url || listingAction(l.url) !== "passed");
   }
@@ -165,12 +166,12 @@ function enrichListing(l) {
 }
 
 function slideHtml(l, idx, total) {
-  const wijk = (resolveNeighborhood(l) || "Eindhoven").toUpperCase();
+  const wijk = resolveNeighborhood(l).toUpperCase();
   const platform = l.platform || l.source || "?";
   const tag = l.match_tag || "?";
   const aff = l.aff;
   const action = listingAction(l.url);
-  const slideClass = ["rg-slide", aff.status, action === "interested" ? "interested" : "", action === "passed" ? "passed" : ""]
+  const slideClass = ["rg-slide", aff.status, action === "passed" ? "passed" : ""]
     .filter(Boolean)
     .join(" ");
   const interestedActive = action === "interested" ? " active" : "";
@@ -234,37 +235,20 @@ function applyListingFilters(listings) {
     if (minM2 > 0 && (m2 == null || m2 < minM2)) return false;
     if (maxM2 > 0 && (m2 == null || m2 > maxM2)) return false;
     if (wijken.size > 0) {
-      const w = (l.neighborhood || "").toLowerCase();
-      const ok = [...wijken].some((wk) => w.includes(wk.toLowerCase()) || wk.toLowerCase().includes(w));
-      if (!ok) return false;
+      const w = resolveNeighborhood(l);
+      if (!wijken.has(w)) return false;
     }
     return true;
   });
 }
 
-function collectWijken(listings) {
-  const set = new Set();
-  for (const l of listings) {
-    const w = (l.neighborhood || "").trim();
-    if (w) set.add(w);
-  }
-  return [...set].sort((a, b) => a.localeCompare(b, "nl"));
-}
-
 function renderWijkFilters() {
   const wrap = $("#wijk-filters");
   if (!wrap) return;
-  const wijken = collectWijken(state.rawListings);
-  if (!wijken.length) {
-    wrap.innerHTML = `<p class="muted">Wijken verschijnen na laden.</p>`;
-    return;
-  }
-  wrap.innerHTML = wijken
-    .map(
-      (w) =>
-        `<label class="rg-wijk-chip"><input type="checkbox" value="${w}" ${state.filters.wijken.has(w) ? "checked" : ""} /><span>${w}</span></label>`
-    )
-    .join("");
+  wrap.innerHTML = OFFICIAL_STADSDELEN.map(
+    (w) =>
+      `<label class="rg-wijk-chip"><input type="checkbox" value="${w}" ${state.filters.wijken.has(w) ? "checked" : ""} /><span>${w}</span></label>`
+  ).join("");
 }
 
 function readFiltersFromForm() {
@@ -282,13 +266,22 @@ function showWelcomeScreen() {
   feed.innerHTML = `
     <div class="rg-welcome">
       <h2>Welkom</h2>
-      <p>Stel eerst je filters in: inkomen, buitenruimte, m² en wijken.</p>
-      <p class="muted">Daarna zie je matches, mini-kaart en je shortlist.</p>
+      <p>Stel eerst je filters in: inkomen, buitenruimte, m² en stadsdeel.</p>
+      <p class="muted">Daarna zie je alleen woningen waar je op mag reageren.</p>
       <button type="button" class="rg-btn rg-btn-primary rg-welcome-btn" id="welcome-open-filters">Filters instellen</button>
     </div>`;
   $("#welcome-open-filters")?.addEventListener("click", () => {
     $("#filter-panel").hidden = false;
     $("#filter-toggle").setAttribute("aria-expanded", "true");
+  });
+}
+
+function updateModeToggle() {
+  const toggle = $("#mode-toggle");
+  if (!toggle) return;
+  toggle.hidden = !state.filtersReady || state.currentView === "seekers";
+  document.querySelectorAll(".rg-mode-btn").forEach((b) => {
+    b.disabled = !state.filtersReady;
   });
 }
 
@@ -306,11 +299,12 @@ function renderFeed(view) {
     feed.innerHTML =
       mode === "saved"
         ? `<p class="rg-feed-loading muted">Nog niets opgeslagen. Tik ♥ Interessant op een woning.</p>`
-        : `<p class="rg-feed-loading muted">Geen matches geladen.</p>`;
+        : `<p class="rg-feed-loading muted">Geen woningen binnen bereik met deze filters.</p>`;
     updateSavedBadge();
     return;
   }
   feed.innerHTML = state.listings.map((l, i) => slideHtml(l, i, state.listings.length)).join("");
+  feed.scrollTop = 0;
   initMiniMapsObserver();
   updateSavedBadge();
 }
@@ -382,7 +376,26 @@ function applyFilters() {
     b.disabled = false;
   });
   renderFeed(state.currentView === "seekers" ? "feed" : state.currentView);
-  if (state.currentView === "map" || state.map) refreshBigMap();
+  if (state.displayMode === "map" || state.map) refreshBigMap();
+  updateModeToggle();
+}
+
+function setDisplayMode(mode) {
+  state.displayMode = mode;
+  document.querySelectorAll(".rg-mode-btn").forEach((b) => {
+    b.classList.toggle("active", b.dataset.view === mode);
+  });
+  const feedEl = $("#feed");
+  const mapPanel = $("#map-panel");
+  if (mode === "map") {
+    if (feedEl) feedEl.hidden = true;
+    if (mapPanel) mapPanel.hidden = false;
+    initBigMap();
+    setTimeout(() => state.map && state.map.invalidateSize(), 150);
+  } else {
+    if (feedEl) feedEl.hidden = false;
+    if (mapPanel) mapPanel.hidden = true;
+  }
 }
 
 function toggleFilters() {
@@ -421,29 +434,21 @@ function initBigMap() {
 function refreshBigMap() {
   if (!state.mapLayer) return;
   state.mapLayer.clearLayers();
-  const mode = state.mapMode;
   const mapListings = listingsForView("feed");
   mapListings.forEach((l) => {
-    const ok = l.aff.status === "reachable";
-    const faded = mode === "yours" && !ok;
-    const color = ok ? "#171717" : faded ? "#ddd" : "#999";
     L.circleMarker([l.map_lat, l.map_lon], {
-      radius: ok ? 7 : 5,
-      color,
-      fillColor: color,
-      fillOpacity: faded ? 0.12 : ok ? 1 : 0.5,
+      radius: 7,
+      color: "#171717",
+      fillColor: "#171717",
+      fillOpacity: 1,
       weight: 1,
     })
       .addTo(state.mapLayer)
-      .bindPopup(`<b>${formatEur(l.rent_eur)}</b><br/><a href="${l.url}" target="_blank">open</a>`);
+      .bindPopup(`<b>${formatEur(l.rent_eur)}</b><br/>${resolveNeighborhood(l)}<br/><a href="${l.url}" target="_blank">open</a>`);
   });
   L.circleMarker([state.userLat, state.userLon], { radius: 6, color: "#888", fillColor: "#888", fillOpacity: 1 }).addTo(state.mapLayer);
   const total = mapListings.length;
-  const okN = mapListings.filter((l) => l.aff.status === "reachable").length;
-  $("#map-stats").textContent =
-    mode === "all"
-      ? `${total} woningen op de kaart`
-      : `${okN} bereikbaar · ${total - okN} verdwenen uit jouw Eindhoven`;
+  $("#map-stats").textContent = `${total} woningen binnen bereik op de kaart`;
 }
 
 function calcLandlord() {
@@ -463,26 +468,26 @@ function setView(view) {
   if (!state.filtersReady && view !== "feed") return;
   state.currentView = view;
   document.querySelectorAll(".rg-nav-btn[data-view]").forEach((b) => {
-    b.classList.toggle("active", view !== "saved" && b.dataset.view === view);
+    b.classList.toggle("active", view === "seekers" && b.dataset.view === "seekers");
   });
   const tagline = $(".rg-tagline");
   if (tagline) {
     const labels = {
       seekers: "Je bent niet alleen, zelfde live feed als het dashboard",
       saved: `${interestedCount()} opgeslagen, jouw shortlist`,
-      feed: "Hoeveel Eindhoven blijft er voor jou over?",
+      feed: "Alleen woningen waar je op mag reageren",
     };
     if (labels[view]) tagline.textContent = labels[view];
   }
-  $("#map-overlay").hidden = view !== "map";
-  const feedEl = $("#feed");
-  if (feedEl) feedEl.scrollTop = 0;
-  if (view === "map") {
-    initBigMap();
-    setTimeout(() => state.map && state.map.invalidateSize(), 150);
+  if (view === "seekers") {
+    setDisplayMode("feed");
+    renderSeekersFeed();
+  } else if (view === "saved" || view === "feed") {
+    setDisplayMode(state.displayMode === "map" ? "map" : "feed");
+    renderFeed(view);
+    if (state.displayMode === "map") refreshBigMap();
   }
-  if (view === "feed" || view === "saved") renderFeed(view);
-  if (view === "seekers") renderSeekersFeed();
+  updateModeToggle();
   updateSavedBadge();
 }
 
@@ -508,6 +513,7 @@ async function loadAll() {
   renderWijkFilters();
   updateSavedBadge();
   state.filtersReady = localStorage.getItem(FILTERS_DONE_KEY) === "1";
+  updateModeToggle();
   if (!state.filtersReady) {
     $("#filter-panel").hidden = false;
     $("#filter-toggle").setAttribute("aria-expanded", "true");
@@ -543,17 +549,20 @@ function bindEvents() {
     $("#landlord-panel").hidden = true;
   });
   $("#landlord-calc")?.addEventListener("click", calcLandlord);
-  $("#map-close")?.addEventListener("click", () => setView("feed"));
+  document.querySelectorAll(".rg-mode-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (!state.filtersReady) return;
+      if (state.currentView === "seekers") state.currentView = "feed";
+      setDisplayMode(btn.dataset.view);
+      if (btn.dataset.view === "feed") {
+        renderFeed(state.currentView === "saved" ? "saved" : "feed");
+      } else {
+        refreshBigMap();
+      }
+    });
+  });
   document.querySelectorAll(".rg-nav-btn[data-view]").forEach((btn) => {
     btn.addEventListener("click", () => setView(btn.dataset.view));
-  });
-  document.querySelectorAll(".rg-map-toggle button").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".rg-map-toggle button").forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      state.mapMode = btn.dataset.mapMode;
-      refreshBigMap();
-    });
   });
 }
 
