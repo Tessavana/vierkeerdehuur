@@ -423,10 +423,67 @@ async function initSupportButton() {
   });
 }
 
+function formatSeekerTime(iso) {
+  if (!iso) return { relative: "", full: "" };
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return { relative: "", full: "" };
+  const full = d.toLocaleString("nl-NL", {
+    timeZone: "Europe/Amsterdam",
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const diff = Date.now() - d.getTime();
+  const mins = Math.floor(diff / 60000);
+  let relative = full;
+  if (mins < 1) relative = "zojuist";
+  else if (mins < 60) relative = `${mins} min geleden`;
+  else if (mins < 48 * 60) relative = `${Math.floor(mins / 60)} uur geleden`;
+  else relative = `${Math.floor(mins / 1440)} d geleden`;
+  return { relative, full };
+}
+
+function renderRedditOverview(overview) {
+  const el = document.getElementById("reddit-overview");
+  if (!el || !overview || !overview.total_relevant) {
+    if (el) el.innerHTML = "";
+    return;
+  }
+  const kindLabel = (k) =>
+    k === "seeking" ? "zoekt" : k === "offering" ? "biedt" : "bericht";
+  const renderLine = (a) => {
+    const t = formatSeekerTime(a.posted_at);
+    const budget = a.budget_eur ? ` · ≤€${a.budget_eur}` : "";
+    const loc = a.location_hint ? ` · ${a.location_hint}` : "";
+    const tag = a.kind ? `<span class="seeker-tag seeker-tag-${a.kind === "seeking" ? "seek" : a.kind === "offering" ? "offer" : "unknown"}">${kindLabel(a.kind)}</span>` : "";
+    return `<li>${tag}<a href="${a.url}" target="_blank" rel="noopener noreferrer">${a.title}</a><span class="muted"> · ${t.relative} (${t.full})${budget}${loc}</span></li>`;
+  };
+  const asks = overview.recent_asks || [];
+  const recent = overview.recent_posts || asks;
+  const askLines = recent.map(renderLine).join("");
+  el.innerHTML = `
+    <div class="reddit-overview-card">
+      <div class="reddit-overview-head">
+        <strong>${overview.subreddit || "Reddit"}</strong>
+        <span class="muted">wonen in Eindhoven · titels gefilterd op relevantie</span>
+      </div>
+      <p class="reddit-overview-stats">
+        <span class="reddit-stat"><b>${overview.seeking ?? 0}</b> zoekt</span>
+        <span class="reddit-stat"><b>${overview.offering ?? 0}</b> biedt</span>
+        <span class="reddit-stat"><b>${overview.total_relevant ?? 0}</b> relevant</span>
+      </p>
+      ${recent.length ? `<ul class="reddit-ask-list">${askLines}</ul>` : ""}
+    </div>`;
+}
+
 function renderSeekersFeed(feed) {
   const el = document.getElementById("seekers-feed");
   const subtitle = document.getElementById("seekers-subtitle");
   if (!el) return;
+  renderRedditOverview(feed && feed.reddit_overview);
   const posts = (feed && feed.posts) || [];
   const sources = (feed && feed.sources_active) || [];
   if (subtitle) {
@@ -443,17 +500,19 @@ function renderSeekersFeed(feed) {
       const kindLabel = kind === "seeking" ? "zoekt" : kind === "offering" ? "biedt" : "bericht";
       const kindClass =
         kind === "seeking" ? "seeker-tag seeker-tag-seek" : kind === "offering" ? "seeker-tag seeker-tag-offer" : "seeker-tag";
-      const when = p.posted_at ? new Date(p.posted_at).toLocaleString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
+      const when = formatSeekerTime(p.posted_at);
       const budget = p.budget_eur ? ` · max €${p.budget_eur}` : "";
       const loc = p.location_hint ? ` · ${p.location_hint}` : "";
       const group = p.group_name || p.source || "";
+      const author = p.author ? `<span class="seeker-author muted"> · u/${p.author}</span>` : "";
       return `
         <article class="seeker-card">
           <div class="seeker-card-top">
             <span class="${kindClass}">${kindLabel}</span>
-            <span class="seeker-source">${group}</span>
-            ${when ? `<span class="seeker-time muted">${when}</span>` : ""}
+            <span class="seeker-source">${group}${author}</span>
+            ${when.relative ? `<span class="seeker-time" title="${when.full}">${when.relative}</span>` : ""}
           </div>
+          ${when.full ? `<div class="seeker-datetime muted">${when.full}</div>` : ""}
           <h3 class="seeker-title">${p.title || "—"}</h3>
           ${p.snippet && p.snippet !== p.title ? `<p class="seeker-snippet muted">${p.snippet.slice(0, 220)}${p.snippet.length > 220 ? "…" : ""}</p>` : ""}
           <div class="seeker-meta muted">${budget}${loc}</div>

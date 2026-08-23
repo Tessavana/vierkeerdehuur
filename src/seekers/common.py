@@ -88,6 +88,7 @@ class SeekerPost:
     budget_eur: int | None = None
     location_hint: str = ""
     group_name: str = ""
+    relevance_score: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -142,7 +143,12 @@ def is_housing_related(text: str) -> bool:
 
 
 def classify_kind(title: str, snippet: str = "") -> str:
+    from src.seekers.relevance import _HOUSING_SEEK, _has_strict_housing
+
     blob = f"{title} {snippet}".lower()
+    if not _has_strict_housing(blob) and not any(s in blob for s in _HOUSING_SEEK if "available" not in s):
+        if not any(s in blob for s in ("room available", "te huur", "for rent", "accommodation")):
+            return "unknown"
     seek = sum(1 for m in _SEEKING if m in blob)
     offer = sum(1 for m in _OFFERING if m in blob)
     if "gezocht" in blob and "te huur" not in blob:
@@ -175,4 +181,5 @@ def post_from_fields(**kwargs: Any) -> SeekerPost | None:
         budget_eur=kwargs.get("budget_eur") or extract_budget(combined),
         location_hint=kwargs.get("location_hint") or extract_location_hint(combined),
         group_name=str(kwargs.get("group_name") or ""),
+        relevance_score=int(kwargs.get("relevance_score") or 0),
     )

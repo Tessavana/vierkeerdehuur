@@ -8,9 +8,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from src.seekers.common import SeekerPost
+from src.seekers.relevance import is_relevant_post
 from src.seekers.facebook_local import load_facebook_seekers_from_cache
 from src.seekers.marktplaats_gezocht import fetch_marktplaats_seekers
-from src.seekers.reddit_rss import fetch_reddit_seekers
+from src.seekers.reddit_rss import build_reddit_overview, fetch_reddit_seekers
 
 _REGISTRY = Path(os.getenv("SEEKERS_REGISTRY_PATH", "data/seekers_registry.json"))
 _OUTPUT = Path("docs/data/seekers_feed.json")
@@ -31,6 +32,12 @@ def _save_registry(registry: dict[str, dict]) -> None:
     _REGISTRY.write_text(json.dumps(registry, indent=2, ensure_ascii=True), encoding="utf-8")
 
 
+def _reddit_is_relevant(post: SeekerPost) -> bool:
+    return is_relevant_post(
+        post.title, post.snippet, subreddit=post.group_name, source="reddit"
+    )
+
+
 def _merge_registry(posts: list[SeekerPost]) -> list[SeekerPost]:
     now = datetime.now(timezone.utc).isoformat()
     registry = _load_registry()
@@ -42,14 +49,23 @@ def _merge_registry(posts: list[SeekerPost]) -> list[SeekerPost]:
         entry["last_seen_utc"] = now
         entry.update(post.to_dict())
         registry[key] = entry
-    _save_registry(registry)
-    merged = []
+
     fields = SeekerPost.__dataclass_fields__
-    for row in registry.values():
+    stale: list[str] = []
+    merged: list[SeekerPost] = []
+    for key, row in registry.items():
         try:
-            merged.append(SeekerPost(**{k: row[k] for k in fields if k in row}))
+            post = SeekerPost(**{k: row[k] for k in fields if k in row})
         except (TypeError, KeyError):
+            stale.append(key)
             continue
+        if post.source == "reddit" and not _reddit_is_relevant(post):
+            stale.append(key)
+            continue
+        merged.append(post)
+    for key in stale:
+        registry.pop(key, None)
+    _save_registry(registry)
     merged.sort(key=lambda p: p.posted_at or "", reverse=True)
     return merged
 
@@ -61,10 +77,11 @@ def build_seekers_feed() -> dict:
     posts: list[SeekerPost] = []
     sources_ok: list[str] = []
 
+    reddit_posts: list[SeekerPost] = []
     try:
-        reddit = fetch_reddit_seekers()
-        posts.extend(reddit)
-        if reddit:
+        reddit_posts = fetch_reddit_seekers()
+        posts.extend(reddit_posts)
+        if reddit_posts:
             sources_ok.append("reddit")
     except Exception as exc:
         print(f"seekers reddit failed: {exc}")
@@ -103,12 +120,16 @@ def build_seekers_feed() -> dict:
     merged.sort(key=_sort_key, reverse=True)
     seeking = [p for p in merged if p.kind == "seeking"]
     display = merged[: int(os.getenv("SEEKERS_FEED_MAX", "40"))]
+    reddit_merged = [p for p in merged if p.source == "reddit"]
+    if reddit_merged and "reddit" not in sources_ok:
+        sources_ok.append("reddit")
 
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "sources_active": sources_ok,
         "total": len(display),
         "seeking_count": len(seeking),
+        "reddit_overview": build_reddit_overview(reddit_merged),
         "posts": [p.to_dict() for p in display],
         "notes": (
             "Automatisch: Reddit + Marktplaats. Facebook alleen lokaal "

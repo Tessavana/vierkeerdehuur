@@ -304,6 +304,25 @@ h3 { margin: 0 0 8px; font-size: 18px; }
 .platform-bar-fill { height: 100%; background: #171717; }
 
 .seekers-section { margin-bottom: 14px; }
+.reddit-overview { margin-bottom: 12px; }
+.reddit-overview-card {
+  border: 1px solid #171717;
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: #fff;
+}
+.reddit-overview-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin-bottom: 8px; }
+.reddit-overview-stats { display: flex; gap: 16px; margin: 0 0 10px; font-size: 14px; }
+.reddit-stat b { font-size: 18px; }
+.reddit-ask-list li { margin-bottom: 8px; line-height: 1.45; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.reddit-ask-list .seeker-tag { font-size: 11px; padding: 2px 6px; }
+  margin: 0;
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.reddit-ask-list a { color: #171717; font-weight: 600; }
+.seeker-datetime { font-size: 12px; margin-bottom: 4px; }
 .seekers-feed {
   display: flex;
   flex-direction: column;
