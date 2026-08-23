@@ -240,15 +240,15 @@ def _load_application_status() -> dict:
     path = Path("data/application_status.json")
     if not path.exists():
         return {
-            "reacties_verstuurd": 46,
-            "bezichtigingen": 0,
+            "reacties_verstuurd": "180+",
+            "bezichtigingen": 2,
             "kijkavonden": 2,
             "rejections": 3,
             "no_response": 4,
             "rejected_addresses": ["PSV-laan 233", "Schootsestraat 94 A"],
             "sociale_huur": {
                 "platform": "Wooniezie",
-                "inschrijfduur": "4 jaar en 3 maanden",
+                "inschrijfduur": "4 jaar en 5 maanden",
                 "reacties_verstuurd": "230+",
                 "actief_gezocht": "2 jaar",
                 "bezichtigingen": 0,

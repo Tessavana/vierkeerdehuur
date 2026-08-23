@@ -175,22 +175,7 @@ function renderStats(stats, maxRent, listingsCount) {
   }
 
   const tags = stats.tag_counts || {};
-  const tagTotal = Object.values(tags).reduce((a, b) => a + b, 0) || 1;
-  const tagOrder = ["super nice", "nice", "okay", "meh"];
-  const tagBars = tagOrder
-    .map((name) => {
-      const n = tags[name] || 0;
-      const pct = Math.round((100 * n) / tagTotal);
-      return `
-        <div class="stack-bar-row">
-          <div class="stack-bar-label">${name}</div>
-          <div class="stack-bar-track">
-            <div class="stack-bar-fill" style="width:${pct}%"></div>
-            <span class="stack-bar-pct">${n}</span>
-          </div>
-        </div>`;
-    })
-    .join("");
+  void tags; // kept for future use
 
   const outdoorYes = stats.outdoor_yes_count ?? 0;
   const inBudget = listingsCount ?? stats.active_in_budget ?? 0;
@@ -215,10 +200,6 @@ function renderStats(stats, maxRent, listingsCount) {
           <span class="outdoor-stat-num">${outdoorYes}</span>
           <span class="outdoor-stat-text">woningen gevonden met buitenruimte</span>
         </div>
-      </div>
-      <div class="market-stack-card">
-        <h3 class="market-stack-title">Tags (matches)</h3>
-        ${tagBars}
       </div>
     `;
   }
@@ -398,8 +379,8 @@ function renderOverviewTable(status) {
   if (!table) return;
   const sh = status.sociale_huur || {};
   table.innerHTML = `
-    <tr><td>Reacties verstuurd</td><td><b>${status.reacties_verstuurd ?? status.applications_sent ?? 46}</b></td></tr>
-    <tr><td>Bezichtigingen</td><td><b>${status.bezichtigingen ?? status.viewings ?? 0}</b></td></tr>
+    <tr><td>Reacties verstuurd</td><td><b>${status.reacties_verstuurd ?? status.applications_sent ?? "180+"}</b></td></tr>
+    <tr><td>Bezichtigingen</td><td><b>${status.bezichtigingen ?? status.viewings ?? 2}</b></td></tr>
     <tr><td>Kijkavonden</td><td><b>${status.kijkavonden ?? 0}</b></td></tr>
     <tr class="overview-section-head"><td colspan="2"><b>Sociale huur (${sh.platform || "Wooniezie"})</b></td></tr>
     <tr><td>Inschrijfduur</td><td>${dash(sh.inschrijfduur)}</td></tr>
@@ -431,6 +412,14 @@ function saveSeenSeekers(ids) {
   sessionStorage.setItem(SEEKERS_SEEN_KEY, JSON.stringify([...ids].slice(-120)));
 }
 
+function sourceDotClass(source) {
+  const s = (source || "").toLowerCase();
+  if (s === "reddit") return "seeker-source-reddit";
+  if (s === "marktplaats") return "seeker-source-marktplaats";
+  if (s === "facebook") return "seeker-source-facebook";
+  return "seeker-source-other";
+}
+
 function seekerCardHtml(p, idx, seenSet) {
   const kind = p.kind || "unknown";
   const kindLabel = kind === "seeking" ? "zoekt" : kind === "offering" ? "biedt" : "bericht";
@@ -443,12 +432,13 @@ function seekerCardHtml(p, idx, seenSet) {
   const author = formatSeekerAuthor(p.author);
   const pid = seekerPostId(p);
   const isNew = !seenSet.has(pid);
+  const dotClass = sourceDotClass(p.source);
   return `
     <article class="seeker-card${isNew ? " seeker-card-new" : ""}" data-seeker-id="${pid}">
       <div class="seeker-card-top">
         <span class="${kindClass}">${kindLabel}</span>
         ${isNew ? `<span class="seeker-tag seeker-tag-new">nieuw</span>` : ""}
-        <span class="seeker-source">${sourceLabel}${author ? `<span class="seeker-author muted">${author}</span>` : ""}</span>
+        <span class="seeker-source"><span class="seeker-source-dot ${dotClass}" aria-hidden="true"></span>${sourceLabel}${author ? `<span class="seeker-author muted">${author}</span>` : ""}</span>
         ${when.relative ? `<span class="seeker-time" title="${when.full}">${when.relative}</span>` : ""}
       </div>
       ${when.full ? `<div class="seeker-datetime muted">${when.full}</div>` : ""}
@@ -482,58 +472,77 @@ function formatSeekerTime(iso) {
   return { relative, full };
 }
 
-function renderRedditOverview(overview) {
-  const el = document.getElementById("reddit-overview");
-  if (!el || !overview || !overview.total_relevant) {
-    if (el) el.innerHTML = "";
+function aloneCardHtml(p) {
+  const when = formatSeekerTime(p.posted_at);
+  const author = formatSeekerAuthor(p.author);
+  const sub = p.group_name || "Reddit";
+  const snippet =
+    p.snippet && p.snippet !== p.title
+      ? `<p class="alone-snippet">${p.snippet.slice(0, 280)}${p.snippet.length > 280 ? "…" : ""}</p>`
+      : "";
+  return `
+    <article class="alone-card">
+      <div class="alone-card-top">
+        <span class="seeker-source-dot seeker-source-reddit" aria-hidden="true"></span>
+        <span class="alone-sub">${sub}</span>
+        ${author ? `<span class="alone-author muted">${author}</span>` : ""}
+        ${when.relative ? `<span class="alone-time muted">${when.relative}</span>` : ""}
+      </div>
+      <h3 class="alone-title"><a href="${p.url}" target="_blank" rel="noopener noreferrer">${p.title || "—"}</a></h3>
+      ${snippet}
+    </article>`;
+}
+
+function renderAloneFeed(feed) {
+  const el = document.getElementById("alone-feed");
+  const subtitle = document.getElementById("alone-subtitle");
+  if (!el) return;
+
+  const reddit =
+    (feed && feed.reddit_posts && feed.reddit_posts.length
+      ? feed.reddit_posts
+      : (feed && feed.posts ? feed.posts.filter((p) => p.source === "reddit") : [])) || [];
+
+  const overview = feed && feed.reddit_overview;
+  const subs =
+    overview && overview.subreddits && overview.subreddits.length
+      ? overview.subreddits.join(" · ")
+      : overview && overview.subreddit
+        ? overview.subreddit
+        : "Reddit";
+
+  if (subtitle) {
+    subtitle.textContent =
+      reddit.length > 0
+        ? `${reddit.length} posts · ${subs} · hopeloos zoeken, tips, advies`
+        : "Geen recente Reddit-posts gevonden";
+  }
+
+  if (!reddit.length) {
+    el.innerHTML = `<div class="muted">Nog geen Reddit-posts in de feed. Volgende scan pakt r/eindhoven en r/NetherlandsHousing op.</div>`;
     return;
   }
-  const kindLabel = (k) =>
-    k === "seeking" ? "zoekt" : k === "offering" ? "biedt" : "bericht";
-  const renderLine = (a) => {
-    const t = formatSeekerTime(a.posted_at);
-    const budget = a.budget_eur ? ` · ≤€${a.budget_eur}` : "";
-    const loc = a.location_hint ? ` · ${a.location_hint}` : "";
-    const tag = a.kind ? `<span class="seeker-tag seeker-tag-${a.kind === "seeking" ? "seek" : a.kind === "offering" ? "offer" : "unknown"}">${kindLabel(a.kind)}</span>` : "";
-    return `<li>${tag}<a href="${a.url}" target="_blank" rel="noopener noreferrer">${a.title}</a><span class="muted"> · ${t.relative} (${t.full})${budget}${loc}</span></li>`;
-  };
-  const asks = overview.recent_asks || [];
-  const recent = overview.recent_posts || asks;
-  const askLines = recent.map(renderLine).join("");
-  const subs = (overview.subreddits && overview.subreddits.length
-    ? overview.subreddits
-    : overview.subreddit
-      ? [overview.subreddit]
-      : []
-  ).join(" · ");
-  el.innerHTML = `
-    <div class="reddit-overview-card">
-      <div class="reddit-overview-head">
-        <strong>Reddit</strong>
-        <span class="muted">${subs || "—"} · wonen in Eindhoven · titels gefilterd op relevantie</span>
-      </div>
-      <p class="reddit-overview-stats">
-        <span class="reddit-stat"><b>${overview.seeking ?? 0}</b> zoekt</span>
-        <span class="reddit-stat"><b>${overview.offering ?? 0}</b> biedt</span>
-        <span class="reddit-stat"><b>${overview.total_relevant ?? 0}</b> relevant</span>
-      </p>
-      ${recent.length ? `<ul class="reddit-ask-list">${askLines}</ul>` : ""}
-    </div>`;
+
+  el.innerHTML = reddit.map(aloneCardHtml).join("");
+}
+
+function renderRedditOverview(overview) {
+  /* reddit overview moved to Je bent niet alleen section */
 }
 
 function renderSeekersFeed(feed) {
   const el = document.getElementById("seekers-feed");
   const subtitle = document.getElementById("seekers-subtitle");
   if (!el) return;
-  renderRedditOverview(feed && feed.reddit_overview);
-  const posts = (feed && feed.posts) || [];
+  renderAloneFeed(feed);
+  const posts = ((feed && feed.posts) || []).filter((p) => p.source !== "reddit");
   const sources = (feed && feed.sources_active) || [];
   const seenSet = loadSeenSeekers();
   if (subtitle) {
     const src = sources.length ? sources.join(" · ") : "—";
     const newCount = posts.filter((p) => !seenSet.has(seekerPostId(p))).length;
     const newLabel = newCount ? ` · ${newCount} nieuw` : "";
-    subtitle.textContent = `${posts.length} zoekers · bronnen: ${src}${newLabel}`;
+    subtitle.textContent = `${posts.length} zoekers · bronnen: ${src}${newLabel} · zonder Reddit`;
   }
   if (!posts.length) {
     el.innerHTML = `<div class="muted">Nog geen zoekers gevonden in Eindhoven. Reddit en Marktplaats worden elke scan bijgewerkt.</div>`;
@@ -597,7 +606,7 @@ setInterval(updateDeadlineRow, 1000);
 updateDeadlineRow();
 loadRun().catch((err) => {
   const headline = document.getElementById("headline-status");
-  if (headline) headline.textContent = `Status: nog steeds geen woning — site error: ${err}`;
+  if (headline) headline.textContent = `Status: woning gevonden via Facebook — met huisgenoot — site error: ${err}`;
 });
 
 window.addEventListener("resize", () => {

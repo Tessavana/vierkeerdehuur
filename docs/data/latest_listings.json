@@ -5916,8 +5916,8 @@
     }
   },
   "application_status": {
-    "reacties_verstuurd": 46,
-    "bezichtigingen": 0,
+    "reacties_verstuurd": "180+",
+    "bezichtigingen": 2,
     "kijkavonden": 2,
     "rejections": 3,
     "no_response": 4,
@@ -5927,7 +5927,7 @@
     ],
     "sociale_huur": {
       "platform": "Wooniezie",
-      "inschrijfduur": "4 jaar en 3 maanden",
+      "inschrijfduur": "4 jaar en 5 maanden",
       "reacties_verstuurd": "230+",
       "actief_gezocht": "2 jaar",
       "bezichtigingen": 0

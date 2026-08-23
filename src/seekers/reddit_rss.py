@@ -104,7 +104,7 @@ def fetch_reddit_seekers() -> list[SeekerPost]:
             if post:
                 out.append(post)
     out.sort(key=lambda p: p.posted_at or "", reverse=True)
-    return out[: int(os.getenv("REDDIT_SEEKER_MAX", "25"))]
+    return out[: int(os.getenv("REDDIT_SEEKER_MAX", "40"))]
 
 
 def build_reddit_overview(posts: list[SeekerPost]) -> dict:

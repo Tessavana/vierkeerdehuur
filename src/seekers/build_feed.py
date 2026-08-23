@@ -128,12 +128,15 @@ def build_seekers_feed() -> dict:
     if reddit_merged and "reddit" not in sources_ok:
         sources_ok.append("reddit")
 
+    reddit_alone = [p for p in merged if p.source == "reddit" and p.kind == "seeking"]
+
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "sources_active": sources_ok,
         "total": len(display),
         "seeking_count": len(seeking),
         "reddit_overview": build_reddit_overview(reddit_merged),
+        "reddit_posts": [p.to_dict() for p in reddit_alone],
         "posts": [p.to_dict() for p in display],
         "notes": (
             "Automatisch: Reddit (r/eindhoven, r/NetherlandsHousing) + Marktplaats. "

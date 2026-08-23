@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vier keer de huur</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="./styles.css?v=20260823d" />
+    <link rel="stylesheet" href="./styles.css?v=20260823f" />
   </head>
   <body>
     <main class="container">
@@ -25,14 +25,19 @@
             <span class="hero-deadline-label">Deadline:</span>
             Verhuizen 26 jul · <span id="deadline-countdown">—</span>
           </p>
-          <p class="hero-status" id="headline-status">Status: nog steeds geen woning🙂</p>
+          <p class="hero-status" id="headline-status">Status: woning gevonden via Facebook — met huisgenoot</p>
         </div>
+      </section>
+
+      <section class="panel alone-section">
+        <h2>Je bent niet alleen</h2>
+        <p class="muted" id="alone-subtitle">Recent op Reddit · anderen die ook hopeloos zoeken, tips vragen, advies delen</p>
+        <div id="alone-feed" class="alone-feed"></div>
       </section>
 
       <section class="panel seekers-section">
         <h2>Mensen die zoeken</h2>
         <p class="muted" id="seekers-subtitle">Live feed · alleen zoekers in Eindhoven</p>
-        <div id="reddit-overview" class="reddit-overview"></div>
         <div id="seekers-feed" class="seekers-feed"></div>
       </section>
 
@@ -83,11 +88,11 @@
         <p class="muted" id="stats-subtitle">Op basis van alles wat de scanners vinden</p>
         <div id="stats-dashboard" class="stats-dashboard"></div>
         <div class="stats-charts">
-          <div class="chart-block">
+          <div class="chart-block market-stack-card">
             <h3>Huurverdeling</h3>
             <canvas id="price-chart" width="560" height="220" aria-label="Huurverdeling"></canvas>
           </div>
-          <div class="chart-block">
+          <div class="chart-block market-stack-card">
             <h3>Per platform</h3>
             <div id="platform-breakdown" class="platform-breakdown"></div>
           </div>
@@ -96,6 +101,6 @@
     </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="./app.js?v=20260823e"></script>
+    <script src="./app.js?v=20260823f"></script>
   </body>
 </html>

@@ -259,7 +259,10 @@ h3 { margin: 0 0 8px; font-size: 18px; }
   grid-template-columns: 1.4fr 1fr;
   gap: 20px;
 }
-.chart-block h3 { margin: 0 0 8px; font-size: 15px; font-weight: 700; }
+.chart-block.market-stack-card {
+  margin: 0;
+}
+.chart-block h3 { margin: 0 0 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
 #price-chart { width: 100%; max-width: 100%; height: 220px; display: block; }
 .platform-breakdown { display: flex; flex-direction: column; gap: 8px; }
 .platform-row {
@@ -343,12 +346,61 @@ h3 { margin: 0 0 8px; font-size: 18px; }
 .seeker-tag-seek { background: #171717; color: #fff; }
 .seeker-tag-offer { background: #fff; color: #171717; }
 .seeker-tag-new { background: #fff; color: #171717; font-size: 10px; }
-.seeker-source { font-weight: 600; color: #444; }
+.seeker-source { font-weight: 600; color: #444; display: inline-flex; align-items: center; gap: 6px; }
+.seeker-source-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  background: #171717;
+}
+.seeker-source-reddit { background: #171717; }
+.seeker-source-marktplaats { background: #8a7200; }
+.seeker-source-facebook { background: #444; }
+.seeker-source-other { background: #999; }
 .seeker-time { margin-left: auto; }
 .seeker-title { margin: 0 0 6px; font-size: 16px; line-height: 1.35; font-weight: 700; }
 .seeker-snippet { margin: 0 0 6px; font-size: 13px; line-height: 1.45; }
 .seeker-meta { font-size: 12px; margin-bottom: 6px; }
 .seeker-link { font-size: 13px; font-weight: 700; color: #171717; }
+
+.alone-section { margin-bottom: 14px; }
+.alone-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.alone-card {
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: #fafafa;
+}
+.alone-card-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.alone-sub { font-weight: 700; }
+.alone-author { font-size: 12px; }
+.alone-time { margin-left: auto; font-size: 12px; }
+.alone-title {
+  margin: 0 0 6px;
+  font-size: 16px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+.alone-title a { color: #171717; text-decoration: none; }
+.alone-title a:hover { text-decoration: underline; }
+.alone-snippet {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #666;
+}
 
 @media (min-width: 900px) {
   .hero { padding-right: 200px; }

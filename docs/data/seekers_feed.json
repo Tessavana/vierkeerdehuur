@@ -57,6 +57,36 @@
       }
     ]
   },
+  "reddit_posts": [
+    {
+      "id": "reddit-anyone_currently_living_at_xior_zernikestraat",
+      "source": "reddit",
+      "kind": "seeking",
+      "title": "Anyone currently living at Xior Zernikestraat? Looking for honest reviews on facilities.",
+      "snippet": "I'm moving to Eindhoven and have an offer from Xior on Zernikestraat. I know the housing market here is brutal and options are limited, but after reading several negative reviews online and hearing mixed feedback from people who've lived in Xior properties, I'm feeling pretty skeptical.",
+      "url": "https://www.reddit.com/r/eindhoven/comments/1vrgrxo/anyone_currently_living_at_xior_zernikestraat/",
+      "author": "/u/arqa977",
+      "posted_at": "2026-08-18T06:05:19+00:00",
+      "budget_eur": null,
+      "location_hint": "Eindhoven",
+      "group_name": "r/eindhoven",
+      "relevance_score": 115
+    },
+    {
+      "id": "reddit-what_are_the_best_ways_to_find_private_landlords",
+      "source": "reddit",
+      "kind": "seeking",
+      "title": "What are the best ways to find private landlords around Eindhoven?",
+      "snippet": "Looking for advice and recommendations. A young working couple is struggling to find accommodation despite having stable income and a guarantor.",
+      "url": "https://www.reddit.com/r/eindhoven/comments/1vqvre4/what_are_the_best_ways_to_find_private_landlords/",
+      "author": "/u/OrionEngineering",
+      "posted_at": "2026-08-17T15:36:43+00:00",
+      "budget_eur": null,
+      "location_hint": "Eindhoven",
+      "group_name": "r/eindhoven",
+      "relevance_score": 75
+    }
+  ],
   "posts": [
     {
       "id": "marktplaats-m2419688566",
